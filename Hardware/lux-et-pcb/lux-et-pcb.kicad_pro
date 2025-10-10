@@ -131,7 +131,7 @@
         "min_track_width": 0.12,
         "min_via_annular_width": 0.1,
         "min_via_diameter": 0.3,
-        "solder_mask_to_copper_clearance": 0.0,
+        "solder_mask_to_copper_clearance": 0.005,
         "use_height_for_length_calcs": true
       },
       "teardrop_options": [
@@ -179,6 +179,7 @@
       ],
       "track_widths": [
         0.0,
+        0.0,
         0.2,
         0.3,
         0.4,
@@ -220,6 +221,10 @@
         {
           "diameter": 0.0,
           "drill": 0.0
+        },
+        {
+          "diameter": 0.6,
+          "drill": 0.3
         }
       ],
       "zones_allow_external_fillets": false
@@ -491,6 +496,7 @@
       "SDA": "rgb(27, 255, 17)",
       "TX0": "rgb(27, 255, 17)",
       "VCC": "rgb(255, 105, 82)",
+      "V_REG": "rgb(255, 145, 222)",
       "Vin": "rgb(255, 105, 82)"
     },
     "netclass_assignments": null,

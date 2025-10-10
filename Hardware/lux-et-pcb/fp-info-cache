@@ -1,4 +1,4 @@
-24818330097008443
+24820090212721204
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -66037,6 +66037,13 @@ U-PDFN-8_L6.0-W8.0-P1.27-BL
 0
 8
 8
+Library
+USB-C-SMD_GT-USB-7101A
+
+
+0
+10
+9
 Library
 microSD
 
