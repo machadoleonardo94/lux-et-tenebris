@@ -1,4 +1,4 @@
-24820090212721204
+24823610588521829
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -65950,6 +65950,20 @@ Library
 GY-NEO-6M
 
 
+0
+6
+5
+Library
+Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical
+Hirose DF13C SMD, CL535-0404-8-51, 4 Pins per row (https://www.hirose.com/product/en/products/DF13/DF13C-10P-1.25V%2851%29/), generated with kicad-footprint-generator
+connector Hirose DF13C vertical
+0
+6
+5
+Library
+JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal
+JST GH series connector, SM04B-GHS-TB (http://www.jst-mfg.com/product/pdf/eng/eGH.pdf), generated with kicad-footprint-generator
+connector JST GH horizontal
 0
 6
 5

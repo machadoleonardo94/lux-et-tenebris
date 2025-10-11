@@ -3037,6 +3037,244 @@
 				)
 			)
 		)
+		(symbol "New_Library:Conn_01x04_Socket"
+			(pin_names
+				(offset 1.016) hide)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "J"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x04_Socket"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Library:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x04, script generated"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Conn_01x04_Socket_1_1"
+				(arc
+					(start 0 -4.572)
+					(mid -0.5058 -5.08)
+					(end 0 -5.588)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -2.032)
+					(mid -0.5058 -2.54)
+					(end 0 -3.048)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -5.08) (xy -0.508 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy -0.508 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy -0.508 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.54) (xy -0.508 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 0.508)
+					(mid -0.5058 0)
+					(end 0 -0.508)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 3.048)
+					(mid -0.5058 2.54)
+					(end 0 2.032)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+		)
 		(symbol "New_Library:TP4056"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -7204,16 +7442,6 @@
 	)
 	(wire
 		(pts
-			(xy 251.46 74.93) (xy 248.92 74.93)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4220ac1f-0883-43f8-ada3-1b44db8de508")
-	)
-	(wire
-		(pts
 			(xy 130.81 128.27) (xy 130.81 130.81)
 		)
 		(stroke
@@ -7491,16 +7719,6 @@
 			(type default)
 		)
 		(uuid "623dd64b-daee-4f77-8c9d-94720a6e6152")
-	)
-	(wire
-		(pts
-			(xy 251.46 49.53) (xy 248.92 49.53)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "62ba39d2-1ce3-4062-b82b-3c4817434258")
 	)
 	(wire
 		(pts
@@ -7824,13 +8042,13 @@
 	)
 	(wire
 		(pts
-			(xy 251.46 77.47) (xy 248.92 77.47)
+			(xy 248.92 72.39) (xy 251.46 72.39)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "8593583f-5317-4a5a-b5c3-5a46ea9a832f")
+		(uuid "863ff496-a33c-41bc-a122-7a64b79f3cb3")
 	)
 	(wire
 		(pts
@@ -8181,6 +8399,16 @@
 			(type default)
 		)
 		(uuid "a7f1a6f1-2602-4bd1-af29-eab18c000448")
+	)
+	(wire
+		(pts
+			(xy 248.92 74.93) (xy 251.46 74.93)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a8ba30c1-1697-4f9e-92bb-512cc145b7de")
 	)
 	(wire
 		(pts
@@ -8661,6 +8889,16 @@
 			(type default)
 		)
 		(uuid "ed4fa5cb-2340-4c0c-a378-61e62d6f8694")
+	)
+	(wire
+		(pts
+			(xy 248.92 77.47) (xy 251.46 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee0b9e66-2e32-41d7-8a21-2e2b0d1c0018")
 	)
 	(wire
 		(pts
@@ -9265,7 +9503,7 @@
 	)
 	(global_label "CH1"
 		(shape input)
-		(at 251.46 49.53 0)
+		(at 251.46 77.47 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9275,7 +9513,7 @@
 		)
 		(uuid "4d54d9c6-a567-41d3-b954-dcd4a344230c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 258.2552 49.53 0)
+			(at 258.2552 77.47 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9705,7 +9943,7 @@
 	)
 	(global_label "CH2"
 		(shape input)
-		(at 251.46 77.47 0)
+		(at 251.46 74.93 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9715,7 +9953,7 @@
 		)
 		(uuid "c1160393-8147-4d82-84a4-7cae7160e9bf")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 258.2552 77.47 0)
+			(at 258.2552 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9815,7 +10053,7 @@
 	)
 	(global_label "CH3"
 		(shape input)
-		(at 251.46 74.93 0)
+		(at 251.46 72.39 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9825,7 +10063,7 @@
 		)
 		(uuid "d969355f-18cc-4fdd-bb1b-2d4d25709851")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 258.2552 74.93 0)
+			(at 258.2552 72.39 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12915,7 +13153,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Connector_Hirose:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
+		(property "Footprint" "Library:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
 			(at 261.62 31.75 0)
 			(effects
 				(font
@@ -12991,7 +13229,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Connector_Hirose:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
+		(property "Footprint" "Library:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
 			(at 184.15 68.58 0)
 			(effects
 				(font
@@ -21429,7 +21667,7 @@
 		)
 	)
 	(symbol
-		(lib_id "Connector:Conn_01x04_Socket")
+		(lib_id "New_Library:Conn_01x04_Socket")
 		(at 187.96 36.83 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -21456,7 +21694,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Connector_Hirose:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
+		(property "Footprint" "Library:Hirose_DF13C_CL535-0404-8-51_1x04-1MP_P1.25mm_Vertical"
 			(at 187.96 36.83 0)
 			(effects
 				(font
