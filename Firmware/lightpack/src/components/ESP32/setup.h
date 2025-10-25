@@ -21,14 +21,14 @@ void setup_ESP32()
     pinMode(buttonA, INPUT);
     pinMode(buttonB, INPUT);
     pinMode(prog_switch, INPUT);
-    pinMode(CC_output, OUTPUT);
+    // pinMode(CC_output, OUTPUT);
     pinMode(openDrain_output1, OUTPUT);
     pinMode(openDrain_output2, OUTPUT);
-    pinMode(openDrain_output3, OUTPUT);
-    digitalWrite(CC_output, LOW);
+    // pinMode(openDrain_output3, OUTPUT);
+    // digitalWrite(CC_output, LOW);
     digitalWrite(openDrain_output1, LOW);
     digitalWrite(openDrain_output2, LOW);
-    digitalWrite(openDrain_output3, LOW);
+    // digitalWrite(openDrain_output3, LOW);
 
     setup_OTA();
 
