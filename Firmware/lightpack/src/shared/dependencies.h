@@ -7,8 +7,6 @@
 
 #define firmware_version 1
 
-#define EQUIPAHA
-
 //? ---------------------- Framework --------------------------
 #include <Arduino.h>
 

@@ -15,7 +15,8 @@ void setup()
   setup_ESP32();   //* Enables WiFi modem, disables BLE, enables watchdog
   setup_DISPLAY(); //* Enables debug display
   setup_WS2812B(); //* Enables debug WS2812B LED
-  setup_WIFI();    //* Setups AP for control
+  // setup_WIFI();    //* Setups AP for control
+  WiFi.mode(WIFI_OFF); //* Disable WiFi for lower power consumption
 
   Serial.println("\n---------------------------------------------------");
   Serial.println("----------------  END OF SETUP --------------------");
@@ -27,8 +28,22 @@ void loop()
 {
   ArduinoOTA.handle();
 
-  update_channel1_states();
-  update_channel2_states();
-  update_channel3_states();
+  update_channel0_states();
+  // update_channel1_states();
+  // update_channel2_states();
+  // update_channel3_states();
   serial_outputs();
+  esp_task_wdt_reset();
+
+  if (digitalRead(prog_switch) == LOW)
+  {
+    uint32_t pressStart = millis();
+    while (!digitalRead(prog_switch))
+      if (millis() - pressStart > 2000) // Check if it was held for 2 seconds
+        break;
+    if (millis() - pressStart < 2000) // Check if it was held for 2 seconds
+      return;
+    Serial.println("[MAIN] Program switch detected! Restarting...");
+    ESP.restart();
+  }
 }

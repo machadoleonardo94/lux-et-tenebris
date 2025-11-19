@@ -4,16 +4,45 @@
 #include "shared/dependencies.h"
 
 void update_rgb_values(uint8_t colorCode);
+void update_channel0_states();
 void update_channel1_states();
 void update_channel2_states();
 void update_channel3_states();
 
-void update_rgb_values(uint8_t stripAdress)
+void update_strip_color(uint8_t stripAdress)
 {
     strip[stripAdress].red = (strip[stripAdress].color & 0x1) ? strip[stripAdress].brightness : 0;
     strip[stripAdress].green = (strip[stripAdress].color & 0x2) ? strip[stripAdress].brightness : 0;
     strip[stripAdress].blue = (strip[stripAdress].color & 0x4) ? strip[stripAdress].brightness : 0;
     return;
+}
+
+void update_channel0_states()
+{
+    if (millis() - onboard_led.update_time < 10)
+        return;
+    onboard_led.update_time = millis();
+
+    float brightness = 30;
+    // brightness = sin(((millis() * (2 * PI)) / 1500.0)) * 30 + 30;
+    onboard_led.brightness = constrain(brightness, 0, 150);
+    onboard_led.color = millis() / 1500 % 7 + 1; // Change color every 1500ms
+    bool hasRed = onboard_led.color & 0x1;
+    bool hasGreen = onboard_led.color & 0x2;
+    bool hasBlue = onboard_led.color & 0x4;
+    uint8_t numColors = hasRed + hasGreen + hasBlue; // Normalizes intensity based on number of active colors
+    uint8_t fade = 15;
+    onboard_led.red = hasRed ? onboard_led.brightness / numColors : 0;
+    onboard_led.green = hasGreen ? onboard_led.brightness / numColors : 0;
+    onboard_led.blue = hasBlue ? onboard_led.brightness / numColors : 0;
+
+    onboard_led.index = millis() / 150 % ONBOARD_LEDS + ONBOARD_LEDS; // Tagets a pixel between 0 and ONBOARD_LEDS every 150ms, plus offset
+
+    onboard_circle.setPixelColor(onboard_led.index % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red, onboard_led.green, onboard_led.blue));
+    onboard_circle.setPixelColor((onboard_led.index - 1) % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red / fade, onboard_led.green / fade, onboard_led.blue / fade));
+    onboard_circle.setPixelColor((onboard_led.index - 2) % ONBOARD_LEDS, onboard_circle.Color(0, 0, 0));
+
+    onboard_circle.show(); // update to the WS2812B Led Strip
 }
 
 void update_channel1_states()
@@ -24,7 +53,7 @@ void update_channel1_states()
 
     for (int i = 0; i < 8; i++)
     {
-        update_rgb_values(ZONAS);
+        update_strip_color(ZONAS);
         led_zonas.setPixelColor(i, led_zonas.Color(strip[ZONAS].red, strip[ZONAS].green, strip[ZONAS].blue));
         led_zonas.show(); // update to the WS2812B Led Strip
         strip[ZONAS].color++;
@@ -50,7 +79,7 @@ void update_channel2_states()
     static uint8_t direction = 1;
     for (int i = 0; i < 4; i++)
     {
-        update_rgb_values(BAR1);
+        update_strip_color(BAR1);
         if (i != empty_pos)
             led_bar1.setPixelColor(i, led_bar1.Color(strip[BAR1].red, strip[BAR1].green, strip[BAR1].blue));
         else
@@ -80,7 +109,7 @@ void update_channel3_states()
 
     for (int i = 0; i < 4; i++)
     {
-        update_rgb_values(BAR2);
+        update_strip_color(BAR2);
         if (i != empty_pos)
             led_bar2.setPixelColor(i, led_bar2.Color(strip[BAR2].red, strip[BAR2].green, strip[BAR2].blue));
         else

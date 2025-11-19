@@ -23,8 +23,10 @@ typedef struct ledstrip
     uint8_t color = 0;
     uint8_t brightness = 25;
     uint32_t update_time = 50;
+    int8_t index = 0;
 } struct_ledstrip;
 
+struct_ledstrip onboard_led;
 struct_ledstrip strip[3];
 #define ZONAS 0
 #define BAR1 1

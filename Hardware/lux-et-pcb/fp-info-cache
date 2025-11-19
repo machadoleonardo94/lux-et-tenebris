@@ -1,4 +1,4 @@
-24827131512365649
+24828894487625815
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -65939,6 +65939,13 @@ DFN-6_L1.5-W1.0-P0.50-TL
 0
 6
 6
+Library
+Display_1602_2004
+
+
+0
+40
+16
 Library
 ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP
 
