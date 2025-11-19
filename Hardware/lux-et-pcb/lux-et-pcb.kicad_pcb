@@ -5782,7 +5782,7 @@
 				)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "2.2k"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "f7c3dfee-16d0-4ac0-ba4e-1f2c1b19ad14")
@@ -5845,7 +5845,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C11702"
+		(property "LCSC" "C17520"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -7858,7 +7858,7 @@
 				)
 			)
 		)
-		(property "Sim.Pins" "1=D 2=G 3=S"
+		(property "Sim.Pins" "1=G 2=D 3=S"
 			(at 0 0 180)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -9035,7 +9035,7 @@
 				)
 			)
 		)
-		(property "Value" "~"
+		(property "Value" "XL4001"
 			(at -0.325 4.2085 90)
 			(layer "F.Fab")
 			(uuid "99055cfd-08f5-4852-8993-ff8839a1bfd8")
@@ -9648,7 +9648,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "0eae4eb8-7a22-475b-8ebe-422d46e29d1e")
@@ -13366,7 +13366,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "7d3ab916-a1de-4693-bc93-85cfb377364e")
@@ -15125,7 +15125,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "6d5d3ed7-4703-4e09-8e55-5a1194f8d4c0")
@@ -18024,7 +18024,7 @@
 				)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 0 1.65 0)
 			(layer "F.Fab")
 			(uuid "53aa1070-3d2e-4f71-a2ee-8a0122e3d125")
@@ -21380,7 +21380,7 @@
 				)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "a17b2e90-f230-499b-9e5d-13971d8ec15b")
@@ -21724,7 +21724,7 @@
 				)
 			)
 		)
-		(property "Value" "1k"
+		(property "Value" "2.2k"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "c97d56c5-17c3-4745-b5cc-db22b4959f91")
@@ -21787,7 +21787,7 @@
 				)
 			)
 		)
-		(property "LCSC" "C11702"
+		(property "LCSC" "C17520"
 			(at 0 0 -90)
 			(unlocked yes)
 			(layer "F.Fab")
@@ -24207,7 +24207,7 @@
 				)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "8890ba90-b159-4dd9-881c-4ed8e7f698bb")
@@ -30148,7 +30148,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 0 1.65 90)
 			(layer "F.Fab")
 			(uuid "1757e503-9ab4-4aa8-ae32-91898f6da85f")

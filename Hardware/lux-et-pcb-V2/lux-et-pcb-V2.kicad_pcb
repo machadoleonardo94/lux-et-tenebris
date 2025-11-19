@@ -4397,7 +4397,7 @@
 		(uuid "1691de90-146d-4595-846c-5d268a68e684")
 		(at 187.7275 94.345 -90)
 		(property "Reference" "U4"
-			(at 3.405 1.7275 180)
+			(at 3.405 1.7275 360)
 			(layer "F.SilkS")
 			(uuid "63c3a103-3913-487d-96da-2360c671307e")
 			(effects
@@ -4455,7 +4455,7 @@
 			)
 		)
 		(property "JLC_3DModel_Q" "61ef29b2ff5a43409194f49f83a2395a"
-			(at 0 0 -90)
+			(at 0 0 90)
 			(layer "Cmts.User")
 			(hide yes)
 			(uuid "bb68d757-771d-4229-8fd6-c5cc474e8c3c")
@@ -4467,7 +4467,7 @@
 			)
 		)
 		(property "JLC_3D_Size" "6 21.3275"
-			(at 0 0 -90)
+			(at 0 0 90)
 			(layer "Cmts.User")
 			(hide yes)
 			(uuid "bd9e9a9a-62bd-4a17-9128-8059ea797511")
@@ -4983,7 +4983,7 @@
 			(pintype "unspecified")
 			(uuid "5ef235e2-666f-45fd-93a5-7af9c84279d5")
 		)
-		(model "${KIPRJMOD}/EASYEDA_MODELS/SOP-8_L4.9-W3.9-H1.7-LS6.0-P1.30.step"
+		(model "${KICAD8_3DMODEL_DIR}/Package_SO.3dshapes/HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm.step"
 			(offset
 				(xyz 0 0 0)
 			)

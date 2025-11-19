@@ -1,0 +1,18 @@
+LTspice 24.1.5 for Windows
+Circuit: C:\GitHub\lux-et-tenebris\Simulations\Vin-enabler.net
+Start Time: Tue Nov  4 11:15:58 2025
+solver = Normal
+Maximum thread count: 8
+tnom = 27
+temp = 27
+method = trap
+Direct Newton iteration for .op point succeeded.
+Changing Tseed to 1e-08
+Changing Tseed to 1e-10
+Total elapsed time: 0.085 seconds.
+
+Files loaded:
+C:\GitHub\lux-et-tenebris\Simulations\Vin-enabler.net
+C:\Users\Leonardo\AppData\Local\LTspice\lib\cmp\standard.dio
+C:\Users\Leonardo\AppData\Local\LTspice\lib\sub\Contrib\Toshiba\LVMOS\T2N7002AK_G0_00_enc.lib
+

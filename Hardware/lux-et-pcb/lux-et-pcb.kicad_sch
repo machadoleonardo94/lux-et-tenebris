@@ -9231,7 +9231,7 @@
 		)
 		(uuid "004e169a-9cb0-495f-8bf4-d16e2dd5d813")
 	)
-	(text "To do:\n*Add enable (power saving)\n*USB-C 6 pin (cheaper)\n*0402 footprints (smaller)"
+	(text "To do:\n*Add enable (power saving)\n*USB-C 6 pin (cheaper)\n*0402 footprints (smaller)\n*Change PMOS to SOT-23"
 		(exclude_from_sim no)
 		(at 121.412 157.226 0)
 		(effects
@@ -10668,7 +10668,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 139.954 124.46 90)
 			(effects
 				(font
@@ -11753,7 +11753,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 66.04 123.952 90)
 			(effects
 				(font
@@ -13809,7 +13809,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 106.426 134.62 90)
 			(effects
 				(font
@@ -17760,7 +17760,7 @@
 				)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 178.054 26.67 90)
 			(effects
 				(font
@@ -18724,7 +18724,7 @@
 				(hide yes)
 			)
 		)
-		(property "Sim.Pins" "1=D 2=G 3=S"
+		(property "Sim.Pins" "1=G 2=D 3=S"
 			(at 40.64 33.02 0)
 			(effects
 				(font
@@ -20442,7 +20442,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 122.174 124.46 90)
 			(effects
 				(font
@@ -20936,7 +20936,7 @@
 				(justify right)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 60.452 124.206 90)
 			(effects
 				(font
@@ -21443,18 +21443,17 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "a1b2fd1d-95f8-4081-a8e8-de0f50f8c689")
 		(property "Reference" "U5"
-			(at 41.91 151.13 0)
+			(at 41.91 150.368 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "~"
-			(at 41.91 153.67 0)
+		(property "Value" "XL4001"
+			(at 41.91 152.654 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23171,7 +23170,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 157.734 124.46 90)
 			(effects
 				(font
@@ -23544,7 +23543,7 @@
 				)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 174.244 26.67 90)
 			(effects
 				(font
@@ -26761,7 +26760,7 @@
 				)
 			)
 		)
-		(property "Value" "330"
+		(property "Value" "330R"
 			(at 268.224 72.39 90)
 			(effects
 				(font
