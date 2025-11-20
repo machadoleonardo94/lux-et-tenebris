@@ -55,5 +55,6 @@
 #include "services/led_scripts.h"
 #include "services/serial_outputs.h"
 #include "services/wifi_settings.h"
+#include "services/user_interface.h"
 
 #endif

@@ -34,16 +34,5 @@ void loop()
   // update_channel3_states();
   serial_outputs();
   esp_task_wdt_reset();
-
-  if (digitalRead(prog_switch) == LOW)
-  {
-    uint32_t pressStart = millis();
-    while (!digitalRead(prog_switch))
-      if (millis() - pressStart > 2000) // Check if it was held for 2 seconds
-        break;
-    if (millis() - pressStart < 2000) // Check if it was held for 2 seconds
-      return;
-    Serial.println("[MAIN] Program switch detected! Restarting...");
-    ESP.restart();
-  }
+  check_power_button();
 }

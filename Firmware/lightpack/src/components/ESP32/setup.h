@@ -30,6 +30,8 @@ void setup_ESP32()
     digitalWrite(openDrain_output2, LOW);
     // digitalWrite(openDrain_output3, LOW);
 
+    esp_sleep_enable_ext0_wakeup(prog_switch, LOW);
+
     setup_OTA();
 
     Serial.println("[ESP32] SETUP FINISHED!");

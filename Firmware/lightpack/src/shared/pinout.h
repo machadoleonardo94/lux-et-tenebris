@@ -20,7 +20,6 @@
 //* PORT2 (buttons):
 #define buttonA 17
 #define buttonB 18
-#endif
 
 //* PORT1 (Serial0):
 #define tx_0 1
@@ -30,6 +29,6 @@
 #define i2c_sda 21
 #define i2c_scl 22
 
-#define prog_switch 0
+#define prog_switch GPIO_NUM_0 // GPIO0 is used for programming mode detection
 
 #endif // PROJECT_GLOBAL_PINOUT
