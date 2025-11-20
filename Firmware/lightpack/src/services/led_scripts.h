@@ -19,28 +19,28 @@ void update_strip_color(uint8_t stripAdress)
 
 void update_channel0_states()
 {
-    if (millis() - onboard_led.update_time < 10)
+    if (millis() - onboard_led.update_time < 5)
         return;
     onboard_led.update_time = millis();
 
-    float brightness = 30;
-    // brightness = sin(((millis() * (2 * PI)) / 1500.0)) * 30 + 30;
+    float brightness = 50;
+    // brightness = sin(((millis() * (2 * PI)) / 1500.0)) * 30 + 50;
     onboard_led.brightness = constrain(brightness, 0, 150);
-    onboard_led.color = millis() / 1500 % 7 + 1; // Change color every 1500ms
+    onboard_led.color = millis() / 1000 % 7 + 1; // Change color every 1500ms
     bool hasRed = onboard_led.color & 0x1;
     bool hasGreen = onboard_led.color & 0x2;
     bool hasBlue = onboard_led.color & 0x4;
     uint8_t numColors = hasRed + hasGreen + hasBlue; // Normalizes intensity based on number of active colors
-    uint8_t fade = 15;
     onboard_led.red = hasRed ? onboard_led.brightness / numColors : 0;
     onboard_led.green = hasGreen ? onboard_led.brightness / numColors : 0;
     onboard_led.blue = hasBlue ? onboard_led.brightness / numColors : 0;
+    uint8_t fade = 15;
 
-    onboard_led.index = millis() / 150 % ONBOARD_LEDS + ONBOARD_LEDS; // Tagets a pixel between 0 and ONBOARD_LEDS every 150ms, plus offset
+    onboard_led.index = millis() / 90 % ONBOARD_LEDS + ONBOARD_LEDS; // Tagets a pixel between 0 and ONBOARD_LEDS every 150ms, plus offset
 
     onboard_circle.setPixelColor(onboard_led.index % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red, onboard_led.green, onboard_led.blue));
     onboard_circle.setPixelColor((onboard_led.index - 1) % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red / fade, onboard_led.green / fade, onboard_led.blue / fade));
-    onboard_circle.setPixelColor((onboard_led.index - 2) % ONBOARD_LEDS, onboard_circle.Color(0, 0, 0));
+    // onboard_circle.setPixelColor((onboard_led.index - 2) % ONBOARD_LEDS, onboard_circle.Color(0, 0, 0));
 
     onboard_circle.show(); // update to the WS2812B Led Strip
 }
