@@ -9,6 +9,8 @@ void update_channel1_states();
 void update_channel2_states();
 void update_channel3_states();
 
+void light_circle();
+
 void update_strip_color(uint8_t stripAdress)
 {
     strip[stripAdress].red = (strip[stripAdress].color & 0x1) ? strip[stripAdress].brightness : 0;
@@ -23,6 +25,11 @@ void update_channel0_states()
         return;
     onboard_led.update_time = millis();
 
+    light_circle();
+}
+
+void light_circle()
+{
     float brightness = 50;
     // brightness = sin(((millis() * (2 * PI)) / 1500.0)) * 30 + 50;
     onboard_led.brightness = constrain(brightness, 0, 150);
@@ -36,11 +43,11 @@ void update_channel0_states()
     onboard_led.blue = hasBlue ? onboard_led.brightness / numColors : 0;
     uint8_t fade = 15;
 
-    onboard_led.index = millis() / 90 % ONBOARD_LEDS + ONBOARD_LEDS; // Tagets a pixel between 0 and ONBOARD_LEDS every 150ms, plus offset
+    onboard_led.index = millis() / 50 % ONBOARD_LEDS + ONBOARD_LEDS; // Tagets a pixel between 0 and ONBOARD_LEDS every 150ms, plus offset
 
     onboard_circle.setPixelColor(onboard_led.index % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red, onboard_led.green, onboard_led.blue));
     onboard_circle.setPixelColor((onboard_led.index - 1) % ONBOARD_LEDS, onboard_circle.Color(onboard_led.red / fade, onboard_led.green / fade, onboard_led.blue / fade));
-    // onboard_circle.setPixelColor((onboard_led.index - 2) % ONBOARD_LEDS, onboard_circle.Color(0, 0, 0));
+    onboard_circle.setPixelColor((onboard_led.index - 2) % ONBOARD_LEDS, onboard_circle.Color(0, 0, 0));
 
     onboard_circle.show(); // update to the WS2812B Led Strip
 }
@@ -74,7 +81,7 @@ void update_channel2_states()
     if (millis() - strip[BAR1].update_time < 350)
         return;
     strip[BAR1].update_time = millis();
-    strip[BAR1].brightness = 50; // Fixed brightness for bar1
+    strip[BAR1].brightness = 255; // Fixed brightness for bar1
     static uint8_t empty_pos = 0;
     static uint8_t direction = 1;
     for (int i = 0; i < 4; i++)
