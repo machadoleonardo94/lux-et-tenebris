@@ -32,4 +32,15 @@ struct_ledstrip strip[3];
 #define BAR1 1
 #define BAR2 2
 
+typedef struct buttonState
+{
+    bool currentState = HIGH;
+    bool lastState = HIGH;
+    uint32_t lastDebounceTime = 0;
+    uint32_t debounceDelay = 50;
+    uint8_t counter = 0;
+} struct_buttonState;
+
+struct_buttonState button_states[4]; // Assuming 4 buttons
+
 #endif // PROJECT_GLOBAL_VARIABLES
