@@ -16,6 +16,19 @@ void setup_WS2812B()
     led_bar2.begin();
     led_bar2.clear();
 
+    onboard_circle.begin();
+    onboard_circle.clear();
+
+    for (int j = 0; j < 6; j++)
+    {
+        for (int i = 0; i < ONBOARD_LEDS; i++)
+        {
+            onboard_circle.setPixelColor(i, onboard_circle.Color(0, 100 * ((j + 1) % 2), 0)); // Green color
+        }
+        onboard_circle.show();
+        delay(200);
+    }
+
     for (int zone = 0; zone < 8; zone++)
     {
         uint8_t red = (zone & 0x1) ? 50 : 0;
