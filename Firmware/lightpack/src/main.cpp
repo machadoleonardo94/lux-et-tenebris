@@ -12,11 +12,14 @@ void setup()
   Serial.println("------------------ Void Setup  --------------------");
   Serial.println("---------------------------------------------------\n");
 
-  setup_ESP32();   //* Enables WiFi modem, disables BLE, enables watchdog
-  setup_DISPLAY(); //* Enables debug display
-  setup_WS2812B(); //* Enables debug WS2812B LED
-  // setup_WIFI();    //* Setups AP for control
-  WiFi.mode(WIFI_OFF); //* Disable WiFi for lower power consumption
+  setup_ESP32();       //* Enables WiFi modem, disables BLE, enables watchdog
+  setup_12V_sources(); //* Enables 12V power sources
+  setup_DISPLAY();     //* Enables debug display
+  setup_WS2812B();     //* Enables debug WS2812B LED
+  majora.begin();
+  majora.clear();
+  setup_WIFI(); //* Setups AP for control
+  // WiFi.mode(WIFI_OFF); //* Disable WiFi for lower power consumption
 
   Serial.println("\n---------------------------------------------------");
   Serial.println("----------------  END OF SETUP --------------------");
@@ -29,6 +32,7 @@ void loop()
   ArduinoOTA.handle();
 
   update_channel0_states();
+  run_majoras();
   // update_channel1_states();
   // update_channel2_states();
   // update_channel3_states();

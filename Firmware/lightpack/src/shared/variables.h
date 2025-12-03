@@ -27,6 +27,7 @@ typedef struct ledstrip
 } struct_ledstrip;
 
 struct_ledstrip onboard_led;
+struct_ledstrip majora_strip;
 struct_ledstrip strip[3];
 #define ZONAS 0
 #define BAR1 1

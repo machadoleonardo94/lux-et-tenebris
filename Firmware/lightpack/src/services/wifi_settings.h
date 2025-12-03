@@ -91,7 +91,7 @@ bool setup_WIFI(bool portal_enabled)
 
         wifiManager.setConfigPortalTimeout(portal_enabled ? 60 : 1);
 
-        String hostname = "Lightpack Devkit";
+        String hostname = "Lightpack-Devkit";
 
         wifiManager.setHostname(hostname);
 
@@ -122,6 +122,9 @@ bool setup_WIFI(bool portal_enabled)
                       macAdress[0], macAdress[1], macAdress[2],
                       macAdress[3], macAdress[4], macAdress[5]);
     }
+
+    String current_hostname = WiFi.getHostname();
+    Serial.printf("Hostname: %s\n", current_hostname.c_str());
 
     // Save credentials
     saveCredentials(WiFi.SSID().c_str(), WiFi.psk().c_str());

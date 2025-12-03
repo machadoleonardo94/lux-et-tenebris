@@ -3,15 +3,28 @@
 
 #include "shared/dependencies.h"
 
+void setup_12V_sources();
 void update_rgb_values(uint8_t colorCode);
+void light_circle();
 void update_channel0_states();
 void update_channel1_states();
 void update_channel2_states();
 void update_channel3_states();
+void run_majoras();
 
-void light_circle();
+void setup_12V_sources()
+{
+    pinMode(CC_output, OUTPUT);
+    digitalWrite(CC_output, LOW); // Disables 12V power controled current source (up to 600mA)
+    pinMode(openDrain_output1, OUTPUT);
+    digitalWrite(openDrain_output1, LOW); // Disable open drain output 1 (R)
+    pinMode(openDrain_output2, OUTPUT);
+    digitalWrite(openDrain_output2, LOW); // Disable open drain output 2 (G)
+    pinMode(openDrain_output3, OUTPUT);
+    digitalWrite(openDrain_output3, LOW); // Disable open drain output 3 (B)
+}
 
-void update_strip_color(uint8_t stripAdress)
+void update_rgb_values(uint8_t stripAdress)
 {
     strip[stripAdress].red = (strip[stripAdress].color & 0x1) ? strip[stripAdress].brightness : 0;
     strip[stripAdress].green = (strip[stripAdress].color & 0x2) ? strip[stripAdress].brightness : 0;
@@ -21,7 +34,7 @@ void update_strip_color(uint8_t stripAdress)
 
 void update_channel0_states()
 {
-    if (millis() - onboard_led.update_time < 5)
+    if (millis() - onboard_led.update_time < 10)
         return;
     onboard_led.update_time = millis();
 
@@ -52,28 +65,42 @@ void light_circle()
     onboard_circle.show(); // update to the WS2812B Led Strip
 }
 
+void run_majoras()
+{
+    static uint32_t lastUpdate = 0;
+    if (millis() - lastUpdate < 10)
+        return;
+    lastUpdate = millis();
+    static uint8_t step = 0; // From 0 to 127 positions
+    uint8_t red = 0;
+    uint8_t green = 0;
+    uint8_t blue = 0;
+
+    for (int i = 0; i < MAJORAS_LEDS - 2; i++)
+    {
+        float sin1 = sin(((millis() * (2 * PI)) / 1500.0));
+        float sin2 = sin(((millis() * (2 * PI)) / 4000.0));
+        float sin3 = sin(((millis() * (2 * PI)) / 1200.0));
+
+        red = 30 + 40 * (sin1 > 0 ? sin1 : 0);
+        green = 10 + 70 * (sin2 > 0 ? sin2 : 0);
+        blue = 20 + 70 * (sin3 > 0 ? sin3 : 0);
+
+        majora.setPixelColor(i, majora.Color(red, green, blue));
+    }
+    majora.setPixelColor(MAJORAS_LEDS - 2, red, 0, 0);
+    majora.setPixelColor(MAJORAS_LEDS - 1, red, 0, 0);
+    majora.show();
+    // Serial.printf("[MAJORA] Step %d executed.\n", step);
+
+    step = (step + 1) % 127;
+}
+
 void update_channel1_states()
 {
     if (millis() - strip[ZONAS].update_time < 100)
         return;
     strip[ZONAS].update_time = millis();
-
-    for (int i = 0; i < 8; i++)
-    {
-        update_strip_color(ZONAS);
-        led_zonas.setPixelColor(i, led_zonas.Color(strip[ZONAS].red, strip[ZONAS].green, strip[ZONAS].blue));
-        led_zonas.show(); // update to the WS2812B Led Strip
-        strip[ZONAS].color++;
-        if (strip[ZONAS].color > 7) // If last 3 bits are zero, go back to red
-            strip[ZONAS].color = 1;
-    }
-    strip[ZONAS].color %= 8;
-
-    // Brightness oscillates between 20 and 120 with a period of 4 seconds
-    strip[ZONAS].brightness = 70 + 50 * sin(((millis() * (2 * PI)) / 4000.0));
-    // Serial.printf("Brightness ZONAS: %d \n", strip[ZONAS].brightness);
-    //   if (strip[ZONAS].brightness >= 120)
-    //       strip[ZONAS].brightness = 5;
 }
 
 void update_channel2_states()
@@ -81,28 +108,6 @@ void update_channel2_states()
     if (millis() - strip[BAR1].update_time < 350)
         return;
     strip[BAR1].update_time = millis();
-    strip[BAR1].brightness = 255; // Fixed brightness for bar1
-    static uint8_t empty_pos = 0;
-    static uint8_t direction = 1;
-    for (int i = 0; i < 4; i++)
-    {
-        update_strip_color(BAR1);
-        if (i != empty_pos)
-            led_bar1.setPixelColor(i, led_bar1.Color(strip[BAR1].red, strip[BAR1].green, strip[BAR1].blue));
-        else
-            led_bar1.setPixelColor(i, 0, 0, 0); // turn off the "empty" pixel
-        led_bar1.show();                        // update to the WS2812B Led Strip
-    }
-
-    empty_pos += direction;
-    if (empty_pos == 3 || empty_pos == 0)
-    {
-        direction = -direction;
-        strip[BAR1].color++;
-    }
-
-    if (strip[BAR1].color > 15)
-        strip[BAR1].color -= 7;
 }
 
 void update_channel3_states()
@@ -110,30 +115,6 @@ void update_channel3_states()
     if (millis() - strip[BAR2].update_time < 150)
         return;
     strip[BAR2].update_time = millis();
-    strip[BAR2].brightness = 25; // Fixed brightness for bar2
-    static uint8_t empty_pos = 0;
-    static uint8_t direction = 1;
-
-    for (int i = 0; i < 4; i++)
-    {
-        update_strip_color(BAR2);
-        if (i != empty_pos)
-            led_bar2.setPixelColor(i, led_bar2.Color(strip[BAR2].red, strip[BAR2].green, strip[BAR2].blue));
-        else
-            led_bar2.setPixelColor(i, 0, 0, 0); // turn off the "empty" pixel
-        led_bar2.show();                        // update to the WS2812B Led Strip
-    }
-
-    empty_pos += direction;
-    if (empty_pos == 3 || empty_pos == 0)
-    {
-        direction = -direction;
-        strip[BAR2].color++;
-    }
-
-    // strip[BAR2].color++;
-    if (strip[BAR2].color > 15)
-        strip[BAR2].color -= 7;
 }
 
 #endif // SERVICE_LED_SCRIPTS

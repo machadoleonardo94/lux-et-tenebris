@@ -10,12 +10,14 @@
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 #define ONBOARD_LEDS 6
+#define MAJORAS_LEDS 28
 
 //* Fancy LED WS2812B
-Adafruit_NeoPixel onboard_circle(ONBOARD_LEDS, WS_channel0, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led_zonas(8, WS_channel1, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led_bar1(4, WS_channel2, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel led_bar2(4, WS_channel3, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel onboard_circle(ONBOARD_LEDS, WS_channel0, NEO_GRB + NEO_KHZ800); // Embeddeed WS2812B ring on devkit board
+Adafruit_NeoPixel majora(MAJORAS_LEDS, WS_channel2, NEO_RGB + NEO_KHZ800);         // 5mm PTH LEDs on Majora's Mask
+// Adafruit_NeoPixel led_zonas(8, WS_channel1, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel led_bar1(4, WS_channel2, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel led_bar2(4, WS_channel3, NEO_GRB + NEO_KHZ800);
 
 //* Preferences (NVS)
 Preferences preferences;

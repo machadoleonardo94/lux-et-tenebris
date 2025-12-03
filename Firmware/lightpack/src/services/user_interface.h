@@ -19,6 +19,7 @@ void check_power_button()
     // Check for long press to enter deep sleep
     if (button_states[0].currentState == LOW && (millis() - button_states[0].lastDebounceTime) > 1000)
     {
+        Serial.println("[MAIN] Program switch detected! Deep sleep mode activated...");
         // Indicate deep sleep mode with LED blink
         for (int j = 0; j < 10; j++)
         {
@@ -29,7 +30,12 @@ void check_power_button()
             onboard_circle.show();
             delay(150);
         }
-        Serial.println("[MAIN] Program switch detected! Deep sleep mode activated...");
+        for (int i = 0; i < MAJORAS_LEDS; i++)
+        {
+            majora.setPixelColor(i, 0); // Turn off LEDs
+        }
+        majora.show();
+
         while (digitalRead(prog_switch) == LOW)
             ;
         esp_deep_sleep_start();
