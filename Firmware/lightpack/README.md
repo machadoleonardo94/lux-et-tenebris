@@ -26,7 +26,7 @@ Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller
 - **SSD1306 OLED Display** (128x64, I2C)
 - **WS2812B LED Strips** (up to 4 channels)
 - **RGB LED Strips** (compatible with open drain outputs)
-- **Push Buttons** (2x on PORT2, 1x programming switch)
+- **Push Buttons** (1x programming switch, 1x reset, 2x optional for external buttons )
 
 ### Pinout Configuration
 
@@ -41,9 +41,9 @@ Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller
 #### I/O Ports
 | Port  | GPIO Pins        | Function             |
 |-------|------------------|----------------------|
-| PORT1 | TX0(1), RX0(3)   | Serial Communication |
-| PORT2 | 17, 18           | Button Inputs (A, B) |
-| PORT3 | 21(SDA), 22(SCL) | I2C Bus (Display)    |
+| PORT1 | GND, TX0(1), RX0(3), 5V in   | Serial Communication |
+| PORT2 | GND, 18, 17, 3V3 out         | Button Inputs (A, B) |
+| PORT3 | GND, 22(SCL),21(SDA), 3V3 out | I2C Bus (Display)   |
 
 #### Additional I/O
 - **CC Output**: GPIO 13 - Controlled current output for power hungry LED
