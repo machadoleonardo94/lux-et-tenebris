@@ -31,7 +31,7 @@ void loop()
 {
   ArduinoOTA.handle();
 
-  update_channel0_states();
+  update_onboard_circle_state();
   run_majoras();
   // update_channel1_states();
   // update_channel2_states();

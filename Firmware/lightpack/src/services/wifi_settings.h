@@ -109,6 +109,8 @@ bool setup_WIFI(bool portal_enabled)
 
     if (!connected)
     {
+        blink_circle(0x1, 3, 200); // Blink RGB LED in red 3 times
+        WiFi.mode(WIFI_OFF);       // Turns off wifi for power saving
         return false;
     }
 
@@ -131,7 +133,7 @@ bool setup_WIFI(bool portal_enabled)
 
     // Start our persistent device portal (available at http://<localIP>/ )
     // startWebPortal();
-
+    blink_circle(0x4, 3, 200); // Blink RGB LED in blue 3 times
     return true;
 }
 

@@ -11,15 +11,7 @@ void setup_WS2812B()
     onboard_circle.begin();
     onboard_circle.clear();
 
-    for (int j = 0; j < 6; j++)
-    {
-        for (int i = 0; i < ONBOARD_LEDS; i++)
-        {
-            onboard_circle.setPixelColor(i, onboard_circle.Color(0, 100 * ((j + 1) % 2), 0)); // Green color
-        }
-        onboard_circle.show();
-        delay(200);
-    }
+    blink_circle(0x7, 2, 100); // Blink RGB LED in white 2 times to indicate WS2812B setup
 
     Serial.println("[WS2812B] SETUP FINISHED!");
 }

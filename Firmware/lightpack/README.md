@@ -57,7 +57,7 @@ Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller
    - Install via [VS Code Extension](https://platformio.org/install/ide?install=vscode) or
    - Install [PlatformIO Core](https://docs.platformio.org/en/latest/core/installation.html)
 
-2. **USB Drivers** for ESP32 (CP210x or CH340)
+2. **USB Drivers** for USB-Serial converter (CP210x or CH340)
 
 ### Installation
 
@@ -206,10 +206,8 @@ Press and hold the **programming switch (GPIO 0)** for more than 1 second to ent
 
 ### Power Consumption
 
-For lower power consumption, you can disable WiFi in `main.cpp`:
-```cpp
-WiFi.mode(WIFI_OFF);
-```
+For lower power consumption, you can disable WiFi via clicking tree times on the prog button.
+For turning it back on, simply click tree times again.
 
 ## 🤝 Contributing
 
