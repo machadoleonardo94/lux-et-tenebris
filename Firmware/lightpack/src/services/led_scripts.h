@@ -60,9 +60,9 @@ void run_majoras()
         float sin2 = sin(((millis() * (2 * PI)) / 4000.0));
         float sin3 = sin(((millis() * (2 * PI)) / 1200.0));
 
-        red = 30 + 40 * (sin1 > 0 ? sin1 : 0);
-        green = 10 + 70 * (sin2 > 0 ? sin2 : 0);
-        blue = 20 + 70 * (sin3 > 0 ? sin3 : 0);
+        red = (30 + 40 * sin1 > 0 ? 30 + 40 * sin1 : 0);
+        green = (30 + 40 * sin2 > 0 ? 30 + 40 * sin2 : 0);
+        blue = (30 + 40 * sin3 > 0 ? 30 + 40 * sin3 : 0);
         uint16_t total = red + green + blue;
 
         if (i < 16) // Removes offset and dims for first 16 LEDs

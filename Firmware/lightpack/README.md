@@ -6,20 +6,29 @@
 
 Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller with OLED display, WiFi connectivity, and over-the-air (OTA) update capabilities.
 
-## 🎯 Features
+## Disclaimer
+
+### Most of the readme.md present here was writen by Clanker, as a proof of concept for fast doccumentation generation. It may not contain the newest features, but it's good enough as a placeholder. Considering that it took 2 prompts and minor fixes, time that would've been used on this document was allocated elsewere more productive, like the main features.
+
+But you know what? Using Clankers' template made the doccumentation much more enjoyable, and ended up with way more content than all of my previous projects combined, as after reading it I've managed to add tidbits that I wouldn't have written otherwise.
+
+
+## Features
 
 - **Multi-Channel WS2812B LED Control**: Control up to 4 independent addressable LED channels
-- **Open Drain Outputs**: 3 dedicated open drain outputs (GPIO 27, 26, 25) for driving RGB LED strips or other high-current loads
-- **Controlled Current Output**: Constant current output (GPIO 13) for precise LED current regulation
+- **Open Drain Outputs**: 3 dedicated open drain outputs (GPIO 25, 26, 27) for driving RGB LED strips or other high-current loads
+- **Controlled Current Output**: Constant current output (GPIO 13) for those power hungry LEDs. Also good for short-circuit protection, as the voltage drop protects your wiring and power source. Good for sensitive and prone to failure props. 
 - **WiFi Connectivity**: Built-in WiFi manager for easy network configuration
 - **OTA Updates**: Update firmware wirelessly without Serial connection
 - **OLED Display**: 0.96" SSD1306 I2C display for status information
 - **LED Effects**: Dynamic LED animations including breathing effects, color cycles, and custom patterns
 - **Power Management**: Watchdog timer and deep sleep mode support
-- **User Interface**: Physical button support with debouncing and long-press detection
+- **User Interface**: Physical button support with debouncing and long-press detection. Good for wiring a controller for switching between animations
 - **Non-Volatile Storage**: Persistent WiFi credentials and settings storage
 
-## 📋 Hardware Requirements
+## Future upgrades:
+
+## Hardware Requirements
 
 ### Main Components
 - **ESP32 Development Board** (4MB Flash)
@@ -49,9 +58,17 @@ Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller
 - **CC Output**: GPIO 13 - Controlled current output for power hungry LED
 - **Open Drain Outputs**: GPIO 27, 26, 25 - For driving RGB LED strips or other high-current loads
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
+
+0. **Getting your hardware**
+- The devkit hardware is [linked here](https://github.com/machadoleonardo94/lux-et-tenebris/tree/main/Hardware/lux-et-pcb)
+- Build your own devkit with the sourced list
+- Getting 5 soldered boards from JLCPCB should cost about $130 plus shipping
+- Soldering the componets yourself would cost $8~15 per board, and a solder stencil ($7) is higly recomended if going through that route.
+- Print your case with the provided STL files
+- Assemble a JST1.25 4P connector with +5V, GND, TX and RX pins to power-up the board
 
 1. **PlatformIO IDE** or **PlatformIO Core**
    - Install via [VS Code Extension](https://platformio.org/install/ide?install=vscode) or
@@ -73,6 +90,8 @@ platformio run
 ```
 
 3. Upload via USB (first time):
+- Connect your serial header to the 
+- Put the device on download mode (Holding the prog button during a reboot)
 ```bash
 platformio run --target upload
 ```
@@ -117,9 +136,10 @@ platformio run --target upload
 ## 🎨 LED Effects
 
 ### Onboard LED Ring (Channel 0)
-- **Circular Chase Effect**: Single LED travels around the ring with fade trail
+- **Circular Chase Effect**: Single LED travels around the ring with fade trail when offline.
 - **Color Cycling**: Automatically cycles through 7 colors (R, G, B, RG, RB, GB, RGB)
-- **Update Rate**: 50ms per step
+- **Breathing effect**: Pulses blue color if connected to the WiFi
+- **Update Rate**: 10ms per step
 
 ### Majora's Mask LEDs (Channel 2)
 - **Breathing Effect**: Smooth sine wave modulation on R, G, B channels
@@ -167,6 +187,7 @@ The firmware is compiled with optimization level `-Os` (optimize for size) and c
 - **Partitions**: min_spiffs.csv
 - **Upload Speed**: 921600 baud
 - **Monitor Speed**: 115200 baud
+If your upload device cannot handle 921600, reduce it to 115200. It will upload slower, but consistently for most USB-Serial converters
 
 ## 📚 Dependencies
 
@@ -199,7 +220,7 @@ The ESP32 watchdog timer is enabled and must be reset regularly. The firmware ca
 ### Deep Sleep Mode
 
 Press and hold the **programming switch (GPIO 0)** for more than 1 second to enter deep sleep mode:
-1. LED ring blinks red 5 times
+1. LED ring blinks white 5 times
 2. All LEDs turn off
 3. Device enters deep sleep
 4. Press reset or prog button to wake
@@ -208,22 +229,13 @@ Press and hold the **programming switch (GPIO 0)** for more than 1 second to ent
 
 For lower power consumption, you can disable WiFi via clicking tree times on the prog button.
 For turning it back on, simply click tree times again.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues.
-
-## 📄 License
+Do remember that disabling the WiFi modem also disables the bridge to OTA, so turn it back on if you need to update firmware.
 
 This project is part of the **Lux et Tenebris** ecosystem.
 
 ## 👨‍💻 Author
 
 **Leonardo Machado** - [@machadoleonardo94](https://github.com/machadoleonardo94)
-
-## 🔗 Related Projects
-
-- **Lux et Tenebris Devkit Hardware** - PCB design and schematics
 
 ## 📝 Version History
 
