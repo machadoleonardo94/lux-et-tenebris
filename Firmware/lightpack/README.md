@@ -30,9 +30,17 @@ But you know what? Using Clankers' template made the doccumentation much more en
 
 Showcase of base firmware, case interaction, and sine wave composition as lightshow:
 
-- [Base Board Demo](../../Media/base_board.mp4) - Overview of the base board functionality
-- [Two Channels Example](../../Media/two_channels_example.mp4) - Dual LED channel control demonstration
-- [WiFi Toggle](../../Media/wifi_toggle.mp4) - WiFi configuration and toggle features
+#### Base Board Demo
+Overview of the base board functionality
+https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/base_board.mp4
+
+#### Two Channels Example
+Dual LED channel control demonstration
+https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/two_channels_example.mp4
+
+#### WiFi Toggle
+WiFi configuration and toggle features
+https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/wifi_toggle.mp4
 
 ## Future upgrades:
 
