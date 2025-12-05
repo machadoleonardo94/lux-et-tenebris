@@ -32,15 +32,22 @@ Showcase of base firmware, case interaction, and sine wave composition as lights
 
 #### Base Board Demo
 Overview of the base board functionality
-https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/base_board.mp4
+
+https://github.com/user-attachments/assets/8617b1a9-34ca-48c3-8088-12f21609c16c
+
 
 #### Two Channels Example
 Dual LED channel control demonstration
-https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/two_channels_example.mp4
+
+https://github.com/user-attachments/assets/9bc4d82b-29f8-49ef-8373-876afc4fa7dd
+
 
 #### WiFi Toggle
 WiFi configuration and toggle features
-https://github.com/machadoleonardo94/lux-et-tenebris/assets/Media/wifi_toggle.mp4
+
+
+https://github.com/user-attachments/assets/11826e12-3717-4bb9-bba7-9af42934ba8d
+
 
 ## Future upgrades:
 
