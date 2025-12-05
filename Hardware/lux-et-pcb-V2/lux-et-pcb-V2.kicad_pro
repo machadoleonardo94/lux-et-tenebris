@@ -459,7 +459,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "lux-et-pcb.kicad_pro",
+    "filename": "lux-et-pcb-V2.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -751,6 +751,10 @@
     [
       "206e32a6-a876-4798-8e63-17942d575973",
       "Root"
+    ],
+    [
+      "d66da3d6-1218-4c62-b97d-82daf1c77928",
+      "Aditional modules"
     ]
   ],
   "text_variables": {}
