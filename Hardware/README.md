@@ -17,18 +17,18 @@ The Lux et Tenebris hardware consists of custom PCB designs created in KiCad, pr
 - Core ESP32 functionality
 - DC 5521 connector for 5~24V external power
 - USB-C charging port
--- No integrated USB-Serial converter, requires an external one for burning firmware
+- No integrated USB-Serial converter, requires an external one for burning firmware
 - Optional 1S lithium charger and battery
 - 4x WS2812B LED channels (5V from regulator or internal battery)
--- GPIOs 32, 33, 19 and 16 
+  - GPIOs 32, 33, 19 and 16 
 - 3x Open drain outputs (for 12V RGB strips)
--- GPIOs 27, 26 and 25
+  - GPIOs 27, 26 and 25
 - 1x Controlled current output (avoid pesky short-circuits frying your wires)
--- GPIO 13
+  - GPIO 13
 - 2x expansion port with 3V3 power
--- Those can be set as other functions for external hardware
--- GPIOs 21 and 22 for I2C devices (display, gyro, be creative)
--- GPIOs 18 and 19 expansion port (control buttons)
+  - Those can be set as other functions for external hardware
+  - GPIOs 21 and 22 for I2C devices (display, gyro, be creative)
+  - GPIOs 18 and 19 expansion port (control buttons)
 
 ### lux-et-pcb-V2
 - Work in progress
@@ -38,9 +38,9 @@ The Lux et Tenebris hardware consists of custom PCB designs created in KiCad, pr
 - Added microSD slot for SDMMC
 - Modular schematic organization
 - To do: 
--- Add I2S support (crispy sounds)
--- Add gyro support (so the board can do a PEW PEW noise when hit)
--- Remove added latch power-on switch 
+  - Add I2S support (crispy sounds)
+  - Add gyro support (so the board can do a PEW PEW noise when hit)
+  - Remove added latch power-on switch 
 
 ## Features
 
@@ -140,21 +140,6 @@ If you do not require USB-C charging, this component can be avoided.
 2. **3D Models** - Included `.step` files for mechanical clearance verification
 3. **Symbol Library** - Custom `USB_C-8p.kicad_sym` included in project
 
-### Opening the Project
-
-1. Clone the repository:
-```bash
-git clone https://github.com/machadoleonardo94/lux-et-tenebris.git
-cd lux-et-tenebris/Hardware
-```
-
-2. Open the desired version:
-   - **V1**: Open `lux-et-pcb/lux-et-pcb.kicad_pro`
-   - **V2**: Open `lux-et-pcb-V2/lux-et-pcb-V2.kicad_pro`
-
-3. Review schematic and PCB layout
-4. Generate production files if needed. Current files are production ready
-
 ### Generating Manufacturing Files
 
 1. Open the PCB file in KiCad
@@ -175,7 +160,7 @@ cd lux-et-tenebris/Hardware
 
 2. **Through-hole Components**:
    - Cable wires for LED strips, or 2.54 3P terminal block
-   -- It's advised to use in-line connectors for power output, like the JST-3P
+     - It's advised to use in-line connectors for power output, like the JST-3P
    - DC 5521 connector
    - XH-2.54 2P for battery (no one is stoping you from soldering the battery wires directly, but please try to act civilized (I did that, no judgement))
 
@@ -239,15 +224,18 @@ Pin 4: 3V3 Out
 ### V1.0
 - Initial production version
 - Reverse voltage P-MOS protection is wired wrong (swapped gate and source terminals)
--- Board will not receive external nor battery power because of this
--- Swap the SOT-223 transistor for an SS14 schottky diode
+- Board will not receive external nor battery power because of this
+- Swap the SOT-223 transistor for an SS14 schottky diode
+  
+  <img width="400" height="400" alt="image" src="https://github.com/user-attachments/assets/14388e6f-855e-4f7a-8c2a-e56fc158ad2b" />
+
 - Wrong footprints for R8 and R10 0R22 resistors. Used 2010, should have been 1206
 - Charge status and 3V3 LEDs too bright, put 5.1kR series resistor instead of 2.2kR or remove them altogether
 
 
 ### Tools
 - [KiCad](https://www.kicad.org/) - PCB design software
--- JLCPCB Fabrication toolkit plugin
+  - JLCPCB Fabrication toolkit plugin
 - [JLCPCB](https://jlcpcb.com/) - PCB manufacturing
 - Autodesk Fusion360 - Case moddeling
 
