@@ -6,6 +6,12 @@
 
 **Lux et Tenebris** is an open-source ESP32-based LED controller development platform featuring custom PCB hardware, firmware, and support for addressable LEDs, RGB strips, and various lighting effects.
 
+## Disclaimer
+
+### Most of the readme.md present here was writen by Clanker, as a proof of concept for fast doccumentation generation. It may not contain the newest features, but it's good enough as a placeholder. Considering that it took 2 prompts and minor fixes, time that would've been used on this document was allocated elsewere more productive, like the main features.
+
+But you know what? Using Clankers' template made the doccumentation much more enjoyable, and ended up with way more content than all of my previous projects combined, as after reading it I've managed to add tidbits that I wouldn't have written otherwise.
+
 ## Demo Video
 
 https://github.com/user-attachments/assets/9bc4d82b-29f8-49ef-8373-876afc4fa7dd

@@ -6,12 +6,6 @@
 
 Firmware for the **Lux et Tenebris Devkit V1.0** - an ESP32-based LED controller with OLED display, WiFi connectivity, and over-the-air (OTA) update capabilities.
 
-## Disclaimer
-
-### Most of the readme.md present here was writen by Clanker, as a proof of concept for fast doccumentation generation. It may not contain the newest features, but it's good enough as a placeholder. Considering that it took 2 prompts and minor fixes, time that would've been used on this document was allocated elsewere more productive, like the main features.
-
-But you know what? Using Clankers' template made the doccumentation much more enjoyable, and ended up with way more content than all of my previous projects combined, as after reading it I've managed to add tidbits that I wouldn't have written otherwise.
-
 
 ## Features
 
