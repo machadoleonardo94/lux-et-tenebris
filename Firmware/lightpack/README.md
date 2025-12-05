@@ -26,6 +26,14 @@ But you know what? Using Clankers' template made the doccumentation much more en
 - **User Interface**: Physical button support with debouncing and long-press detection. Good for wiring a controller for switching between animations
 - **Non-Volatile Storage**: Persistent WiFi credentials and settings storage
 
+###  Demo Videos
+
+Showcase of base firmware, case interaction, and sine wave composition as lightshow:
+
+- [Base Board Demo](../../Media/base_board.mp4) - Overview of the base board functionality
+- [Two Channels Example](../../Media/two_channels_example.mp4) - Dual LED channel control demonstration
+- [WiFi Toggle](../../Media/wifi_toggle.mp4) - WiFi configuration and toggle features
+
 ## Future upgrades:
 
 ## Hardware Requirements
