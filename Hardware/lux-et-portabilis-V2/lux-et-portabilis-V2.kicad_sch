@@ -6010,7 +6010,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 55.88 44.704 90)
 			(effects
 				(font
@@ -6063,15 +6063,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 55.88 44.45 0)
 			(effects
@@ -6082,51 +6073,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 55.88 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 55.88 44.45 0)
 			(effects
 				(font
@@ -6205,7 +6151,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "1"
+		(property "LCSC" "C7433470"
 			(at 170.18 24.13 0)
 			(effects
 				(font
@@ -6215,15 +6161,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 170.18 24.13 0)
 			(effects
 				(font
@@ -6242,51 +6179,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 170.18 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 170.18 24.13 0)
 			(effects
 				(font
@@ -6435,7 +6327,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C2162971"
+		(property "LCSC" "C25170691"
 			(at 95.25 95.25 0)
 			(effects
 				(font
@@ -6464,69 +6356,6 @@
 		)
 		(property "Observations" "35V 800mA 6.3x7.7mm"
 			(at 91.44 96.266 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "CPN" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Field6" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Part Number" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sup. Part Number" ""
-			(at 95.25 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Type" ""
-			(at 95.25 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6879,15 +6708,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 76.2 95.25 0)
 			(effects
@@ -6898,51 +6718,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 76.2 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 76.2 95.25 0)
 			(effects
 				(font
@@ -7291,7 +7066,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C60491"
+		(property "LCSC" "C149504"
 			(at 208.28 54.61 90)
 			(effects
 				(font
@@ -7301,15 +7076,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 208.28 54.61 0)
 			(effects
 				(font
@@ -7336,115 +7102,7 @@
 				(hide yes)
 			)
 		)
-		(property "SUPPLIER 3" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "MANUFACTURER PART NUMBER" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "CPN" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Field6" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Part Number" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sup. Part Number" ""
-			(at 208.28 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Type" ""
 			(at 208.28 54.61 0)
 			(effects
 				(font
@@ -7846,7 +7504,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C2162971"
+		(property "LCSC" "C25170691"
 			(at 76.2 50.8 0)
 			(effects
 				(font
@@ -7875,69 +7533,6 @@
 		)
 		(property "Observations" "35V 800mA 6.3x7.7mm"
 			(at 72.39 51.816 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "CPN" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Field6" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Part Number" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sup. Part Number" ""
-			(at 76.2 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Type" ""
-			(at 76.2 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8015,7 +7610,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "1"
+		(property "LCSC" "C7433470"
 			(at 205.74 24.13 0)
 			(effects
 				(font
@@ -8025,15 +7620,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 205.74 24.13 0)
 			(effects
 				(font
@@ -8052,51 +7638,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 205.74 24.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 205.74 24.13 0)
 			(effects
 				(font
@@ -8341,7 +7882,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 191.516 50.8 90)
 			(effects
 				(font
@@ -8394,15 +7935,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 191.77 50.8 0)
 			(effects
@@ -8413,51 +7945,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 191.77 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 191.77 50.8 0)
 			(effects
 				(font
@@ -8551,15 +8038,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 90.17 26.67 0)
 			(effects
@@ -8570,51 +8048,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 90.17 26.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 90.17 26.67 0)
 			(effects
 				(font
@@ -9363,15 +8796,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 85.09 77.47 0)
 			(effects
@@ -9382,51 +8806,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 85.09 77.47 0)
 			(effects
 				(font
@@ -9898,15 +9277,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 99.06 50.8 0)
 			(effects
@@ -9917,51 +9287,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 99.06 50.8 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 99.06 50.8 0)
 			(effects
 				(font
@@ -10240,7 +9565,7 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "2k2"
+		(property "Value" "2.2k"
 			(at 58.42 44.704 90)
 			(effects
 				(font
@@ -10293,15 +9618,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 58.42 44.45 0)
 			(effects
@@ -10312,51 +9628,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 58.42 44.45 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 58.42 44.45 0)
 			(effects
 				(font
@@ -10408,7 +9679,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "Custom_Footprints:MPU6050"
+		(property "Footprint" "Aleoexpress:MPU6050"
 			(at 134.62 85.09 0)
 			(effects
 				(font
@@ -10670,15 +9941,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 181.61 63.5 0)
 			(effects
@@ -10689,51 +9951,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 181.61 63.5 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 181.61 63.5 0)
 			(effects
 				(font
@@ -10876,7 +10093,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C77075"
+		(property "LCSC" "C15850"
 			(at 147.32 25.4 0)
 			(effects
 				(font
@@ -10886,15 +10103,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 147.32 25.4 0)
 			(effects
 				(font
@@ -10913,51 +10121,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 147.32 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 147.32 25.4 0)
 			(effects
 				(font
@@ -11034,7 +10197,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C60491"
+		(property "LCSC" "C149504"
 			(at 198.12 54.61 90)
 			(effects
 				(font
@@ -11044,15 +10207,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 198.12 54.61 0)
 			(effects
 				(font
@@ -11079,115 +10233,7 @@
 				(hide yes)
 			)
 		)
-		(property "SUPPLIER 3" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "MANUFACTURER PART NUMBER" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "CPN" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Field6" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Part Number" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sup. Part Number" ""
-			(at 198.12 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Type" ""
 			(at 198.12 54.61 0)
 			(effects
 				(font
@@ -11370,7 +10416,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Custom_Footprints:ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP"
+		(property "Footprint" "Aleoexpress:ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP"
 			(at 148.59 41.91 0)
 			(effects
 				(font
@@ -11390,15 +10436,6 @@
 		)
 		(property "Description" "The Chip Type:Linear charging chip Supply Voltage:4V~6V Supply Voltage:4V~6V Maximum Charge Current:1A Charging Saturation Voltage:4.2V Type of Battery:Lithium-ion/Polymer Number of Cells:1 Number of Cells:1 Operating Temperature:-40°C~+85°C Operating Tempe"
 			(at 152.654 65.024 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer Part" "TP4056"
-			(at 147.066 36.576 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11487,7 +10524,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Custom_Footprints:ESP32-C3-Supermini"
+		(property "Footprint" "Aleoexpress:ESP32-C3-Supermini"
 			(at 38.1 91.44 0)
 			(effects
 				(font
@@ -11712,15 +10749,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 212.09 69.85 0)
 			(effects
@@ -11731,51 +10759,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 212.09 69.85 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 212.09 69.85 0)
 			(effects
 				(font
@@ -12186,15 +11169,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 76.2 83.82 0)
 			(effects
@@ -12205,51 +11179,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 76.2 83.82 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 76.2 83.82 0)
 			(effects
 				(font
@@ -12409,15 +11338,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 193.04 74.93 0)
 			(effects
@@ -12428,51 +11348,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 193.04 74.93 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 193.04 74.93 0)
 			(effects
 				(font
@@ -12728,69 +11603,6 @@
 				(hide yes)
 			)
 		)
-		(property "CPN" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Field6" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Part Number" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Device" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sim.Pins" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Sup. Part Number" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Type" ""
-			(at 215.9 53.34 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(pin "1"
 			(uuid "2c6d3ef1-580c-43a8-a32c-014e952601d4")
 		)
@@ -12928,7 +11740,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C77075"
+		(property "LCSC" "C15850"
 			(at 182.88 25.4 0)
 			(effects
 				(font
@@ -12938,15 +11750,6 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "PART NUMBER" ""
 			(at 182.88 25.4 0)
 			(effects
 				(font
@@ -12965,51 +11768,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 182.88 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 182.88 25.4 0)
 			(effects
 				(font
@@ -13153,7 +11911,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C2909920"
+		(property "LCSC" "C2480"
 			(at 48.26 24.13 90)
 			(effects
 				(font
@@ -13450,7 +12208,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C380331"
+		(property "LCSC" "C15850"
 			(at 166.37 53.34 0)
 			(effects
 				(font
@@ -13687,15 +12445,6 @@
 				(hide yes)
 			)
 		)
-		(property "PART NUMBER" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
 		(property "SUPPLIER 1" ""
 			(at 82.55 88.9 0)
 			(effects
@@ -13706,51 +12455,6 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 3" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 1" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 2" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER PART NUMBER 3" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "TYPE" ""
 			(at 82.55 88.9 0)
 			(effects
 				(font
