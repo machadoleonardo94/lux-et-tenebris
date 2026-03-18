@@ -3855,7 +3855,7 @@
 	)
 	(rectangle
 		(start 176.53 40.64)
-		(end 240.03 88.9)
+		(end 240.03 104.14)
 		(stroke
 			(width 0)
 			(type default)
@@ -3913,7 +3913,7 @@
 	)
 	(text "Power-on latch and button"
 		(exclude_from_sim no)
-		(at 204.978 85.852 0)
+		(at 207.772 98.806 0)
 		(effects
 			(font
 				(size 2.54 2.54)
@@ -3980,6 +3980,17 @@
 			)
 		)
 		(uuid "936cc2c7-a119-4fdd-b308-bb6a17031d6b")
+	)
+	(text "Cutoff Q2 pulls Q3 up\nPMOS blocks battery discharge\nButton trigger activates Q2\nQ3 saturates, V_REG = V_BAT - 200mV\nSupermini boots, drive GPIO4 high to latch power on"
+		(exclude_from_sim no)
+		(at 178.308 88.138 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "ab5ec6ee-13f3-4bd5-bf54-5f656e69c698")
 	)
 	(text "1S 500mA charger"
 		(exclude_from_sim no)
@@ -4116,6 +4127,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "8c90729b-e01b-4ad9-b1bf-62303102ab0c")
+	)
+	(junction
+		(at 207.01 69.85)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a490e4ba-6dfd-4aeb-84c4-d2ca19d3c0e7")
 	)
 	(junction
 		(at 54.61 55.88)
@@ -4264,6 +4281,16 @@
 			(type default)
 		)
 		(uuid "0eb03aac-32c5-479b-bf5e-b0d35fd46d8e")
+	)
+	(wire
+		(pts
+			(xy 207.01 69.85) (xy 193.04 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0f63ae3a-5220-4bea-8aca-afd841aedddc")
 	)
 	(wire
 		(pts
@@ -4494,16 +4521,6 @@
 			(type default)
 		)
 		(uuid "55e5ac5a-9921-4fac-84f2-6cacf26eb995")
-	)
-	(wire
-		(pts
-			(xy 193.04 69.85) (xy 208.28 69.85)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "579ee784-ff3a-4456-bc4e-5f5d0d30fa84")
 	)
 	(wire
 		(pts
@@ -5167,7 +5184,7 @@
 	)
 	(wire
 		(pts
-			(xy 193.04 71.12) (xy 193.04 69.85)
+			(xy 207.01 71.12) (xy 207.01 69.85)
 		)
 		(stroke
 			(width 0)
@@ -5264,6 +5281,16 @@
 			(type default)
 		)
 		(uuid "e94b0ce6-5889-485d-aafe-2f782345ccad")
+	)
+	(wire
+		(pts
+			(xy 207.01 69.85) (xy 208.28 69.85)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e99be95c-b1a0-4c20-9e54-713090de62db")
 	)
 	(wire
 		(pts
@@ -11578,7 +11605,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 193.04 78.74 0)
+		(at 207.01 78.74 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11586,7 +11613,7 @@
 		(dnp no)
 		(uuid "bc4fcc15-2431-49d3-806c-088c65d3d1bd")
 		(property "Reference" "#PWR034"
-			(at 193.04 85.09 0)
+			(at 207.01 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11595,7 +11622,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 193.04 83.058 0)
+			(at 207.01 83.058 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11603,7 +11630,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 193.04 78.74 0)
+			(at 207.01 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11612,7 +11639,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 193.04 78.74 0)
+			(at 207.01 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11621,7 +11648,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 193.04 78.74 0)
+			(at 207.01 78.74 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12174,7 +12201,7 @@
 	)
 	(symbol
 		(lib_id "Device:R")
-		(at 193.04 74.93 0)
+		(at 207.01 74.93 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12182,7 +12209,7 @@
 		(dnp no)
 		(uuid "d614a997-f3ec-4342-a959-47cc242a7c4b")
 		(property "Reference" "R13"
-			(at 195.58 74.93 90)
+			(at 209.55 74.93 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12190,7 +12217,7 @@
 			)
 		)
 		(property "Value" "10k"
-			(at 191.008 75.946 90)
+			(at 204.978 75.946 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12198,7 +12225,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 191.262 74.93 90)
+			(at 205.232 74.93 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12207,7 +12234,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 193.04 74.93 0)
+			(at 207.01 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12216,7 +12243,7 @@
 			)
 		)
 		(property "Description" "Resistor"
-			(at 193.04 74.93 0)
+			(at 207.01 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12225,7 +12252,7 @@
 			)
 		)
 		(property "LCSC" "C17414"
-			(at 193.04 74.93 90)
+			(at 207.01 74.93 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12234,7 +12261,7 @@
 			)
 		)
 		(property "ASSEMBLY" ""
-			(at 193.04 74.93 0)
+			(at 207.01 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12243,7 +12270,7 @@
 			)
 		)
 		(property "SUPPLIER 1" ""
-			(at 193.04 74.93 0)
+			(at 207.01 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12252,7 +12279,7 @@
 			)
 		)
 		(property "SUPPLIER 2" ""
-			(at 193.04 74.93 0)
+			(at 207.01 74.93 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12454,12 +12481,11 @@
 			)
 		)
 		(property "Value" "PMOS"
-			(at 217.17 43.688 90)
+			(at 216.154 47.498 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
 		(property "Footprint" "Package_TO_SOT_SMD:SOT-23_Handsoldering"
