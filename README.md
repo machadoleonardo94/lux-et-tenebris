@@ -27,7 +27,7 @@ Custom PCB designs created in KiCad for the Lux et Tenebris devkit. Includes pro
 - USB-C connectivity
 - 4x WS2812B addressable LED channels
 - 3x Open drain outputs + 1x controlled current output
-- Integrated OLED display (SSD1306)
+- I2C expansion port for OLED display (SSD1306)
 - Multiple expansion ports (Serial, I2C, GPIO)
 - Production files ready for manufacturing
 

@@ -23,7 +23,7 @@ typedef struct ledstrip
     int8_t index = 0;
 } struct_ledstrip;
 
-// struct_ledstrip status_led;
+struct_ledstrip status_led;
 struct_ledstrip led_strip;
 
 typedef struct buttonState

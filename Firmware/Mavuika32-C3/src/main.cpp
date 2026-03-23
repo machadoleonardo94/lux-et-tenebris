@@ -17,13 +17,13 @@
 #include <LittleFS.h>
 //* WiFi
 #include <WiFi.h>
-//* Gobal variables
+//* Global variables
 #include <variables.h>
 
 //* Objects
-#define NUM_LEDS 40
+#define NUM_LEDS 196
 Adafruit_NeoPixel strip(NUM_LEDS, strip_pin, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel status_led(1, status_led_pin, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel onboard_led(1, status_led_pin, NEO_GRB + NEO_KHZ800);
 Preferences preferences;
 
 void setup()
@@ -38,6 +38,10 @@ void setup()
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   Serial.println("LED strip initialized");
+
+  onboard_led.begin();
+  onboard_led.show(); // Initialize all pixels to 'off'
+  Serial.println("Status LED initialized");
 }
 
 int position = 0;
@@ -45,10 +49,22 @@ int power = 5;
 
 void loop()
 {
-  power = (sin(millis() / 1000.0) * 25 + 30);              // Vary power between 5 and 55
-  strip.setPixelColor(position, strip.Color(power, 0, 0)); // Red
-  strip.show();
-  position++;
-  position %= NUM_LEDS;
-  delay(25);
+  power = (sin(millis() / 200.0) * 15) + 15; // Calculate brightness based on sine wave (0-50 range)
+
+  if (millis() - led_strip.update_time >= 5)
+  {
+    led_strip.update_time = millis();
+    strip.setPixelColor(position, strip.Color(power, 0, 0)); // Red
+    strip.show();
+    position++;
+    position %= NUM_LEDS;
+  }
+
+  if (millis() - status_led.update_time >= 5)
+  {
+    status_led.update_time = millis();
+    int brightness = power / 3;                                                    // Scale down brightness for status LED
+    onboard_led.setPixelColor(0, strip.Color(brightness, brightness, brightness)); // White status LED with same brightness
+    onboard_led.show();
+  }
 }
