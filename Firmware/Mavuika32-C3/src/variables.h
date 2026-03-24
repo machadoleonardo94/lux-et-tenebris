@@ -10,6 +10,9 @@ uint32_t loopTimer = 0;
 uint32_t globalTimer = 0;
 uint32_t loopCounter = 0;
 
+int position = 0;
+int power = 5;
+
 uint8_t macAdress[6] = {0, 0, 0, 0, 0, 0};
 
 typedef struct ledstrip

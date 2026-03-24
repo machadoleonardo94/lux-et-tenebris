@@ -79,7 +79,7 @@ Arduino-based firmware for ESP32 with WiFi connectivity, OTA updates, and dynami
 ## 🧰 Technology Stack
 
 ### Hardware
-- **PCB Design**: KiCad 8.0
+- **PCB Design**: KiCad 9.0
 - **Microcontroller**: ESP32-WROOM-32
 - **Manufacturing**: JLCPCB-ready production files
 - **Components**: Standard 0805 SMD parts for easy sourcing
