@@ -5,31 +5,8 @@
 //? Lux et Portabilis - Mavuika Let it Go firmware
 //? Basic devboard firmware for smart LED strips, accelerometer, buttons and servo output.
 
-//* Framework
-#include <Arduino.h>
-//* Pinout
-#include "pinout.h"
 //* Dependencies
-//* Smart LED strip control
-#include <Adafruit_NeoPixel.h>
-//* Non-volatile Storage
-#include <Preferences.h>
-#include <LittleFS.h>
-//* WiFi
-#include <WiFi.h>
-//* Gyroscope and Accelerometer
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
-#include <Wire.h>
-//* Global variables
-#include <variables.h>
-
-//* Objects
-#define NUM_LEDS 144
-Adafruit_NeoPixel strip(NUM_LEDS, strip_pin, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel onboard_led(1, status_led_pin, NEO_GRB + NEO_KHZ800);
-Preferences preferences;
-Adafruit_MPU6050 mpu;
+#include "shared/dependencies.h"
 
 //? strip: the NeoPixel object for controlling external LED strip
 //? led_strip: the struct holding the current state of the LED strip (color, brightness, etc.)
@@ -59,9 +36,19 @@ void setup()
   if (!mpu.begin(0x68, &Wire))
   {
     Serial.println("Failed to find MPU6050 chip");
-    while (1)
-      ;
+    for (int k = 0; k < 5; k++)
+    {
+      onboard_led.setPixelColor(0, strip.Color(50 * (k % 2), 0, 0)); // Red
+      onboard_led.show();
+      delay(200);
+    }
   }
+  else
+  {
+    Serial.println("MPU6050 found and initialized");
+    gyro_started = true;
+  }
+  // setup_WIFI();
 }
 
 void loop()
@@ -69,53 +56,12 @@ void loop()
   // power = (sin(millis() / 200.0) * 15) + 15; // Calculate brightness based on sine wave (0-30 range)
 
   /* Get new sensor events with the readings */
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
-  if (millis() - led_strip.update_time >= 5)
-  {
-    led_strip.update_time = millis();
+  if (gyro_started)
+    mpu.getEvent(&a, &g, &temp);
 
-    /* Print out the values */
-    Serial.print("Acceleration X: ");
-    Serial.print(a.acceleration.x);
-    Serial.print(", Y: ");
-    Serial.print(a.acceleration.y);
-    Serial.print(", Z: ");
-    Serial.print(a.acceleration.z);
-    Serial.println(" m/s^2");
-    if (a.acceleration.x > 1.0 || a.acceleration.x < -1.0)
-    {
-      power = 10 + abs(a.acceleration.x); // Full brightness if there's significant movement
-    }
-    else
-    {
-      power = 5; // Dim when stationary
-    }
+  update_onboard_LED();
 
-    for (int i = 0; i < 20 * abs(a.acceleration.x); i++)
-    {
-      strip.setPixelColor(i, strip.Color(power, 0, power)); // Red
-    }
-    for (int i = 20 * abs(a.acceleration.x); i < NUM_LEDS; i++)
-    {
-      strip.setPixelColor(i, strip.Color(0, 0, 0)); // Off
-    }
-    strip.show();
+  update_strip();
 
-    //* Sine wave brightness
-    /*
-    strip.setPixelColor(position, strip.Color(power, 0, 0)); // Red
-    strip.show();
-    position++;
-    position %= NUM_LEDS;
-    */
-  }
-
-  if (millis() - status_led.update_time >= 5)
-  {
-    status_led.update_time = millis();
-    int brightness = abs(a.acceleration.z);                      // Scale down brightness for status LED
-    onboard_led.setPixelColor(0, strip.Color(0, brightness, 0)); // Green status LED with same brightness
-    onboard_led.show();
-  }
+  serial_outputs();
 }

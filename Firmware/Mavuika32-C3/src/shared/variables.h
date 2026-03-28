@@ -6,12 +6,21 @@
 //* OLED display
 bool display_started = false;
 
+//* Gyroscope
+bool gyro_started = false;
+sensors_event_t a, g, temp;
+
+float max_gyro_x = 0;
+float max_gyro_y = 0;
+float max_gyro_z = 0;
+
 uint32_t loopTimer = 0;
 uint32_t globalTimer = 0;
 uint32_t loopCounter = 0;
 
 int position = 0;
 int power = 5;
+int lenght = 0;
 
 uint8_t macAdress[6] = {0, 0, 0, 0, 0, 0};
 
@@ -28,6 +37,7 @@ typedef struct ledstrip
 
 struct_ledstrip status_led;
 struct_ledstrip led_strip;
+struct_ledstrip majora_strip;
 
 typedef struct buttonState
 {
