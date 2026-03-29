@@ -64,4 +64,6 @@ void loop()
   update_strip();
 
   serial_outputs();
+
+  run_majoras();
 }

@@ -18,25 +18,21 @@ void run_majoras()
     uint8_t green = 0;
     uint8_t blue = 0;
 
+    float sin1 = sin(((millis() * (2 * PI)) / 1500.0));
+    float sin2 = sin(((millis() * (2 * PI)) / 4000.0));
+    float sin3 = sin(((millis() * (2 * PI)) / 1200.0));
+
+    red = (40 + 80 * sin1 > 0 ? 40 + 80 * sin1 : 0);
+    green = (40 + 80 * sin2 > 0 ? 40 + 80 * sin2 : 0);
+    blue = (40 + 80 * sin3 > 0 ? 40 + 80 * sin3 : 0);
+    uint16_t total = red + green + blue;
+
     for (int i = 0; i < MAJORAS_LEDS - 2; i++)
     {
-        float sin1 = sin(((millis() * (2 * PI)) / 1500.0));
-        float sin2 = sin(((millis() * (2 * PI)) / 4000.0));
-        float sin3 = sin(((millis() * (2 * PI)) / 1200.0));
-
-        red = (30 + 40 * sin1 > 0 ? 30 + 40 * sin1 : 0);
-        green = (30 + 40 * sin2 > 0 ? 30 + 40 * sin2 : 0);
-        blue = (30 + 40 * sin3 > 0 ? 30 + 40 * sin3 : 0);
-        uint16_t total = red + green + blue;
-
-        if (i < 16) // Removes offset and dims for first 16 LEDs
-        {
-            red /= 4;
-            green /= 4;
-            blue /= 4;
-        }
-
-        majora.setPixelColor(i, majora.Color(red, green, blue));
+        if (i == 10 || i == 11) // Removes offset and dims for first 16 LEDs
+            majora.setPixelColor(i, majora.Color(red / 5, green / 10, blue / 10));
+        else
+            majora.setPixelColor(i, majora.Color(red, green, blue));
     }
     majora.setPixelColor(MAJORAS_LEDS - 2, red, 0, 0);
     majora.setPixelColor(MAJORAS_LEDS - 1, red, 0, 0);
