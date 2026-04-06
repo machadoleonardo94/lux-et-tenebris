@@ -1,4 +1,4 @@
-27327149176284999
+27336024579483722
 Aleoexpress
 ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP
 
@@ -14,12 +14,33 @@ ESP32-C3-Supermini
 32
 16
 Aleoexpress
+LED-SMD_L3.5-W2.8-RD_LT2835KYCT
+
+
+0
+2
+2
+Aleoexpress
 MPU6050
 
 
 0
 4
 4
+Aleoexpress
+PhoenixContact_MC_1,5_2-G-3.81_1x02_P3.81mm_Horizontal
+Generic Phoenix Contact connector footprint for: MC_1,5/2-G-3.81; number of pins: 02; pin pitch: 3.81mm; Angled || order number: 1803277 8A 160V
+phoenix_contact connector MC_01x02_G_3.81mm
+0
+2
+2
+Aleoexpress
+PhoenixContact_MC_1,5_3-G-3.81_1x03_P3.81mm_Horizontal
+Generic Phoenix Contact connector footprint for: MC_1,5/3-G-3.81; number of pins: 03; pin pitch: 3.81mm; Angled || order number: 1803280 8A 160V
+phoenix_contact connector MC_01x03_G_3.81mm
+0
+3
+3
 Aleoexpress
 TF-SMD_TF-CARD-XG8P-H1.5
 
@@ -35,12 +56,26 @@ USB-C-SMD_GT-USB-7101A
 10
 9
 Aleoexpress
+Untitled
+
+
+0
+0
+0
+Aleoexpress
 WS2812B_PTH_staggered
 LED, diameter 5.0mm, 4 pins, WP154A4, https://www.kingbright.com/attachments/file/psearch/000/00/00/L-154A4SUREQBFZGEW(Ver.11A).pdf
 rgb led
 0
 4
 4
+Aleoexpress
+X2QFN-10_L2.0-W1.5-P0.50-BL
+
+
+0
+10
+10
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -95396,6 +95431,13 @@ Potentiometer horizontal Vishay 148E-149E Dual
 10
 7
 Potentiometer_THT
+Potentiometer_Vishay_148E-149E_Single_Horizontal
+Potentiometer, horizontal, Vishay 148E-149E Single, http://www.vishay.com/docs/57040/148149.pdf
+Potentiometer horizontal Vishay 148E-149E Single
+0
+7
+4
+Potentiometer_THT
 Potentiometer_Vishay_248BH-249BH_Single_Horizontal
 Potentiometer, horizontal, Vishay 248BH-249BH Single, http://www.vishay.com/docs/57054/248249.pdf
 Potentiometer horizontal Vishay 248BH-249BH Single
@@ -97450,6 +97492,13 @@ Relay_THT
 Relay_SPST_Hongfa_JQC-3FF_0XX-1H
 Hongfa subminature high power latching SPST-NO relay 5, 6, 9, 12, 18, 24, 48VDC. 15A switching current, Form-A https://www.generationrobots.com/media/JQC-3FF-v1.pdf
 relays Hongmei 1-coil
+0
+4
+4
+Relay_THT
+Relay_SPST_Omron-G5Q-1A
+Relay SPST-NO Omron Serie G5Q, http://omronfs.omron.com/en_US/ecb/products/pdf/en-g5q.pdf
+Relay SPST-NO Omron Serie G5Q
 0
 4
 4

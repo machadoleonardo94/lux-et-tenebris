@@ -2165,6 +2165,89 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Mechanical:MountingHole"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim yes)
+			(in_bom no)
+			(on_board yes)
+			(property "Reference" "H"
+				(at 0 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MountingHole"
+				(at 0 3.175 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Mounting Hole without connection"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "mounting hole"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "MountingHole*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MountingHole_0_1"
+				(circle
+					(center 0 0)
+					(radius 1.27)
+					(stroke
+						(width 1.27)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "New_Library:TP4056"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -3745,6 +3828,18 @@
 		(uuid 8f777a4d-7edd-47a0-aecb-bbc8046ba231)
 	)
 	(rectangle
+		(start 26.67 54.61)
+		(end 50.8 80.01)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(uuid a9e6e5f2-7289-439e-bb1c-d97b595ba73a)
+	)
+	(rectangle
 		(start 26.67 12.7)
 		(end 274.32 80.01)
 		(stroke
@@ -3866,6 +3961,12 @@
 		(uuid "001bca63-609e-4b9f-ba9b-bf6ea856e87d")
 	)
 	(junction
+		(at 104.14 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "058c1708-31bd-4c64-b3b4-8e24f84b33fb")
+	)
+	(junction
 		(at 110.49 144.78)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3932,12 +4033,6 @@
 		(uuid "9c6c8dfd-b5e1-46ae-9cd7-ff3d56ed067a")
 	)
 	(junction
-		(at 115.57 88.9)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "9fffabcb-d121-4b3b-80f0-09541fe874ea")
-	)
-	(junction
 		(at 102.87 125.73)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3981,6 +4076,16 @@
 	)
 	(wire
 		(pts
+			(xy 227.33 54.61) (xy 227.33 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "001b6e5c-0847-42bc-a738-841ea51370c5")
+	)
+	(wire
+		(pts
 			(xy 129.54 104.14) (xy 132.08 104.14)
 		)
 		(stroke
@@ -3988,6 +4093,26 @@
 			(type default)
 		)
 		(uuid "00b616eb-a238-4c03-9047-d69cf1c0260b")
+	)
+	(wire
+		(pts
+			(xy 151.13 21.59) (xy 151.13 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0253b616-456c-467a-b7fc-ab610b457b19")
+	)
+	(wire
+		(pts
+			(xy 166.37 54.61) (xy 166.37 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "030225ec-f8eb-4976-ad7d-95eb5a89d1c2")
 	)
 	(wire
 		(pts
@@ -4011,6 +4136,16 @@
 	)
 	(wire
 		(pts
+			(xy 212.09 21.59) (xy 212.09 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "04f3e6a0-6dc6-4bf0-a68e-816722efd03a")
+	)
+	(wire
+		(pts
 			(xy 59.69 21.59) (xy 59.69 22.86)
 		)
 		(stroke
@@ -4028,16 +4163,6 @@
 			(type default)
 		)
 		(uuid "0a81e160-2b7c-42d2-9eb8-6c0632c1c82e")
-	)
-	(wire
-		(pts
-			(xy 242.57 21.59) (xy 242.57 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0b802d19-125b-429c-9727-799f4a728167")
 	)
 	(wire
 		(pts
@@ -4161,6 +4286,16 @@
 	)
 	(wire
 		(pts
+			(xy 151.13 54.61) (xy 151.13 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1e8f58a9-bead-4b7b-b8d4-357776ccbeaa")
+	)
+	(wire
+		(pts
 			(xy 236.22 90.17) (xy 237.49 90.17)
 		)
 		(stroke
@@ -4221,16 +4356,6 @@
 	)
 	(wire
 		(pts
-			(xy 212.09 54.61) (xy 212.09 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "24349003-de27-47c4-acfc-628491f285e7")
-	)
-	(wire
-		(pts
 			(xy 194.31 111.76) (xy 194.31 118.11)
 		)
 		(stroke
@@ -4251,6 +4376,16 @@
 	)
 	(wire
 		(pts
+			(xy 59.69 54.61) (xy 59.69 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2726ea78-9543-485d-b17c-65937bbedd3c")
+	)
+	(wire
+		(pts
 			(xy 245.11 138.43) (xy 246.38 138.43)
 		)
 		(stroke
@@ -4268,16 +4403,6 @@
 			(type default)
 		)
 		(uuid "2ead2e44-eff5-41b7-b07d-913aac489635")
-	)
-	(wire
-		(pts
-			(xy 196.85 54.61) (xy 196.85 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "33794aad-5f25-4384-be73-d10669d5ab9b")
 	)
 	(wire
 		(pts
@@ -4311,6 +4436,16 @@
 	)
 	(wire
 		(pts
+			(xy 104.14 92.71) (xy 104.14 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3846278f-f006-44ef-9f82-587eeb8839d3")
+	)
+	(wire
+		(pts
 			(xy 194.31 104.14) (xy 196.85 104.14)
 		)
 		(stroke
@@ -4338,6 +4473,16 @@
 			(type default)
 		)
 		(uuid "3a933aeb-25ab-45b9-852c-0795dbc35f1f")
+	)
+	(wire
+		(pts
+			(xy 74.93 21.59) (xy 74.93 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3c38a9e6-9500-41c1-bf2b-c8b88b60de9b")
 	)
 	(wire
 		(pts
@@ -4381,16 +4526,6 @@
 	)
 	(wire
 		(pts
-			(xy 181.61 21.59) (xy 181.61 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "3fd8bfa2-8c7d-4bd3-8850-b34065ffa2cc")
-	)
-	(wire
-		(pts
 			(xy 34.29 99.06) (xy 34.29 100.33)
 		)
 		(stroke
@@ -4411,16 +4546,6 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 21.59) (xy 151.13 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "407eca20-7f28-49f7-a421-79bd514b1a88")
-	)
-	(wire
-		(pts
 			(xy 132.08 104.14) (xy 132.08 109.22)
 		)
 		(stroke
@@ -4428,16 +4553,6 @@
 			(type default)
 		)
 		(uuid "416aad8d-abc5-4cdb-8d84-7734a6b6898c")
-	)
-	(wire
-		(pts
-			(xy 90.17 54.61) (xy 90.17 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "42f5f777-3f50-45b5-86a8-ea74a5796483")
 	)
 	(wire
 		(pts
@@ -4511,16 +4626,6 @@
 	)
 	(wire
 		(pts
-			(xy 105.41 21.59) (xy 105.41 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4e3240c3-fb28-499e-9e23-7e51566a69f3")
-	)
-	(wire
-		(pts
 			(xy 196.85 38.1) (xy 196.85 39.37)
 		)
 		(stroke
@@ -4581,26 +4686,6 @@
 	)
 	(wire
 		(pts
-			(xy 227.33 54.61) (xy 227.33 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "58c63b59-8005-44e2-bb79-fa5d4bb047fe")
-	)
-	(wire
-		(pts
-			(xy 74.93 21.59) (xy 74.93 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "59eece5e-1c67-4037-9a14-44458fdaa596")
-	)
-	(wire
-		(pts
 			(xy 99.06 93.98) (xy 106.68 93.98)
 		)
 		(stroke
@@ -4608,6 +4693,16 @@
 			(type default)
 		)
 		(uuid "5ae42f15-8ef3-49ef-90b4-d9997e4d5f25")
+	)
+	(wire
+		(pts
+			(xy 135.89 21.59) (xy 135.89 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5b9f96e3-754f-4eb2-9397-91601059ef7f")
 	)
 	(wire
 		(pts
@@ -4628,6 +4723,16 @@
 			(type default)
 		)
 		(uuid "5cf3fbb3-5d7f-45e1-8271-ec4ec10d8494")
+	)
+	(wire
+		(pts
+			(xy 166.37 21.59) (xy 166.37 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d60b28a-1bac-46c9-8bc5-781530cbf4f8")
 	)
 	(wire
 		(pts
@@ -4671,13 +4776,13 @@
 	)
 	(wire
 		(pts
-			(xy 59.69 54.61) (xy 59.69 55.88)
+			(xy 90.17 54.61) (xy 90.17 55.88)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "62568404-b93c-4a06-a53e-b4c8d1b82725")
+		(uuid "645578fb-f574-4c5b-a0fc-0292d0b1d25d")
 	)
 	(wire
 		(pts
@@ -4691,16 +4796,6 @@
 	)
 	(wire
 		(pts
-			(xy 227.33 21.59) (xy 227.33 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "655c1669-7e2d-4ad8-84f3-e6d43651a262")
-	)
-	(wire
-		(pts
 			(xy 109.22 144.78) (xy 110.49 144.78)
 		)
 		(stroke
@@ -4708,6 +4803,16 @@
 			(type default)
 		)
 		(uuid "660f5c43-65e5-4a0e-997c-33523668dd15")
+	)
+	(wire
+		(pts
+			(xy 196.85 54.61) (xy 196.85 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6708707e-0dc4-4a3e-9a3a-85f57b532ccf")
 	)
 	(wire
 		(pts
@@ -4751,6 +4856,16 @@
 	)
 	(wire
 		(pts
+			(xy 105.41 54.61) (xy 105.41 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6cfaf5b5-6642-478f-a191-b89db3806b62")
+	)
+	(wire
+		(pts
 			(xy 74.93 71.12) (xy 74.93 72.39)
 		)
 		(stroke
@@ -4771,6 +4886,16 @@
 	)
 	(wire
 		(pts
+			(xy 74.93 54.61) (xy 74.93 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "71633609-d1b2-47e7-bdaf-c7e8cf95b343")
+	)
+	(wire
+		(pts
 			(xy 270.51 46.99) (xy 52.07 46.99)
 		)
 		(stroke
@@ -4788,16 +4913,6 @@
 			(type default)
 		)
 		(uuid "71dcdcd7-eb1e-45fe-9e4d-3c3ca9000883")
-	)
-	(wire
-		(pts
-			(xy 135.89 21.59) (xy 135.89 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "72338a6b-75e6-4bbb-8ae0-90a2ff8c8684")
 	)
 	(wire
 		(pts
@@ -4851,6 +4966,16 @@
 	)
 	(wire
 		(pts
+			(xy 120.65 21.59) (xy 120.65 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7d6e5522-9427-467c-8fe9-2f6b5ca8cf70")
+	)
+	(wire
+		(pts
 			(xy 135.89 71.12) (xy 135.89 72.39)
 		)
 		(stroke
@@ -4878,6 +5003,16 @@
 			(type default)
 		)
 		(uuid "80c0c66e-38e3-428c-a446-999d918794b0")
+	)
+	(wire
+		(pts
+			(xy 105.41 21.59) (xy 105.41 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80e71d14-90fb-4a0c-bf3c-0b2759d7bfd9")
 	)
 	(wire
 		(pts
@@ -4921,6 +5056,16 @@
 	)
 	(wire
 		(pts
+			(xy 181.61 54.61) (xy 181.61 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8347ccaf-427e-4af1-8cba-25bf2774a56f")
+	)
+	(wire
+		(pts
 			(xy 265.43 30.48) (xy 270.51 30.48)
 		)
 		(stroke
@@ -4951,6 +5096,16 @@
 	)
 	(wire
 		(pts
+			(xy 242.57 21.59) (xy 242.57 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "87e33d7f-2604-4629-904f-ef2a61bba7fe")
+	)
+	(wire
+		(pts
 			(xy 220.98 111.76) (xy 232.41 111.76)
 		)
 		(stroke
@@ -4958,6 +5113,26 @@
 			(type default)
 		)
 		(uuid "8913b6c6-23c5-4804-ad5f-fd5160434c5c")
+	)
+	(wire
+		(pts
+			(xy 212.09 54.61) (xy 212.09 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8936c2a3-b84e-4cf1-aa9e-6e391623ef16")
+	)
+	(wire
+		(pts
+			(xy 135.89 54.61) (xy 135.89 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8d5bcd3a-30f2-4ef1-8d6a-613aff82a4c2")
 	)
 	(wire
 		(pts
@@ -5071,16 +5246,6 @@
 	)
 	(wire
 		(pts
-			(xy 257.81 54.61) (xy 257.81 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "9d43922a-fce5-4922-b21a-61e32c28c92b")
-	)
-	(wire
-		(pts
 			(xy 87.63 99.06) (xy 87.63 100.33)
 		)
 		(stroke
@@ -5101,23 +5266,13 @@
 	)
 	(wire
 		(pts
-			(xy 74.93 54.61) (xy 74.93 55.88)
+			(xy 115.57 92.71) (xy 104.14 92.71)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "a18baee9-c23f-41ed-b9e3-164e4331f339")
-	)
-	(wire
-		(pts
-			(xy 181.61 54.61) (xy 181.61 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a28309fc-6cc4-477e-bcac-611af3054b21")
+		(uuid "a1e3cae1-6d75-4812-92a8-aca6b4b28152")
 	)
 	(wire
 		(pts
@@ -5151,16 +5306,6 @@
 	)
 	(wire
 		(pts
-			(xy 120.65 21.59) (xy 120.65 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ab8bcc52-a4bf-4cf3-8d6f-64fd3b77c784")
-	)
-	(wire
-		(pts
 			(xy 133.35 149.86) (xy 133.35 151.13)
 		)
 		(stroke
@@ -5168,16 +5313,6 @@
 			(type default)
 		)
 		(uuid "aced7704-9ef2-4e47-8ff4-2796d1907300")
-	)
-	(wire
-		(pts
-			(xy 105.41 54.61) (xy 105.41 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ada857f7-cac5-423f-aa1f-80768c62b5de")
 	)
 	(wire
 		(pts
@@ -5251,13 +5386,13 @@
 	)
 	(wire
 		(pts
-			(xy 90.17 21.59) (xy 90.17 22.86)
+			(xy 227.33 21.59) (xy 227.33 22.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "bb7f8343-733a-468a-9daa-20ba696670be")
+		(uuid "bc82982d-1699-42e3-ae92-29277415bc34")
 	)
 	(wire
 		(pts
@@ -5271,6 +5406,16 @@
 	)
 	(wire
 		(pts
+			(xy 242.57 54.61) (xy 242.57 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "be0a2be0-c241-4851-9185-4df656262f4a")
+	)
+	(wire
+		(pts
 			(xy 104.14 85.09) (xy 104.14 88.9)
 		)
 		(stroke
@@ -5281,16 +5426,6 @@
 	)
 	(wire
 		(pts
-			(xy 115.57 92.71) (xy 115.57 88.9)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "be84fecf-5627-462f-a2ba-4d2d7d0b1fc0")
-	)
-	(wire
-		(pts
 			(xy 166.37 38.1) (xy 166.37 39.37)
 		)
 		(stroke
@@ -5298,6 +5433,16 @@
 			(type default)
 		)
 		(uuid "bfbaff22-8fa3-4306-a2f5-a40d076ed84b")
+	)
+	(wire
+		(pts
+			(xy 196.85 21.59) (xy 196.85 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c09f38d1-4fe6-4f0a-b9e8-f41e35f298f2")
 	)
 	(wire
 		(pts
@@ -5331,16 +5476,6 @@
 	)
 	(wire
 		(pts
-			(xy 242.57 54.61) (xy 242.57 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c7ad94ec-d974-4247-ac1a-d9726ce39b25")
-	)
-	(wire
-		(pts
 			(xy 144.78 88.9) (xy 147.32 88.9)
 		)
 		(stroke
@@ -5371,13 +5506,13 @@
 	)
 	(wire
 		(pts
-			(xy 135.89 54.61) (xy 135.89 55.88)
+			(xy 181.61 21.59) (xy 181.61 22.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "cb74a56d-f079-4efb-9a77-cf59133d500a")
+		(uuid "ca6add78-49bc-46c7-a0fc-1fb441c4887f")
 	)
 	(wire
 		(pts
@@ -5431,16 +5566,6 @@
 	)
 	(wire
 		(pts
-			(xy 166.37 21.59) (xy 166.37 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ce0dee39-f625-4ad0-a69a-269df006f6dc")
-	)
-	(wire
-		(pts
 			(xy 245.11 90.17) (xy 247.65 90.17)
 		)
 		(stroke
@@ -5488,6 +5613,16 @@
 			(type default)
 		)
 		(uuid "d04a142e-2032-4ebb-9ac6-d4de75655c71")
+	)
+	(wire
+		(pts
+			(xy 257.81 21.59) (xy 257.81 22.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d525fa6e-744f-4937-9494-ef8372a12fef")
 	)
 	(wire
 		(pts
@@ -5551,16 +5686,6 @@
 	)
 	(wire
 		(pts
-			(xy 120.65 54.61) (xy 120.65 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dc559192-0a8e-4b25-a004-e0e03a362381")
-	)
-	(wire
-		(pts
 			(xy 106.68 102.87) (xy 113.03 102.87)
 		)
 		(stroke
@@ -5578,16 +5703,6 @@
 			(type default)
 		)
 		(uuid "dd555c73-5b53-495c-820e-4d79beb6fcf6")
-	)
-	(wire
-		(pts
-			(xy 257.81 21.59) (xy 257.81 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "dfc0da76-18de-4c9a-a46a-1ae3b0d38bd2")
 	)
 	(wire
 		(pts
@@ -5641,16 +5756,6 @@
 	)
 	(wire
 		(pts
-			(xy 212.09 21.59) (xy 212.09 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e771902e-95b6-4b0d-b5d5-6e2349b33310")
-	)
-	(wire
-		(pts
 			(xy 52.07 99.06) (xy 52.07 100.33)
 		)
 		(stroke
@@ -5691,6 +5796,16 @@
 	)
 	(wire
 		(pts
+			(xy 257.81 54.61) (xy 257.81 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ed2ec757-17fb-4587-9959-b026b66419ba")
+	)
+	(wire
+		(pts
 			(xy 69.85 163.83) (xy 69.85 165.1)
 		)
 		(stroke
@@ -5711,6 +5826,16 @@
 	)
 	(wire
 		(pts
+			(xy 120.65 54.61) (xy 120.65 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f08ce361-3539-4144-bb96-b692315e93ee")
+	)
+	(wire
+		(pts
 			(xy 227.33 71.12) (xy 227.33 72.39)
 		)
 		(stroke
@@ -5721,33 +5846,13 @@
 	)
 	(wire
 		(pts
-			(xy 151.13 54.61) (xy 151.13 55.88)
+			(xy 90.17 21.59) (xy 90.17 22.86)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "f0ea7590-a7af-4d86-a6d1-d05e9438e486")
-	)
-	(wire
-		(pts
-			(xy 196.85 21.59) (xy 196.85 22.86)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f10ae130-91de-4cf9-8a78-4be016899356")
-	)
-	(wire
-		(pts
-			(xy 166.37 54.61) (xy 166.37 55.88)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f17adc56-96c3-4ac8-9a89-b7f1338a8805")
+		(uuid "f4c96ef3-b27a-456f-aaea-cba1a578ddc4")
 	)
 	(wire
 		(pts
@@ -6303,17 +6408,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 52.07 91.44 0)
+		(lib_id "power:+BATT")
+		(at 52.07 134.62 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "01af3d7d-0337-4215-b9a3-bc57cfacb1d0")
-		(property "Reference" "#PWR066"
-			(at 52.07 95.25 0)
+		(uuid "036b8dfa-42a1-4610-8c89-f7cf56d7d506")
+		(property "Reference" "#PWR0109"
+			(at 52.07 138.43 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6321,8 +6427,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 52.07 86.36 0)
+		(property "Value" "V_REG"
+			(at 52.07 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6330,7 +6436,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 52.07 91.44 0)
+			(at 52.07 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6339,7 +6445,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 52.07 91.44 0)
+			(at 52.07 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6347,8 +6453,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 52.07 91.44 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 52.07 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6357,12 +6463,146 @@
 			)
 		)
 		(pin "1"
-			(uuid "8bfb99ef-bfe1-49b0-830f-7ccd2cf265e0")
+			(uuid "8ea57b00-702a-4b3e-b6b4-c0772fa1cbcf")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR066")
+					(reference "#PWR0109")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 43.18 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "06807db8-ef0f-43ad-b62e-f6e69d2a9ebd")
+		(property "Reference" "#PWR065"
+			(at 43.18 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 43.18 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 43.18 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6b8a3c19-ddaf-4533-a7d1-aef42540d000")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR065")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 135.89 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "07871182-b736-4787-821f-0dfdab53b5ee")
+		(property "Reference" "#PWR034"
+			(at 135.89 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 135.89 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 135.89 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 135.89 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 135.89 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e2893d19-8b4e-4a17-b9b0-3ecc32720000")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -6608,6 +6848,140 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 34.29 134.62 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "08d69261-88c9-4908-a8df-9e6bc30b44d5")
+		(property "Reference" "#PWR0107"
+			(at 34.29 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 34.29 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 34.29 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 34.29 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 34.29 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3936671e-c63c-41ad-a642-7ada83b2ade5")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0107")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 69.85 156.21 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "08fcd3ec-354a-42a0-b49d-0b7374a3628a")
+		(property "Reference" "#PWR0133"
+			(at 69.85 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 69.85 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 69.85 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 69.85 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 69.85 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1b05eed8-71bf-466d-811c-00ad0d2726d7")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0133")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:R")
 		(at 194.31 107.95 0)
 		(unit 1)
@@ -6712,72 +7086,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 120.65 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "0b5cc546-d927-43d8-a090-f0edb481ab19")
-		(property "Reference" "#PWR05"
-			(at 120.65 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 120.65 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 120.65 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 120.65 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 120.65 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f23ea23c-00c7-4454-965b-29413870d715")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 135.89 72.39 0)
 		(unit 1)
@@ -6838,6 +7146,301 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR048")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 69.85 113.03 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0da733d7-a5e1-4fc4-a5d0-cb47355cf426")
+		(property "Reference" "#PWR091"
+			(at 69.85 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 69.85 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 69.85 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 69.85 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 69.85 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fe12e166-9f9b-4561-b1c7-0e91db5b62a1")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR091")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 181.61 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0ec9eb13-2ddb-4a46-a90e-743319708e9e")
+		(property "Reference" "#PWR037"
+			(at 181.61 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 181.61 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 181.61 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 181.61 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 181.61 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c5e56cbb-819d-46f1-a6d4-472a129d6f03")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR037")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 109.22 88.9 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "0f172b45-215f-47ce-9f1e-921db5b0c23b")
+		(property "Reference" "R3"
+			(at 108.966 91.44 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "220mR 1W 1%"
+			(at 113.03 84.582 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+			(at 109.22 90.678 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.lcsc.com/datasheet/C4382.pdf"
+			(at 109.22 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "220mΩ ±1% 1W Current Sense Resistor"
+			(at 109.22 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "LCSC" "C2683384"
+			(at 109.22 88.9 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Mfr. Part Number" "RLH12FTCR220"
+			(at 109.22 88.9 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Observations" ""
+			(at 109.22 88.9 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2d6219e2-70da-4104-b8ad-3ef16d967830")
+		)
+		(pin "2"
+			(uuid "a2030ffe-8cda-4e66-a31d-595188cf1f19")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "R3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 60.96 156.21 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "0f29f003-e30d-4300-9a47-e7d3bbd7962f")
+		(property "Reference" "#PWR0132"
+			(at 60.96 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 60.96 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 60.96 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 60.96 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 60.96 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6f982a8b-17d4-4e47-9165-7b9d30e4a734")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0132")
 					(unit 1)
 				)
 			)
@@ -7087,17 +7690,35 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 87.63 113.03 0)
+		(lib_id "Mechanical:MountingHole")
+		(at 31.75 59.69 0)
 		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
+		(exclude_from_sim yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "1273c5e9-6473-4ff1-a81d-d8a99902fd93")
-		(property "Reference" "#PWR093"
-			(at 87.63 116.84 0)
+		(uuid "127bf356-73d0-4c05-9c35-54270775f9cd")
+		(property "Reference" "H1"
+			(at 34.29 58.4199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 34.29 60.9599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+			(at 31.75 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7105,8 +7726,55 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 87.63 107.95 0)
+		(property "Datasheet" "~"
+			(at 31.75 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 31.75 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "H1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 52.07 113.03 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1392ff3c-49de-45ca-9d4b-86a340f30523")
+		(property "Reference" "#PWR089"
+			(at 52.07 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 52.07 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7114,7 +7782,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 87.63 113.03 0)
+			(at 52.07 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7123,7 +7791,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 87.63 113.03 0)
+			(at 52.07 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7131,8 +7799,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 87.63 113.03 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 52.07 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7141,12 +7809,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "ab31242b-52ca-4b9c-b172-7d1cfd371dbb")
+			(uuid "62702b2a-3384-4041-a1c4-411ebd482285")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR093")
+					(reference "#PWR089")
 					(unit 1)
 				)
 			)
@@ -7258,17 +7926,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 59.69 21.59 0)
+		(lib_id "power:+BATT")
+		(at 43.18 134.62 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "1481ba81-7ed0-4289-9fe0-9a974381698a")
-		(property "Reference" "#PWR01"
-			(at 59.69 25.4 0)
+		(uuid "14a88f1d-ad28-41d5-8961-98a67e2131d7")
+		(property "Reference" "#PWR0108"
+			(at 43.18 138.43 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7276,8 +7945,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 59.69 16.51 0)
+		(property "Value" "V_REG"
+			(at 43.18 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7285,7 +7954,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 59.69 21.59 0)
+			(at 43.18 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7294,7 +7963,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 59.69 21.59 0)
+			(at 43.18 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7302,74 +7971,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 59.69 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b0ee1954-8617-4316-b2fd-dfc55528d5ab")
-		)
-		(instances
-			(project ""
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR01")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 257.81 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1538a709-ef67-4df0-82e2-6dfdfe52a9d5")
-		(property "Reference" "#PWR042"
-			(at 257.81 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 257.81 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 257.81 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 257.81 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 257.81 54.61 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 43.18 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7378,12 +7981,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c8da3d93-d826-483b-a1be-2fad5a7f8826")
+			(uuid "84a5b0df-c921-45f8-a7a5-c196552dd6a2")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR042")
+					(reference "#PWR0108")
 					(unit 1)
 				)
 			)
@@ -7455,72 +8058,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 135.89 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "19689ba2-1247-4867-9c2e-b9dc8a46014c")
-		(property "Reference" "#PWR06"
-			(at 135.89 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 135.89 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 135.89 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 135.89 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 135.89 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "81825ed3-bd6b-45d7-b7bf-887be24dd155")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR06")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 60.96 100.33 0)
 		(unit 1)
@@ -7581,6 +8118,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR079")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 227.33 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1a60a1cb-ffff-407f-b98f-ba04a07f0baa")
+		(property "Reference" "#PWR012"
+			(at 227.33 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 227.33 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 227.33 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 227.33 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 227.33 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "02302664-a29c-4220-96b1-0573aefc29b6")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -7956,72 +8560,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 151.13 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "1fc29411-df66-4a4a-9e67-99fbb82544e8")
-		(property "Reference" "#PWR035"
-			(at 151.13 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 151.13 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 151.13 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 151.13 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 151.13 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9fbb3d1d-cd11-44a0-8cea-b659128769ad")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR035")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 90.17 30.48 0)
 		(unit 1)
@@ -8036,6 +8574,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -8091,6 +8630,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 34.29 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1ff82d2b-f3b9-4788-90c0-2c4624c4da1c")
+		(property "Reference" "#PWR064"
+			(at 34.29 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 34.29 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 34.29 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 34.29 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 34.29 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "afe18ff3-44c7-4df8-85b9-a86357adea39")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR064")
 					(unit 1)
 				)
 			)
@@ -8158,72 +8764,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR0104")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 52.07 113.03 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "217af5f1-c8f7-484e-89ee-38cee25c06c1")
-		(property "Reference" "#PWR089"
-			(at 52.07 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 52.07 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 52.07 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 52.07 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 52.07 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0f7721e0-0ac9-43d6-a7d7-d167c3dc5b3d")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR089")
 					(unit 1)
 				)
 			)
@@ -8438,17 +8978,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 196.85 21.59 0)
+		(lib_id "power:+BATT")
+		(at 69.85 134.62 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "260d1388-ee3e-4d15-9d35-b3880411b787")
-		(property "Reference" "#PWR010"
-			(at 196.85 25.4 0)
+		(uuid "236a6293-ac35-486b-932f-2bcc877fbd7f")
+		(property "Reference" "#PWR0111"
+			(at 69.85 138.43 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8456,8 +8997,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 196.85 16.51 0)
+		(property "Value" "V_REG"
+			(at 69.85 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8465,7 +9006,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 196.85 21.59 0)
+			(at 69.85 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8474,7 +9015,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 196.85 21.59 0)
+			(at 69.85 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8482,8 +9023,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 196.85 21.59 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 69.85 134.62 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8492,12 +9033,79 @@
 			)
 		)
 		(pin "1"
-			(uuid "15a75409-0fcb-4b2c-b62d-f7dfcc755951")
+			(uuid "ae22ab18-89bc-44d9-b886-5f56bde8571a")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR010")
+					(reference "#PWR0111")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 87.63 113.03 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2468c51a-84a0-4ac9-a2e8-00f7c5a26579")
+		(property "Reference" "#PWR093"
+			(at 87.63 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 87.63 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 87.63 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 87.63 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 87.63 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1e3e36fe-545b-40a2-9e14-92eb91e127f9")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR093")
 					(unit 1)
 				)
 			)
@@ -8518,6 +9126,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -8758,17 +9367,35 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 135.89 54.61 0)
+		(lib_id "Mechanical:MountingHole")
+		(at 31.75 64.77 0)
 		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
+		(exclude_from_sim yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "29e21a2d-3498-4c6b-bead-6471b8875161")
-		(property "Reference" "#PWR034"
-			(at 135.89 58.42 0)
+		(uuid "2a03bdb5-01d6-4ff7-8e44-f043993f5d48")
+		(property "Reference" "H2"
+			(at 34.29 63.4999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 34.29 66.0399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+			(at 31.75 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8776,16 +9403,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 135.89 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 135.89 54.61 0)
+		(property "Datasheet" "~"
+			(at 31.75 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8793,97 +9412,19 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 135.89 54.61 0)
+		(property "Description" "Mounting Hole without connection"
+			(at 31.75 64.77 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 135.89 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "18d23973-1586-4f50-ad29-f2b93004feba")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR034")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 212.09 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2a3c1a35-c053-4d27-8a71-0f91e9bea2d6")
-		(property "Reference" "#PWR039"
-			(at 212.09 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 212.09 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 212.09 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 212.09 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 212.09 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "0e31df76-3371-43ef-860e-5681f26734f2")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR039")
+					(reference "H2")
 					(unit 1)
 				)
 			)
@@ -8956,17 +9497,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 242.57 21.59 0)
+		(lib_id "power:+BATT")
+		(at 87.63 91.44 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "2b673b2a-8319-4781-b4db-6c19c35251c3")
-		(property "Reference" "#PWR013"
-			(at 242.57 25.4 0)
+		(uuid "2e80b2e1-c19f-46f9-8765-d62151d79987")
+		(property "Reference" "#PWR070"
+			(at 87.63 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8974,8 +9516,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 242.57 16.51 0)
+		(property "Value" "V_REG"
+			(at 87.63 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8983,7 +9525,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 242.57 21.59 0)
+			(at 87.63 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8992,7 +9534,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 242.57 21.59 0)
+			(at 87.63 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9000,74 +9542,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 242.57 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8d221300-26a8-4a3a-8c23-e06efc091175")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR013")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 257.81 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "2b8eb0c2-6a10-4ae7-9093-3207fd000a90")
-		(property "Reference" "#PWR014"
-			(at 257.81 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 257.81 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 257.81 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 257.81 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 257.81 21.59 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 87.63 91.44 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9076,12 +9552,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "5314ca2f-7108-4e26-bfbe-dc2cb6183d60")
+			(uuid "3c1e2f23-9618-41ad-8cf8-49fd8a0bf6ef")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR014")
+					(reference "#PWR070")
 					(unit 1)
 				)
 			)
@@ -9148,72 +9624,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR078")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 69.85 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "304c27ed-87ba-4bda-89e3-3f081ebb27db")
-		(property "Reference" "#PWR068"
-			(at 69.85 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 69.85 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 69.85 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 69.85 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 69.85 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a5850251-e11f-4b01-b2d0-fef9e46e600a")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR068")
 					(unit 1)
 				)
 			)
@@ -9384,6 +9794,70 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR073")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 31.75 74.93 0)
+		(unit 1)
+		(exclude_from_sim yes)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "31597727-f7d6-46b8-9a00-f6dff3776a2f")
+		(property "Reference" "H4"
+			(at 34.29 73.6599 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 34.29 76.1999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+			(at 31.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 31.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 31.75 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "H4")
 					(unit 1)
 				)
 			)
@@ -9600,6 +10074,140 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 60.96 134.62 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "340fe699-b3a3-4c11-af72-7a9a6b79a94b")
+		(property "Reference" "#PWR0110"
+			(at 60.96 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 60.96 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 60.96 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 60.96 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 60.96 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fc6e90ad-6027-4dc9-b699-2809ef212499")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0110")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 257.81 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "34721e91-46e9-4c76-b702-9ebd69b0c73d")
+		(property "Reference" "#PWR014"
+			(at 257.81 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 257.81 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 257.81 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 257.81 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 257.81 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "61ff6496-3a16-49a2-84a7-83818e796e71")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR014")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 181.61 63.5 0)
 		(unit 1)
@@ -9614,6 +10222,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -9669,6 +10278,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D23")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 52.07 156.21 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "34db2717-a081-4ff4-8d1a-42e4a74ec9fe")
+		(property "Reference" "#PWR0131"
+			(at 52.07 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 52.07 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 52.07 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 52.07 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 52.07 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "633c462c-5502-4052-a2fc-785f90f0235e")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0131")
 					(unit 1)
 				)
 			)
@@ -9887,6 +10563,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -9948,17 +10625,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 43.18 134.62 0)
+		(lib_id "power:+BATT")
+		(at 87.63 156.21 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "3a4160c8-17fb-43e2-9462-2b090167771e")
-		(property "Reference" "#PWR0108"
-			(at 43.18 138.43 0)
+		(uuid "393ffa0f-7a43-4462-8d3d-f1a3c6c78431")
+		(property "Reference" "#PWR0135"
+			(at 87.63 160.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9966,8 +10644,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 43.18 129.54 0)
+		(property "Value" "V_REG"
+			(at 87.63 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9975,7 +10653,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 43.18 134.62 0)
+			(at 87.63 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9984,7 +10662,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 43.18 134.62 0)
+			(at 87.63 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -9992,8 +10670,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 43.18 134.62 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 87.63 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -10002,12 +10680,79 @@
 			)
 		)
 		(pin "1"
-			(uuid "04c1bc7f-636b-4c13-b867-c2e795887f9d")
+			(uuid "a3831bf3-fb63-454a-a64f-8d9ab8a4e1ba")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0108")
+					(reference "#PWR0135")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 78.74 113.03 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3abf7ceb-0018-4da5-9f46-a582a57b6170")
+		(property "Reference" "#PWR092"
+			(at 78.74 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 78.74 107.95 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 78.74 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 78.74 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 78.74 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f5fbd4ae-cfb6-48f2-b4d1-425c7652fa4d")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR092")
 					(unit 1)
 				)
 			)
@@ -10318,138 +11063,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR0121")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 60.96 156.21 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3c7c161e-9abf-41c3-a3f5-ee326851fbce")
-		(property "Reference" "#PWR0132"
-			(at 60.96 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 60.96 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 60.96 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 60.96 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 60.96 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ba31825b-b6da-4013-8a25-b61c1e46f2c7")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0132")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 90.17 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "3cd6d6ff-bd74-41b3-9fbf-be2283e1edce")
-		(property "Reference" "#PWR03"
-			(at 90.17 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 90.17 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 90.17 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 90.17 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 90.17 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e1928341-2917-4510-9841-2b6f8760dcd5")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR03")
 					(unit 1)
 				)
 			)
@@ -10779,6 +11392,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 43.18 156.21 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "448cb265-8f5f-4d89-b7f1-2cecea8f20ab")
+		(property "Reference" "#PWR0130"
+			(at 43.18 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 43.18 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 43.18 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 43.18 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 43.18 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1591d83e-0156-4523-8e00-2dd2c6fefb01")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0130")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 34.29 116.84 180)
 		(unit 1)
@@ -10884,72 +11564,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 181.61 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "45d2259d-a249-43c6-a79a-e3bf446896a2")
-		(property "Reference" "#PWR09"
-			(at 181.61 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 181.61 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 181.61 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 181.61 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 181.61 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "9664f192-bcb4-4b33-a960-56dd3b16f519")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR09")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:LED")
 		(at 106.68 97.79 90)
 		(unit 1)
@@ -11029,17 +11643,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 60.96 134.62 0)
+		(lib_id "power:+BATT")
+		(at 151.13 21.59 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "4922f64f-1d21-4e7e-8783-91cc6611cff8")
-		(property "Reference" "#PWR0110"
-			(at 60.96 138.43 0)
+		(uuid "474aa947-a917-4a8f-beb3-09b131a424a7")
+		(property "Reference" "#PWR07"
+			(at 151.13 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11047,8 +11662,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 60.96 129.54 0)
+		(property "Value" "V_REG"
+			(at 151.13 16.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11056,7 +11671,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 60.96 134.62 0)
+			(at 151.13 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11065,7 +11680,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 60.96 134.62 0)
+			(at 151.13 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11073,8 +11688,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 60.96 134.62 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 151.13 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -11083,12 +11698,213 @@
 			)
 		)
 		(pin "1"
-			(uuid "1335353c-4426-4589-9d11-42d14e9e5999")
+			(uuid "8df4d0cf-a582-435c-9c76-135339c4fcf3")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0110")
+					(reference "#PWR07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 90.17 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4bebe694-80c8-4b70-b0e1-fa5c3e1c98d2")
+		(property "Reference" "#PWR03"
+			(at 90.17 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 90.17 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 90.17 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 90.17 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 90.17 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "90a2c192-4c6e-44dc-bf25-859efbf6b2d5")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 34.29 156.21 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4cf78668-e830-43eb-bc96-e471e64d2dea")
+		(property "Reference" "#PWR0129"
+			(at 34.29 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 34.29 151.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 34.29 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 34.29 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 34.29 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cc6d2213-1460-4071-870f-e9104eaab087")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0129")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 74.93 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "4e2f5d99-6407-455b-b8e0-d4fc2f58d22a")
+		(property "Reference" "#PWR02"
+			(at 74.93 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 74.93 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 74.93 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 74.93 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 74.93 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f19637be-f17a-4726-8528-a22ad9a228ba")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR02")
 					(unit 1)
 				)
 			)
@@ -11373,6 +12189,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -11654,72 +12471,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 34.29 156.21 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "539c8032-224f-4479-ad7f-5bf94c6adcde")
-		(property "Reference" "#PWR0129"
-			(at 34.29 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 34.29 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 34.29 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 34.29 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 34.29 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "1ffb27c1-8e07-4cf3-a1ce-ddbb354d24bf")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0129")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 246.38 152.4 0)
 		(unit 1)
@@ -11785,6 +12536,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 105.41 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "552063a8-ac1e-4973-bad0-66237d21d836")
+		(property "Reference" "#PWR04"
+			(at 105.41 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 105.41 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 105.41 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 105.41 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 105.41 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "541e8811-7697-4829-9517-86c3dcd943e8")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR04")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 135.89 63.5 0)
 		(unit 1)
@@ -11799,6 +12617,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -11925,6 +12744,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 60.96 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5870f943-e419-4f93-8b55-40b21eea7ac2")
+		(property "Reference" "#PWR067"
+			(at 60.96 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 60.96 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 60.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 60.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 60.96 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8771b09e-2499-4111-8b87-74c30002e8a2")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR067")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 69.85 160.02 180)
 		(unit 1)
@@ -12030,17 +12916,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 227.33 54.61 0)
+		(lib_id "power:+BATT")
+		(at 151.13 54.61 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "5dce1455-cc28-4a89-a808-283ca6bbf18e")
-		(property "Reference" "#PWR040"
-			(at 227.33 58.42 0)
+		(uuid "5ac05525-34a2-4772-bbf1-a14546e02832")
+		(property "Reference" "#PWR035"
+			(at 151.13 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12048,8 +12935,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 227.33 49.53 0)
+		(property "Value" "V_REG"
+			(at 151.13 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12057,7 +12944,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 227.33 54.61 0)
+			(at 151.13 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12066,7 +12953,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 227.33 54.61 0)
+			(at 151.13 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12074,8 +12961,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 227.33 54.61 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 151.13 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12084,12 +12971,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "bb70dbaa-bf6c-45c8-aee8-1c5faf163aa5")
+			(uuid "84bd49d1-6ddf-477e-9877-06a1bc758d34")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR040")
+					(reference "#PWR035")
 					(unit 1)
 				)
 			)
@@ -12183,6 +13070,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -12310,17 +13198,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 60.96 113.03 0)
+		(lib_id "power:+BATT")
+		(at 166.37 21.59 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "64ec324e-e525-4d40-b59e-b3a90472ac5e")
-		(property "Reference" "#PWR090"
-			(at 60.96 116.84 0)
+		(uuid "6376cd73-db30-454f-9a0b-6c8f18555e57")
+		(property "Reference" "#PWR08"
+			(at 166.37 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12328,8 +13217,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 60.96 107.95 0)
+		(property "Value" "V_REG"
+			(at 166.37 16.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12337,7 +13226,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 60.96 113.03 0)
+			(at 166.37 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12346,7 +13235,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 60.96 113.03 0)
+			(at 166.37 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12354,8 +13243,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 60.96 113.03 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 166.37 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12364,12 +13253,146 @@
 			)
 		)
 		(pin "1"
-			(uuid "ac34ad05-39ec-4ba2-87f1-ce1db748c0f9")
+			(uuid "12343886-d835-4386-b457-f364f8b66407")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR090")
+					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 212.09 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "666ea220-1a10-45cd-a212-bd46f098477e")
+		(property "Reference" "#PWR011"
+			(at 212.09 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 212.09 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 212.09 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 212.09 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 212.09 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e53e95d4-b0b1-4958-8818-c45840ca3bd3")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 242.57 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "67f12349-6901-4c08-94f8-cad75737d44e")
+		(property "Reference" "#PWR013"
+			(at 242.57 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 242.57 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 242.57 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 242.57 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 242.57 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5e0c7544-ec58-4359-903d-da2769ecf2c6")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR013")
 					(unit 1)
 				)
 			)
@@ -12508,6 +13531,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 120.65 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6bd01d3e-c516-4ab7-b729-f004ee25914f")
+		(property "Reference" "#PWR033"
+			(at 120.65 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 120.65 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 120.65 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 120.65 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 120.65 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "e8281ba6-b8ca-47dc-bc03-d623415f29de")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR033")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 212.09 63.5 0)
 		(unit 1)
@@ -12522,6 +13612,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -12577,72 +13668,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D25")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 242.57 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "6e343398-3a51-46dc-8427-6bf8060bd86d")
-		(property "Reference" "#PWR041"
-			(at 242.57 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 242.57 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 242.57 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 242.57 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 242.57 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "2a689f8f-1bf2-4fb1-ad61-76152ced9965")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR041")
 					(unit 1)
 				)
 			)
@@ -12820,6 +13845,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 196.85 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "71f59ea5-6107-4d56-be4d-c11e4101bfff")
+		(property "Reference" "#PWR038"
+			(at 196.85 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 196.85 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 196.85 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 196.85 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 196.85 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "69cd24dd-22f2-47ab-8216-e888924eb6b5")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR038")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 78.74 138.43 180)
 		(unit 1)
@@ -12939,6 +14031,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -13000,17 +14093,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 60.96 91.44 0)
+		(lib_id "power:+BATT")
+		(at 78.74 156.21 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "746c52ab-862f-48d9-8811-7299b035ef6f")
-		(property "Reference" "#PWR067"
-			(at 60.96 95.25 0)
+		(uuid "75ce8d26-bc52-41f9-b4a1-39ecafd8c85c")
+		(property "Reference" "#PWR0134"
+			(at 78.74 160.02 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13018,8 +14112,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 60.96 86.36 0)
+		(property "Value" "V_REG"
+			(at 78.74 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13027,7 +14121,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 60.96 91.44 0)
+			(at 78.74 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13036,7 +14130,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 60.96 91.44 0)
+			(at 78.74 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13044,8 +14138,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 60.96 91.44 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 78.74 156.21 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13054,12 +14148,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "8bb50c23-c80a-4252-840a-a1b28e620059")
+			(uuid "1df5c646-dbdc-431c-a0d4-93e1e8fcc15f")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR067")
+					(reference "#PWR0134")
 					(unit 1)
 				)
 			)
@@ -13369,72 +14463,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 166.37 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "78eedceb-f801-4c36-9629-53aa6526b4ea")
-		(property "Reference" "#PWR08"
-			(at 166.37 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 166.37 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 166.37 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 166.37 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 166.37 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "7ddd5ac4-3a66-4def-a3e4-806b734e7c11")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 34.29 138.43 180)
 		(unit 1)
@@ -13606,17 +14634,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 87.63 91.44 0)
+		(lib_id "power:+BATT")
+		(at 135.89 21.59 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "7eb4f7df-7a59-43d3-93b9-687a6a2a4a72")
-		(property "Reference" "#PWR070"
-			(at 87.63 95.25 0)
+		(uuid "7ed1fb45-cc06-4a6c-ad77-ad2787beb943")
+		(property "Reference" "#PWR06"
+			(at 135.89 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13624,8 +14653,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 87.63 86.36 0)
+		(property "Value" "V_REG"
+			(at 135.89 16.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13633,7 +14662,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 87.63 91.44 0)
+			(at 135.89 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13642,7 +14671,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 87.63 91.44 0)
+			(at 135.89 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13650,81 +14679,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 87.63 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "53383c82-033a-4e3b-ac92-581bb07f22b2")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR070")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 109.22 88.9 90)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "7fe8a426-22e5-4934-8129-8fbd2ebf3351")
-		(property "Reference" "R3"
-			(at 109.22 86.36 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "0R22"
-			(at 108.966 84.582 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_2010_5025Metric"
-			(at 109.22 90.678 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 109.22 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 109.22 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C2999625"
-			(at 109.22 88.9 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 135.89 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13733,15 +14689,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "7869429b-d251-4d6e-ab05-5aff004c8968")
-		)
-		(pin "2"
-			(uuid "04e2244d-b869-4a7e-916d-5f5dc2a62315")
+			(uuid "56f31d4b-36bf-457c-b446-e4f602adba37")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "R3")
+					(reference "#PWR06")
 					(unit 1)
 				)
 			)
@@ -14221,17 +15174,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 78.74 156.21 0)
+		(lib_id "power:+BATT")
+		(at 60.96 113.03 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "856b532d-9c2a-46b5-99f7-9c2d846ac575")
-		(property "Reference" "#PWR0134"
-			(at 78.74 160.02 0)
+		(uuid "87c06e50-6f52-4c55-a81f-495c9e973d40")
+		(property "Reference" "#PWR090"
+			(at 60.96 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14239,8 +15193,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 78.74 151.13 0)
+		(property "Value" "V_REG"
+			(at 60.96 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14248,7 +15202,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 78.74 156.21 0)
+			(at 60.96 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14257,7 +15211,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 156.21 0)
+			(at 60.96 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14265,74 +15219,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 78.74 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "92b69895-2a60-43f3-80e9-a29893440b81")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0134")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 78.74 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "862a9953-8722-4558-ae96-08cf7e19bf5a")
-		(property "Reference" "#PWR069"
-			(at 78.74 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 78.74 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 78.74 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 78.74 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 78.74 91.44 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 60.96 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14341,12 +15229,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "cf06b67b-5003-4b41-9824-ca99bb24220d")
+			(uuid "e8ce0523-27a7-4ae3-b262-7cd1eb00a291")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR069")
+					(reference "#PWR090")
 					(unit 1)
 				)
 			)
@@ -14693,72 +15581,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 34.29 113.03 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8b3c5823-2d76-4e9b-b338-fbe4e424a97e")
-		(property "Reference" "#PWR087"
-			(at 34.29 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 34.29 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 34.29 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 34.29 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 34.29 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "43cad6c3-f2dd-4231-9ae4-f52af1512b53")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR087")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 102.87 133.35 180)
 		(unit 1)
@@ -14969,6 +15791,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 242.57 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8c7997b1-6c75-44a7-821a-4e7245f6a5d7")
+		(property "Reference" "#PWR041"
+			(at 242.57 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 242.57 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 242.57 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 242.57 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 242.57 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a38d5ed3-86f7-490d-a54f-8799ccd0f130")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR041")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 135.89 30.48 0)
 		(unit 1)
@@ -14983,6 +15872,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -15038,6 +15928,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 227.33 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8ea91078-ad32-4282-9ba7-b6499dfb3e5e")
+		(property "Reference" "#PWR040"
+			(at 227.33 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 227.33 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 227.33 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 227.33 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 227.33 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "82632a89-24af-41c8-bbf8-5875cca17aa0")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR040")
 					(unit 1)
 				)
 			)
@@ -15125,6 +16082,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -15291,17 +16249,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 120.65 54.61 0)
+		(lib_id "power:+BATT")
+		(at 90.17 54.61 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "926208d1-1b60-4ef0-8c6d-fe8cd2512d54")
-		(property "Reference" "#PWR033"
-			(at 120.65 58.42 0)
+		(uuid "92ca5129-6499-42f7-bfdd-67711c043dff")
+		(property "Reference" "#PWR031"
+			(at 90.17 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15309,8 +16268,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 120.65 49.53 0)
+		(property "Value" "V_REG"
+			(at 90.17 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15318,7 +16277,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 120.65 54.61 0)
+			(at 90.17 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15327,7 +16286,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 120.65 54.61 0)
+			(at 90.17 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15335,74 +16294,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 120.65 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d58734a3-2442-4269-9675-ec7a508bdc0b")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR033")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 43.18 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "928c7715-e1ae-46d6-9da0-4a597ede7341")
-		(property "Reference" "#PWR065"
-			(at 43.18 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 43.18 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 43.18 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 43.18 91.44 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 90.17 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15411,12 +16304,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "c0497fcb-2c1b-4065-8b50-c4089b291d02")
+			(uuid "45365d6e-e15b-43cf-a39d-06b56a30ea09")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR065")
+					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -15483,6 +16376,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR076")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 52.07 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "96dd5239-85de-4adf-a4a9-50fe3677e182")
+		(property "Reference" "#PWR066"
+			(at 52.07 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 52.07 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 52.07 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 52.07 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 52.07 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4299a708-1c6c-4dc5-ac2e-15d975747458")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR066")
 					(unit 1)
 				)
 			)
@@ -15840,72 +16800,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 59.69 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "9b249510-8c9d-4490-b45f-565165b94dbb")
-		(property "Reference" "#PWR029"
-			(at 59.69 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 59.69 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 59.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 59.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 59.69 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b927273e-1f5d-44f0-b5a1-b9563b5de3d9")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR029")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 87.63 121.92 0)
 		(unit 1)
@@ -16180,72 +17074,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 151.13 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "9ed5505e-598d-40d6-ba6f-04086de3e708")
-		(property "Reference" "#PWR07"
-			(at 151.13 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 151.13 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 151.13 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 151.13 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 151.13 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8a188a7b-4773-46a8-87bc-9c76ff5c517c")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR07")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 34.29 160.02 180)
 		(unit 1)
@@ -16470,6 +17298,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -16590,72 +17419,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR095")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 227.33 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a27c2367-ef53-4580-8e7c-78ade57eb55a")
-		(property "Reference" "#PWR012"
-			(at 227.33 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 227.33 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 227.33 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 227.33 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 227.33 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ebc4474c-b8f6-4fb7-b757-b73c0ce301a8")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -16834,72 +17597,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "J1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 69.85 156.21 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a4033164-68b9-4c63-9731-d3254af5235a")
-		(property "Reference" "#PWR0133"
-			(at 69.85 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 69.85 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 69.85 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 69.85 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 69.85 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "42da0802-218d-454b-be4e-681e47b745d6")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0133")
 					(unit 1)
 				)
 			)
@@ -17085,72 +17782,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 74.93 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "a64811ed-84f8-4296-92e7-12cfee1bd46a")
-		(property "Reference" "#PWR02"
-			(at 74.93 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 74.93 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 74.93 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 74.93 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 74.93 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "08011921-6790-4b43-83f5-6bf44a987519")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR02")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "ALeoExpress:WS2812B_PTH")
 		(at 227.33 63.5 0)
 		(unit 1)
@@ -17165,6 +17796,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -17331,17 +17963,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 74.93 54.61 0)
+		(lib_id "power:+BATT")
+		(at 43.18 113.03 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "a90faa83-b159-483a-bdda-71925f9c0167")
-		(property "Reference" "#PWR030"
-			(at 74.93 58.42 0)
+		(uuid "a9a32634-9bec-468e-8bb1-881756ccf4fd")
+		(property "Reference" "#PWR088"
+			(at 43.18 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17349,8 +17982,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 74.93 49.53 0)
+		(property "Value" "V_REG"
+			(at 43.18 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17358,7 +17991,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 74.93 54.61 0)
+			(at 43.18 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17367,7 +18000,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 74.93 54.61 0)
+			(at 43.18 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17375,8 +18008,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 74.93 54.61 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 43.18 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -17385,12 +18018,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "1b3b0ed7-8a87-4d0a-9038-6c8eec2170e1")
+			(uuid "fa2887d6-f6a1-4df1-aad2-6c93f07215b4")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR030")
+					(reference "#PWR088")
 					(unit 1)
 				)
 			)
@@ -17496,138 +18129,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "C15")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 87.63 134.62 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "adf56eda-205e-47fd-acf2-7767a25fff7b")
-		(property "Reference" "#PWR0113"
-			(at 87.63 138.43 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 87.63 129.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 87.63 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 87.63 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 87.63 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "ed162879-d7f8-4433-ba9c-7f312b5849cb")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0113")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 78.74 134.62 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "ae4221a3-ee75-4bf9-a8d5-a4e713a0091a")
-		(property "Reference" "#PWR0112"
-			(at 78.74 138.43 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 78.74 129.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 78.74 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 78.74 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 78.74 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "daf4c780-a74a-4e9e-add0-7a18fc043739")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0112")
 					(unit 1)
 				)
 			)
@@ -17741,6 +18242,140 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "R9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 69.85 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "af7a339a-0853-40c5-9934-0c4407c7436f")
+		(property "Reference" "#PWR068"
+			(at 69.85 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 69.85 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 69.85 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 69.85 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 69.85 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3d8e3e13-2bd9-488a-b9da-0a81bfc412e0")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR068")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 59.69 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b283467d-a56a-455b-ac39-178d057c2a80")
+		(property "Reference" "#PWR01"
+			(at 59.69 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 59.69 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 59.69 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 59.69 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d9516c58-aea6-4712-b039-a2afff04d471")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR01")
 					(unit 1)
 				)
 			)
@@ -17928,7 +18563,7 @@
 		(dnp no)
 		(uuid "b663a22f-6662-4d8c-878c-47bf0056ae16")
 		(property "Reference" "U1"
-			(at 120.142 85.09 0)
+			(at 128.016 82.55 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -18019,72 +18654,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "U1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 52.07 156.21 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b6e15a4d-5630-47d0-9d5b-e7a696f0c0ea")
-		(property "Reference" "#PWR0131"
-			(at 52.07 160.02 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 52.07 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 52.07 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 52.07 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 52.07 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "decdbf91-5cfc-41a9-b013-4a982072ce8d")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0131")
 					(unit 1)
 				)
 			)
@@ -18216,6 +18785,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -18271,72 +18841,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D22")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 90.17 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b8265fe2-13b2-4458-8259-97b233bcc9f0")
-		(property "Reference" "#PWR031"
-			(at 90.17 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 90.17 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 90.17 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 90.17 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 90.17 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "623985ae-da90-4533-9e75-ae073ed726cd")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -18403,6 +18907,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR0119")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 257.81 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b9431312-1a74-4508-95e0-2883ce135a52")
+		(property "Reference" "#PWR042"
+			(at 257.81 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 257.81 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 257.81 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 257.81 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 257.81 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "486417ae-0b6f-47e9-ab63-f90017833271")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR042")
 					(unit 1)
 				)
 			)
@@ -18535,6 +19106,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -18814,72 +19386,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 212.09 21.59 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "bb8b8979-bde3-4236-b1bd-456c53bbfca2")
-		(property "Reference" "#PWR011"
-			(at 212.09 25.4 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 212.09 16.51 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 212.09 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 212.09 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 212.09 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "b0245f0d-469f-40bc-9ce8-fe8687287947")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR011")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 87.63 138.43 180)
 		(unit 1)
@@ -18999,6 +19505,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -19125,17 +19632,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 105.41 54.61 0)
+		(lib_id "power:+BATT")
+		(at 212.09 54.61 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "bd01b0f3-fbf1-460d-b1a8-03c257148be1")
-		(property "Reference" "#PWR032"
-			(at 105.41 58.42 0)
+		(uuid "bd98958a-ace2-4f94-a2db-d4d68f732974")
+		(property "Reference" "#PWR039"
+			(at 212.09 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19143,8 +19651,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 105.41 49.53 0)
+		(property "Value" "V_REG"
+			(at 212.09 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19152,7 +19660,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 105.41 54.61 0)
+			(at 212.09 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19161,7 +19669,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 105.41 54.61 0)
+			(at 212.09 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19169,8 +19677,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 105.41 54.61 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 212.09 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19179,12 +19687,79 @@
 			)
 		)
 		(pin "1"
-			(uuid "44e614da-a00a-4902-8909-3d31e6ec40ea")
+			(uuid "b8d177e2-03a6-4af2-97c0-087aeef90e6e")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR032")
+					(reference "#PWR039")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 78.74 134.62 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "be731d1b-1905-4913-8623-14db72f5781e")
+		(property "Reference" "#PWR0112"
+			(at 78.74 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 78.74 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 78.74 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 78.74 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 78.74 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8bef4029-c89f-4ea8-9f8f-b54c2945e32b")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0112")
 					(unit 1)
 				)
 			)
@@ -19271,6 +19846,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -19346,6 +19922,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -19401,72 +19978,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "D27")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 34.29 91.44 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c3df3281-8116-446e-87e3-f50982e34ea6")
-		(property "Reference" "#PWR064"
-			(at 34.29 95.25 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 34.29 86.36 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 34.29 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 34.29 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 34.29 91.44 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "8fd3b6ba-70be-4cba-9b8a-28a50383c2da")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR064")
 					(unit 1)
 				)
 			)
@@ -19533,72 +20044,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR0116")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 78.74 113.03 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c57e1890-aad7-477e-b9aa-86de402694e8")
-		(property "Reference" "#PWR092"
-			(at 78.74 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 78.74 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 78.74 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 78.74 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 78.74 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "736ea7ef-181b-4e65-9d52-b60afaf3f14a")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR092")
 					(unit 1)
 				)
 			)
@@ -19803,17 +20248,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 69.85 134.62 0)
+		(lib_id "power:+BATT")
+		(at 105.41 54.61 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "c7e6c07d-f0d3-40a6-9246-27781bed6ceb")
-		(property "Reference" "#PWR0111"
-			(at 69.85 138.43 0)
+		(uuid "c87b896b-1167-4be6-b457-e5ac8254cb50")
+		(property "Reference" "#PWR032"
+			(at 105.41 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19821,8 +20267,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 69.85 129.54 0)
+		(property "Value" "V_REG"
+			(at 105.41 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19830,7 +20276,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 69.85 134.62 0)
+			(at 105.41 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19839,7 +20285,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 69.85 134.62 0)
+			(at 105.41 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19847,8 +20293,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 69.85 134.62 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 105.41 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -19857,12 +20303,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "31f8dabe-c02c-424e-8eb9-9ea531a7e435")
+			(uuid "ed2b5871-44c2-40e7-98ce-594d89bc6e93")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0111")
+					(reference "#PWR032")
 					(unit 1)
 				)
 			)
@@ -19941,6 +20387,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 196.85 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c9098fec-9142-465c-9b63-a269894e3a39")
+		(property "Reference" "#PWR010"
+			(at 196.85 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 196.85 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 196.85 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 196.85 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 196.85 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "868a70c0-c295-46da-ba8e-0fc9a3e04407")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -20237,6 +20750,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -20312,6 +20826,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -20478,6 +20993,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 59.69 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "cd292a1e-1586-441d-b159-991ea8ebe11d")
+		(property "Reference" "#PWR029"
+			(at 59.69 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 59.69 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 59.69 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 59.69 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7040e61e-8df1-409b-9aa7-338f67e60614")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR029")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+5V")
 		(at 179.07 86.36 0)
 		(unit 1)
@@ -20538,72 +21120,6 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR060")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 69.85 113.03 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "cf674387-c38d-413a-83e1-4bffc3f06ff2")
-		(property "Reference" "#PWR091"
-			(at 69.85 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 69.85 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 69.85 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 69.85 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 69.85 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "280da461-00a7-419c-a123-72a73d1c5048")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR091")
 					(unit 1)
 				)
 			)
@@ -20715,72 +21231,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 52.07 134.62 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d00ecb7b-5ff7-40c5-bfbe-92db9af080d6")
-		(property "Reference" "#PWR0109"
-			(at 52.07 138.43 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 52.07 129.54 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 52.07 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 52.07 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 52.07 134.62 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d4958f93-9c38-4242-846b-05ba5d6f36b5")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0109")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 181.61 39.37 0)
 		(unit 1)
@@ -20847,72 +21297,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 196.85 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d1f12f00-9f7b-41e3-bed4-8d723bea0f2d")
-		(property "Reference" "#PWR038"
-			(at 196.85 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 196.85 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 196.85 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 196.85 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 196.85 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "e67a886d-8c7f-4b83-b922-ba034cbb34d2")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR038")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 43.18 121.92 0)
 		(unit 1)
@@ -20973,6 +21357,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR097")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 78.74 91.44 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d4543080-7c3a-4c23-9d99-09d4c84996ad")
+		(property "Reference" "#PWR069"
+			(at 78.74 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 78.74 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 78.74 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 78.74 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 78.74 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "83d91dc6-c64e-47e2-9f41-41e6716a59f2")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR069")
 					(unit 1)
 				)
 			)
@@ -21327,17 +21778,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 105.41 21.59 0)
+		(lib_id "power:+BATT")
+		(at 166.37 54.61 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "dc7f4752-a14a-40b9-bb29-b7bf40308b95")
-		(property "Reference" "#PWR04"
-			(at 105.41 25.4 0)
+		(uuid "d9d820c4-2bab-4ad6-8046-f0383fd2019f")
+		(property "Reference" "#PWR036"
+			(at 166.37 58.42 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21345,8 +21797,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 105.41 16.51 0)
+		(property "Value" "V_REG"
+			(at 166.37 49.53 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21354,7 +21806,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 105.41 21.59 0)
+			(at 166.37 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21363,7 +21815,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 105.41 21.59 0)
+			(at 166.37 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21371,74 +21823,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 105.41 21.59 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "18e7db97-e5cb-4a56-a156-16f41e10ccca")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR04")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+5V")
-		(at 43.18 113.03 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "dc8d0f23-f347-4274-a331-0582d00ecaa3")
-		(property "Reference" "#PWR088"
-			(at 43.18 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 43.18 107.95 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 43.18 113.03 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 43.18 113.03 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 166.37 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -21447,12 +21833,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "de43b767-f8e1-4b11-a136-a62bb95040a6")
+			(uuid "28a0ff22-da8b-4ca9-9948-7240e746eb71")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR088")
+					(reference "#PWR036")
 					(unit 1)
 				)
 			)
@@ -21473,6 +21859,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -21703,6 +22090,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -21896,6 +22284,73 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+BATT")
+		(at 74.93 54.61 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e038cebf-882f-440e-917e-f82fe72f83e7")
+		(property "Reference" "#PWR030"
+			(at 74.93 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 74.93 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 74.93 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 74.93 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 74.93 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f872193a-43bf-48fd-8767-03b501e8c647")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR030")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 196.85 72.39 0)
 		(unit 1)
@@ -22028,17 +22483,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 87.63 156.21 0)
+		(lib_id "power:+BATT")
+		(at 120.65 21.59 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "e30b5874-215b-4e17-866d-98a8efaec952")
-		(property "Reference" "#PWR0135"
-			(at 87.63 160.02 0)
+		(uuid "e430fb84-b23a-482c-8e97-8a5ed624b664")
+		(property "Reference" "#PWR05"
+			(at 120.65 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22046,8 +22502,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 87.63 151.13 0)
+		(property "Value" "V_REG"
+			(at 120.65 16.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22055,7 +22511,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 87.63 156.21 0)
+			(at 120.65 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22064,7 +22520,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 87.63 156.21 0)
+			(at 120.65 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22072,8 +22528,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 87.63 156.21 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 120.65 21.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -22082,12 +22538,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "cf58c758-8736-463b-8b4a-7a413a0b7e9e")
+			(uuid "105392f6-05f4-464c-8a2a-46f49e2f0dca")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0135")
+					(reference "#PWR05")
 					(unit 1)
 				)
 			)
@@ -22154,6 +22610,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "#PWR049")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 87.63 134.62 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e46d030e-4875-4f08-9eed-5708ea239969")
+		(property "Reference" "#PWR0113"
+			(at 87.63 138.43 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 87.63 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 87.63 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 87.63 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 87.63 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5b7cc9bf-b42c-4c48-b369-3ade151aefc9")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR0113")
 					(unit 1)
 				)
 			)
@@ -22306,6 +22829,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -22629,6 +23153,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -22772,6 +23297,73 @@
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
 					(reference "C2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 181.61 21.59 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e97b2411-e92b-4ad2-801b-0cba447bb2c4")
+		(property "Reference" "#PWR09"
+			(at 181.61 25.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "V_REG"
+			(at 181.61 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 181.61 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 181.61 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 181.61 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "894ed73b-8c78-461f-8235-1105e9809385")
+		)
+		(instances
+			(project "Marajoara_PCB"
+				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
+					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -23121,6 +23713,7 @@
 				(font
 					(size 1.27 1.27)
 				)
+				(hide yes)
 			)
 		)
 		(property "Value" "WS2812B"
@@ -23182,17 +23775,34 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 43.18 156.21 0)
+		(lib_id "Mechanical:MountingHole")
+		(at 31.75 69.85 0)
 		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
+		(exclude_from_sim yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "f0681a37-3b78-4136-9b0f-be26714ecdcf")
-		(property "Reference" "#PWR0130"
-			(at 43.18 160.02 0)
+		(uuid "f1b558fd-7022-45da-b9f4-9077a80a1f7c")
+		(property "Reference" "H3"
+			(at 34.29 68.5799 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 34.29 71.1199 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_3.2mm_M3"
+			(at 31.75 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23200,16 +23810,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 43.18 151.13 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 43.18 156.21 0)
+		(property "Datasheet" "~"
+			(at 31.75 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23217,31 +23819,19 @@
 				(hide yes)
 			)
 		)
-		(property "Datasheet" ""
-			(at 43.18 156.21 0)
+		(property "Description" "Mounting Hole without connection"
+			(at 31.75 69.85 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 43.18 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "d5da802c-95ae-492e-8a6d-9b024cca30ff")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0130")
+					(reference "H3")
 					(unit 1)
 				)
 			)
@@ -23529,72 +24119,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 166.37 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "f81b023d-71f4-4647-bf16-65275ccaeed4")
-		(property "Reference" "#PWR036"
-			(at 166.37 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 166.37 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 166.37 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 166.37 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 166.37 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f2b19257-2c4a-4248-87f2-5efd912a561e")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR036")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:GND")
 		(at 52.07 165.1 0)
 		(unit 1)
@@ -23727,72 +24251,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 181.61 54.61 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "fc9f4e47-9805-419c-8f41-ae636d29c561")
-		(property "Reference" "#PWR037"
-			(at 181.61 58.42 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "+5V"
-			(at 181.61 49.53 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 181.61 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 181.61 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 181.61 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "03568fce-c3dd-43dd-99ce-8474227c8c13")
-		)
-		(instances
-			(project "Marajoara_PCB"
-				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR037")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 43.18 138.43 180)
 		(unit 1)
@@ -23898,17 +24356,18 @@
 		)
 	)
 	(symbol
-		(lib_id "power:+5V")
-		(at 34.29 134.62 0)
+		(lib_id "power:+BATT")
+		(at 34.29 113.03 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "fea70e92-66de-417d-9129-5f46e9d16717")
-		(property "Reference" "#PWR0107"
-			(at 34.29 138.43 0)
+		(uuid "fe13a5c6-f12f-45f7-8cce-3fd0bb00e126")
+		(property "Reference" "#PWR087"
+			(at 34.29 116.84 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23916,8 +24375,8 @@
 				(hide yes)
 			)
 		)
-		(property "Value" "+5V"
-			(at 34.29 129.54 0)
+		(property "Value" "V_REG"
+			(at 34.29 107.95 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23925,7 +24384,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 34.29 134.62 0)
+			(at 34.29 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23934,7 +24393,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 34.29 134.62 0)
+			(at 34.29 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23942,8 +24401,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Power symbol creates a global label with name \"+5V\""
-			(at 34.29 134.62 0)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 34.29 113.03 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -23952,12 +24411,12 @@
 			)
 		)
 		(pin "1"
-			(uuid "60356baa-1cba-45c5-ace4-2621474b3e4c")
+			(uuid "69f7504c-6151-4f27-9a00-afb88b1eb38d")
 		)
 		(instances
 			(project "Marajoara_PCB"
 				(path "/af3decfc-1828-4d32-8162-5dc802821ae7"
-					(reference "#PWR0107")
+					(reference "#PWR087")
 					(unit 1)
 				)
 			)
