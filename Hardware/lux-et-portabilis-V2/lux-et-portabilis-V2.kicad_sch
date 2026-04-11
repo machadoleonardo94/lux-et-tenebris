@@ -4153,12 +4153,6 @@
 		(uuid "d354415c-8ef7-4f38-b6ab-8ba868cde1c9")
 	)
 	(junction
-		(at 85.09 82.55)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d502432d-7e19-46d3-b2db-4a2411ca4539")
-	)
-	(junction
 		(at 36.83 22.86)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4254,7 +4248,7 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 82.55) (xy 85.09 83.82)
+			(xy 85.09 82.55) (xy 85.09 88.9)
 		)
 		(stroke
 			(width 0)
@@ -4814,16 +4808,6 @@
 	)
 	(wire
 		(pts
-			(xy 85.09 72.39) (xy 85.09 73.66)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "95c7366e-fcc0-4982-8e5c-cadf872bd590")
-	)
-	(wire
-		(pts
 			(xy 93.98 50.8) (xy 95.25 50.8)
 		)
 		(stroke
@@ -4924,7 +4908,7 @@
 	)
 	(wire
 		(pts
-			(xy 76.2 88.9) (xy 77.47 88.9)
+			(xy 76.2 88.9) (xy 85.09 88.9)
 		)
 		(stroke
 			(width 0)
@@ -4941,16 +4925,6 @@
 			(type default)
 		)
 		(uuid "ac25a234-a503-4d48-a108-da6d33bb6a93")
-	)
-	(wire
-		(pts
-			(xy 85.09 81.28) (xy 85.09 82.55)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "acfe720a-f08c-486a-9af3-ddf84d13b99d")
 	)
 	(wire
 		(pts
@@ -5081,16 +5055,6 @@
 			(type default)
 		)
 		(uuid "c067949e-e568-4f31-b730-5cf491fdde00")
-	)
-	(wire
-		(pts
-			(xy 85.09 93.98) (xy 85.09 99.06)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "c09ffc85-360b-4cf1-831f-b1f3efbda1f6")
 	)
 	(wire
 		(pts
@@ -9214,109 +9178,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 85.09 77.47 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "68b78291-cac0-4f02-b873-e077392ff257")
-		(property "Reference" "R5"
-			(at 87.63 77.47 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "10k"
-			(at 82.804 77.47 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 83.312 77.47 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C17414"
-			(at 85.09 77.47 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ASSEMBLY" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 1" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 2" ""
-			(at 85.09 77.47 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "32d6c352-6e3c-4999-b154-40747deb7ce3")
-		)
-		(pin "2"
-			(uuid "436aa589-981b-4c8a-9258-4dfbb10974f4")
-		)
-		(instances
-			(project "lux_et_portabilis"
-				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
-					(reference "R5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C")
 		(at 166.37 93.98 180)
 		(unit 1)
@@ -9618,7 +9479,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_2010_5025Metric"
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 128.27 51.308 90)
 			(effects
 				(font
@@ -9636,7 +9497,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Resistor"
+		(property "Description" "Resistor 0R220 1% 1W 1206"
 			(at 128.27 49.53 0)
 			(effects
 				(font
@@ -9645,7 +9506,7 @@
 				(hide yes)
 			)
 		)
-		(property "LCSC" "C2999625"
+		(property "LCSC" "C2683384"
 			(at 128.27 49.53 0)
 			(effects
 				(font
@@ -9664,71 +9525,6 @@
 			(project "lux_et_portabilis"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 85.09 99.06 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "8289dfac-0496-4b2c-9625-cf1824102db0")
-		(property "Reference" "#PWR011"
-			(at 85.09 105.41 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "GND"
-			(at 85.09 103.124 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 85.09 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 85.09 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 85.09 99.06 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "f01c5e4c-e4c0-4681-99cb-4908ed14be58")
-		)
-		(instances
-			(project "lux_et_portabilis"
-				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
-					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -10957,73 +10753,6 @@
 			(project "lux_et_portabilis"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R14")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:+BATT")
-		(at 85.09 72.39 0)
-		(mirror y)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "b4b95629-209e-4ee8-9faa-52a752e08c28")
-		(property "Reference" "#PWR010"
-			(at 85.09 76.2 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "V_REG"
-			(at 85.09 67.31 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 85.09 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 85.09 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 85.09 72.39 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "a79305eb-adf7-44de-9fa3-2b2fc4d82833")
-		)
-		(instances
-			(project "lux_et_portabilis"
-				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
-					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -13294,118 +13023,6 @@
 			(project "Aranakin"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "H3")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Transistor_FET:2N7002K")
-		(at 82.55 88.9 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "f2849f68-5c8c-4b0d-bc13-490520b85ef0")
-		(property "Reference" "Q1"
-			(at 87.884 85.852 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "2N7002K"
-			(at 88.9 90.1699 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-			(at 87.63 90.805 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(italic yes)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "https://www.diodes.com/assets/Datasheets/ds30896.pdf"
-			(at 87.63 92.71 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Description" "0.38A Id, 60V Vds, N-Channel MOSFET, SOT-23"
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "LCSC" "C65189"
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "ASSEMBLY" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 1" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "SUPPLIER 2" ""
-			(at 82.55 88.9 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "27959838-002f-4ca4-bcdf-9691854d29e9")
-		)
-		(pin "3"
-			(uuid "ba714591-d1de-4692-a838-6992b0492322")
-		)
-		(pin "2"
-			(uuid "5142ece4-8a8c-4fc4-a910-7eed1d730802")
-		)
-		(instances
-			(project "lux_et_portabilis"
-				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
-					(reference "Q1")
 					(unit 1)
 				)
 			)

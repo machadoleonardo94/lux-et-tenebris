@@ -1,4 +1,4 @@
-27336024579483722
+27337801240029314
 Aleoexpress
 ESOP-8_L4.9-W3.9-P1.27-LS6.0-BL-EP
 
@@ -21,6 +21,13 @@ LED-SMD_L3.5-W2.8-RD_LT2835KYCT
 2
 2
 Aleoexpress
+MAX98357A
+
+
+0
+8
+8
+Aleoexpress
 MPU6050
 
 
@@ -42,6 +49,13 @@ phoenix_contact connector MC_01x03_G_3.81mm
 3
 3
 Aleoexpress
+Speaker_4R_3W_35x25mm
+
+
+0
+0
+0
+Aleoexpress
 TF-SMD_TF-CARD-XG8P-H1.5
 
 
@@ -55,13 +69,6 @@ USB-C-SMD_GT-USB-7101A
 0
 10
 9
-Aleoexpress
-Untitled
-
-
-0
-0
-0
 Aleoexpress
 WS2812B_PTH_staggered
 LED, diameter 5.0mm, 4 pins, WP154A4, https://www.kingbright.com/attachments/file/psearch/000/00/00/L-154A4SUREQBFZGEW(Ver.11A).pdf
