@@ -6,13 +6,12 @@
 #define PROJECT_GLOBAL_PINOUT
 
 //* Channels:
-#define status_led_pin 0
+#define analog_channel_0 0
 #define strip_pin 1
 #define servo_pin 2
-
-//* PORT2 (buttons):
-#define buttonA 3
-#define buttonB 4
+#define button_pin 3
+#define latch_enable 4
+#define status_led_pin 10
 
 //* PORT3 (free GPIOs):
 #define freeGPIOA 5

@@ -14,6 +14,10 @@ float max_gyro_x = 0;
 float max_gyro_y = 0;
 float max_gyro_z = 0;
 
+float max_accel_x = 0;
+float max_accel_y = 0;
+float max_accel_z = 0;
+
 uint32_t loopTimer = 0;
 uint32_t globalTimer = 0;
 uint32_t loopCounter = 0;

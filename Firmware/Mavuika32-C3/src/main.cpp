@@ -15,40 +15,48 @@
 
 void setup()
 {
-  // Initialize serial communication for debugging
+  pinMode(button_pin, INPUT_PULLDOWN);
+  // pinMode(servo_pin, OUTPUT);
+  pinMode(latch_enable, OUTPUT);
+  digitalWrite(latch_enable, HIGH); // Ensure latch is high at startup
+  onboard_led.begin();
+  onboard_led.setPixelColor(0, 100, 0, 0);
+  onboard_led.show();
   Serial.begin(115200);
   delay(100);
 
-  Serial.println("\n\nESP32-C3 LED Control Started");
+  Serial.println("\n\nESP32-C3 Mavuika Let it Go ");
   Serial.println("===========================");
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   Serial.println("LED strip initialized");
 
-  onboard_led.begin();
-  onboard_led.show(); // Initialize all pixels to 'off'
   Serial.println("Status LED initialized");
 
   Wire.begin(i2c_sda, i2c_scl);
   Serial.printf("I2C initialized (SDA=%d, SCL=%d)\n", i2c_sda, i2c_scl);
 
-  if (!mpu.begin(0x68, &Wire))
+  if (mpu.begin(0x68, &Wire))
   {
-    Serial.println("Failed to find MPU6050 chip");
-    for (int k = 0; k < 5; k++)
-    {
-      onboard_led.setPixelColor(0, strip.Color(50 * (k % 2), 0, 0)); // Red
-      onboard_led.show();
-      delay(200);
-    }
+    gyro_started = true;
+    Serial.println("MPU6050 found and initialized");
   }
   else
+    Serial.println("Failed to find MPU6050 chip");
+
+  for (int k = 0; k < 5; k++)
   {
-    Serial.println("MPU6050 found and initialized");
-    gyro_started = true;
+    if (!gyro_started)
+      onboard_led.setPixelColor(0, strip.Color(50 * (k % 2), 0, 0)); // Red
+    else
+      onboard_led.setPixelColor(0, strip.Color(0, 50 * (k % 2), 0)); // Green
+    onboard_led.show();
+    delay(200);
   }
+
   // setup_WIFI();
+  WiFi.mode(WIFI_OFF);
 }
 
 void loop()
@@ -61,9 +69,18 @@ void loop()
 
   update_onboard_LED();
 
-  update_strip();
+  // update_strip();
+  // run_majoras();
+  flame_steps();
 
   serial_outputs();
 
-  run_majoras();
+  if ((millis() > 5000) && (digitalRead(button_pin) == HIGH))
+  {
+    Serial.println("Button pressed!");
+    onboard_led.setPixelColor(0, strip.Color(55, 0, 30));
+    onboard_led.show();
+    delay(1000);                     // Debounce delay
+    digitalWrite(latch_enable, LOW); // Deactivate latch to shutdown
+  }
 }

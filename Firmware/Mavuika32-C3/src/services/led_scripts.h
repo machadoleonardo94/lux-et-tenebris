@@ -6,6 +6,7 @@
 void run_majoras();
 void update_onboard_LED();
 void update_strip();
+void flame_steps();
 
 void run_majoras()
 {
@@ -60,20 +61,61 @@ void update_onboard_LED()
     */
 }
 
+void flame_steps()
+{
+    if (millis() - led_strip.update_time < 50)
+        return;
+    led_strip.update_time = millis();
+
+    static float magnitude = 0;
+    magnitude = max(magnitude, (float)detectSingleStep(a.acceleration.x, a.acceleration.y, a.acceleration.z));
+    magnitude *= 0.90f; // Decay over time
+    Serial.printf("Step Magnitude: %.2f \n", magnitude);
+
+    if (magnitude > 1)
+    {
+        lenght = 37 - magnitude;
+        power = magnitude * 5;
+        if (power > 75)
+            power = 75;
+        if (lenght > NUM_LEDS)
+            lenght = NUM_LEDS;
+
+        led_strip.red = power;
+        led_strip.green = 0;
+        led_strip.blue = power;
+        Serial.printf("Flame Length: %d \n", lenght);
+        Serial.printf("Flame Power: %d \n", power);
+    }
+    else
+    {
+        lenght = 37; // Dim when stationary
+        power = 5;   // Dim when stationary
+    }
+
+    for (int i = 0; i < lenght; i++)
+    {
+        strip.setPixelColor(i, strip.Color(led_strip.red, led_strip.green, led_strip.blue)); // Purple
+    }
+    for (int i = lenght; i < NUM_LEDS; i++)
+    {
+        strip.setPixelColor(i, strip.Color(0, 0, 0)); // Off
+    }
+    strip.show();
+}
 void update_strip()
 {
     if (millis() - led_strip.update_time < 50)
         return;
     led_strip.update_time = millis();
 
+    max_gyro_x *= 0.9; // Decay over time
+    max_gyro_y *= 0.9;
+    max_gyro_z *= 0.9;
     // Update hold values
     max_gyro_x = max(max_gyro_x, abs(g.gyro.x));
     max_gyro_y = max(max_gyro_y, abs(g.gyro.y));
     max_gyro_z = max(max_gyro_z, abs(g.gyro.z));
-
-    max_gyro_x *= 0.9; // Decay over time
-    max_gyro_y *= 0.9;
-    max_gyro_z *= 0.9;
 
     if (max_gyro_z > 0.2)
     {

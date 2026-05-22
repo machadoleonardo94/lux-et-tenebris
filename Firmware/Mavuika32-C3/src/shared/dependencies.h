@@ -42,6 +42,7 @@
 #include "components/ESP32/setup.h"
 
 //* Services:
+#include "services/gyros.h"
 #include "services/led_scripts.h"
 #include "services/serial_outputs.h"
 #include "services/wifi_settings.h"
