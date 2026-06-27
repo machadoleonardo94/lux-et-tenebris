@@ -82,5 +82,8 @@ void loop()
     onboard_led.show();
     delay(1000);                     // Debounce delay
     digitalWrite(latch_enable, LOW); // Deactivate latch to shutdown
+    delay(100);                      // Wait for latch to settle
+    Serial.printf("Shutting down at %lu ms\n", millis());
+    ESP.restart(); // Restart the ESP32-C3
   }
 }

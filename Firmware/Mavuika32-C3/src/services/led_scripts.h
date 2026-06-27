@@ -42,12 +42,13 @@ void run_majoras()
 
 void update_onboard_LED()
 {
-    if (millis() - status_led.update_time < 150)
+    if (millis() - status_led.update_time < 5)
         return;
     status_led.update_time = millis();
-    status_led.red = abs(g.gyro.x);
-    status_led.green = abs(g.gyro.y);
-    status_led.blue = abs(g.gyro.z);
+    status_led.blue = 10 * (1 + sin(millis() * 0.01));
+    // status_led.red = abs(g.gyro.x);
+    // status_led.green = abs(g.gyro.y);
+    // status_led.blue = abs(g.gyro.z);
 
     onboard_led.setPixelColor(0, strip.Color(status_led.red, status_led.green, status_led.blue)); // Green status LED with same brightness
     onboard_led.show();

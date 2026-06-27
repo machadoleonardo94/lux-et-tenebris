@@ -103,11 +103,11 @@ cd lux-et-tenebris/Firmware/lightpack
 
 2. Build the project:
 ```bash
-platformio run
+platformio build
 ```
 
 3. Upload via USB (first time):
-- Connect your serial header to the 
+- Connect your serial header to the device
 - Put the device on download mode (Holding the prog button during a reboot)
 ```bash
 platformio run --target upload
@@ -192,10 +192,6 @@ lightpack/
 └── lib/                 # Custom libraries
 ```
 
-## 🔧 Configuration
-
-### Build Flags
-The firmware is compiled with optimization level `-Os` (optimize for size) and core debug level 2.
 
 ### Board Configuration
 - **Platform**: Espressif32 @ 6.11.0
@@ -204,9 +200,10 @@ The firmware is compiled with optimization level `-Os` (optimize for size) and c
 - **Partitions**: min_spiffs.csv
 - **Upload Speed**: 921600 baud
 - **Monitor Speed**: 115200 baud
+
 If your upload device cannot handle 921600, reduce it to 115200. It will upload slower, but consistently for most USB-Serial converters
 
-## 📚 Dependencies
+##  Dependencies
 
 All dependencies are automatically managed by PlatformIO:
 
@@ -250,9 +247,6 @@ Do remember that disabling the WiFi modem also disables the bridge to OTA, so tu
 
 This project is part of the **Lux et Tenebris** ecosystem.
 
-## 👨‍💻 Author
-
-**Leonardo Machado** - [@machadoleonardo94](https://github.com/machadoleonardo94)
 
 ## 📝 Version History
 

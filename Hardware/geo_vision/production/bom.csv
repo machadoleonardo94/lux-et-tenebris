@@ -1,0 +1,4 @@
+﻿Designator,Footprint,Quantity,Value,LCSC Part #
+BT1,BatteryHolder_MYOUNG_BS-07-A1BJ001_CR2032,1,BS-2-1,C70376
+"D1, D2, D3, D4, D5, D6",0805,6,LED,
+R1,0805,1,22R,
