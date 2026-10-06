@@ -42,10 +42,15 @@
 #include "components/ESP32/setup.h"
 
 //* Services:
+#include "services/i2c_scan.h"
 #include "services/gyros.h"
+#include "services/readings.h"
 #include "services/led_scripts.h"
 #include "services/serial_outputs.h"
 #include "services/wifi_settings.h"
 #include "services/webpage.h"
+//* Presets come after the page: their handlers are registered by setup_webpage()
+//* and they reuse its JSON helper and configuration writer.
+#include "services/presets.h"
 
 #endif

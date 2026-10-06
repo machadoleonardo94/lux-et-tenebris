@@ -7,6 +7,10 @@ void serial_outputs()
 {
     loopCounter++;
 
+    //? Previous detector sample count, so the report below can turn the counter into
+    //? a rate over the same 10 s window the loop count uses.
+    static uint32_t impact_samples_last = 0;
+
     if (millis() - loopTimer > 10000)
     {
         Serial.printf("\n\nTotal main loops per 10 seconds: %d \n", loopCounter);
@@ -28,6 +32,20 @@ void serial_outputs()
                       a.acceleration.x, a.acceleration.y, a.acceleration.z);
         Serial.printf("->| GYRO     | Gyro_X: %.2f  | Gyro_Y: %.2f  | Gyro_Z: %.2f |\n",
                       g.gyro.x, g.gyro.y, g.gyro.z);
+
+        //* Detector health. The rate the loop actually achieved is not something the
+        //* firmware can assume: with WiFi, a web request or an OTA transfer in
+        //* flight, loop() can run far slower than the 500 Hz the detector targets,
+        //! and a rate below ~100 Hz is what makes impacts get missed or undersized.
+        const uint32_t samples = impact_samples - impact_samples_last;
+        impact_samples_last = impact_samples;
+        if (impact_count == 0)
+            Serial.printf("->| IMPACT   | %lu samples/s | none detected yet |\n",
+                          (unsigned long)(samples / 10UL));
+        else
+            Serial.printf("->| IMPACT   | %lu samples/s | %lu total | last magnitude %u, %lu ms ago |\n",
+                          (unsigned long)(samples / 10UL), (unsigned long)impact_count,
+                          impact_last_magnitude, (unsigned long)(millis() - impact_last_ms));
         Serial.printf("\n\n");
     }
 

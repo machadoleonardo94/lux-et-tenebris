@@ -38,6 +38,15 @@ void setup_OTA()
     else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
     else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
 
+  //! This is called from setup_ESP32(), i.e. BEFORE the WiFi join, so ArduinoOTA
+  //! has no interface hostname to inherit and falls back to "esp32-<mac>" in
+  //! begin(). Worse, begin() starts the mDNS responder right there, and
+  //! mdns_init() can only succeed once per boot - so this call, not the one in
+  //! setup_webpage(), is what decides the name the board answers to. Without an
+  //! explicit hostname the board lives at esp32-xxxxxxxxxxxx.local and
+  //! NETWORK_HOSTNAME.local never resolves.
+  ArduinoOTA.setHostname(NETWORK_HOSTNAME);
+
   ArduinoOTA.begin();
 }
 
