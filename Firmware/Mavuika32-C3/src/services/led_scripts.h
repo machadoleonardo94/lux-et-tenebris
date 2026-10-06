@@ -5,8 +5,31 @@
 
 void run_majoras();
 void update_onboard_LED();
-void update_strip();
+void update_strip(int mode);
 void flame_steps();
+void fade_strip();
+void constant_brightness();
+
+//* ---------------------- MODE REGISTRY ----------------------
+//? Single source of truth for the selectable LED scripts.
+//? The webpage service enumerates this table to build its mode picker,
+//? so adding an entry below makes the mode available over HTTP with no
+//? change to services/webpage.h.
+
+typedef void (*led_mode_fn)();
+
+typedef struct ledMode
+{
+    uint8_t id;          // Stable numeric id, persisted to NVS
+    const char *key;     // Stable slug for the web API
+    const char *label;   // Human readable name shown in the UI
+    led_mode_fn run;     // Frame function, gated by update_strip()
+} struct_ledMode;
+
+const struct_ledMode *find_led_mode(uint8_t id);
+const struct_ledMode *find_led_mode_by_key(const char *key);
+const struct_ledMode *led_mode_at(uint8_t index);
+uint8_t led_mode_count();
 
 void run_majoras()
 {
@@ -104,12 +127,10 @@ void flame_steps()
     }
     strip.show();
 }
-void update_strip()
-{
-    if (millis() - led_strip.update_time < 50)
-        return;
-    led_strip.update_time = millis();
 
+void fade_strip()
+
+{
     max_gyro_x *= 0.9; // Decay over time
     max_gyro_y *= 0.9;
     max_gyro_z *= 0.9;
@@ -141,7 +162,7 @@ void update_strip()
         strip.setPixelColor(i, strip.Color(0, 0, 0)); // Off
     }
     strip.show();
-
+    return;
     //* Sine wave brightness
     /*
     strip.setPixelColor(position, strip.Color(power, 0, 0)); // Red
@@ -149,6 +170,77 @@ void update_strip()
     position++;
     position %= NUM_LEDS;
     */
+}
+
+void constant_brightness()
+{
+    for (int i = 0; i < NUM_LEDS; i++)
+    {
+        strip.setPixelColor(i, strip.Color(led_strip.red, led_strip.green, led_strip.blue)); // Purple
+    }
+    strip.show();
+}
+
+//* ---------------------- MODE TABLE ----------------------
+//? Ids 1..4 preserve the original switch cases in update_strip().
+const struct_ledMode led_modes[] = {
+    {1, "solid", "Solid color", constant_brightness},
+    {2, "flame", "Step flame", flame_steps},
+    {3, "majora", "Majora's pulse", run_majoras},
+    {4, "fade", "Gyro fade", fade_strip},
+};
+
+uint8_t led_mode_count()
+{
+    return (uint8_t)(sizeof(led_modes) / sizeof(led_modes[0]));
+}
+
+const struct_ledMode *led_mode_at(uint8_t index)
+{
+    if (index >= led_mode_count())
+        return nullptr;
+    return &led_modes[index];
+}
+
+const struct_ledMode *find_led_mode(uint8_t id)
+{
+    for (uint8_t i = 0; i < led_mode_count(); i++)
+        if (led_modes[i].id == id)
+            return &led_modes[i];
+    return nullptr;
+}
+
+const struct_ledMode *find_led_mode_by_key(const char *key)
+{
+    if (key == nullptr)
+        return nullptr;
+    for (uint8_t i = 0; i < led_mode_count(); i++)
+        if (strcmp(led_modes[i].key, key) == 0)
+            return &led_modes[i];
+    return nullptr;
+}
+
+void update_strip(int mode)
+{
+    if (millis() - led_strip.update_time < 50)
+        return;
+    led_strip.update_time = millis();
+
+    //* Push the configured brightness to the NeoPixel drivers only when it
+    //* actually changes. Default of 255 (see variables.h) is a no-op, so the
+    //* scripts' own colour maths are unaffected until the user dims the strip.
+    static uint8_t applied_brightness = 0;
+    if (applied_brightness != led_strip.brightness)
+    {
+        applied_brightness = led_strip.brightness;
+        strip.setBrightness(applied_brightness);
+        majora.setBrightness(applied_brightness);
+    }
+
+    const struct_ledMode *entry = find_led_mode((uint8_t)mode);
+    if (entry == nullptr || entry->run == nullptr)
+        return; // Unknown mode: leave the strip as-is
+    entry->run();
 }
 
 #endif // SERVICE_LED_SCRIPTS

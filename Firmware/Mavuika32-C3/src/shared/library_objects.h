@@ -6,7 +6,7 @@
 
 //* ---------------------- GLOBAL OBJECT INSTANCES ----------------------
 
-#define NUM_LEDS 37
+#define NUM_LEDS 125 // 96 * 1.3
 #define MAJORAS_LEDS 28
 
 Adafruit_NeoPixel strip(NUM_LEDS, strip_pin, NEO_GRB + NEO_KHZ800);

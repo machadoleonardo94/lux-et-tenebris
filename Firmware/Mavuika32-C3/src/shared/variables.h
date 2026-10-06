@@ -26,6 +26,8 @@ int position = 0;
 int power = 5;
 int lenght = 0;
 
+int mode = 1;
+
 uint8_t macAdress[6] = {0, 0, 0, 0, 0, 0};
 
 typedef struct ledstrip
@@ -34,7 +36,7 @@ typedef struct ledstrip
     uint8_t green = 0;
     uint8_t blue = 0;
     uint8_t color = 0;
-    uint8_t brightness = 25;
+    uint8_t brightness = 255; // Applied via setBrightness() in update_strip()
     uint32_t update_time = 50;
     int8_t index = 0;
 } struct_ledstrip;

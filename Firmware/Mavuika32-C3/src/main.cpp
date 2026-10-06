@@ -55,8 +55,19 @@ void setup()
     delay(200);
   }
 
-  // setup_WIFI();
-  WiFi.mode(WIFI_OFF);
+  //* Network bring-up, then the device configuration webpage.
+  //? setup_WIFI() runs WiFiManager (60 s provisioning portal on first boot or
+  //? when the saved network is unreachable). setup_webpage() then binds port 80
+  //? for the persistent configuration page and restores the saved mode/config.
+  //? Set enable_network to false to keep the radio off and run fully offline.
+  const bool enable_network = true;
+  if (enable_network && setup_WIFI(true))
+    setup_webpage();
+  else
+  {
+    Serial.println("Network disabled - running offline");
+    WiFi.mode(WIFI_OFF);
+  }
 }
 
 void loop()
@@ -69,9 +80,10 @@ void loop()
 
   update_onboard_LED();
 
-  // update_strip();
-  // run_majoras();
-  flame_steps();
+  update_strip(mode);
+  // flame_steps();
+
+  webpage_loop();
 
   serial_outputs();
 
