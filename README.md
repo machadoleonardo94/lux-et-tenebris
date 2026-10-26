@@ -31,19 +31,31 @@ Custom PCB designs created in KiCad for the Lux et Tenebris devkit. Includes pro
 - Multiple expansion ports (Serial, I2C, GPIO)
 - Production files ready for manufacturing
 
-### [Firmware](Firmware/lightpack/)
-Arduino-based firmware for ESP32 with WiFi connectivity, OTA updates, and dynamic LED effects.
+### [Firmware](Firmware/)
+Arduino-based firmware with WiFi connectivity, OTA updates, and dynamic LED effects. Two
+boards, two projects:
 
-**[ Firmware Documentation](Firmware/lightpack/README.md)**
+| Project | Board | Status | Compiled firmware |
+|---|---|---|---|
+| **[lightpack-C3](Firmware/lightpack-C3/)** | Lux et Portabilis **V2** (ESP32-C3 SuperMini) | **Pre-release V0.4-pre** | **[⬇ Download](Firmware/lightpack-C3/releases/V0.4-pre/)** — no toolchain needed |
+| [lightpack](Firmware/lightpack/) | Lux et Tenebris **Devkit** (ESP32-WROOM) | V1.0 | Build from source |
 
-**Features:**
-- WiFi connectivity with captive portal configuration
-- Over-the-air (OTA) firmware updates
+**lightpack-C3 (Portabilis V2)** — current work:
+
+- WiFi connectivity with captive portal configuration, 2 saved networks, offline (radio-off) mode
+- Two OTA paths: ArduinoOTA and a **browser firmware upload** from the device page
+- Single-channel WS2812B LED control with 5 modes (solid, flame, gyro fade, pulse whip, rainbow)
+- MPU6050 accelerometer, impact detector, I²C bus scan, rail-voltage telemetry
+- Battery latch power control, on-device menu, non-volatile storage for every setting
+- 5 versioned preset slots with web import/export
+- **[📖 Firmware Documentation](Firmware/lightpack-C3/README.md)** · **[📋 Release notes](Firmware/lightpack-C3/CHANGELOG.md)** · **[⬇ V0.4-pre binaries](Firmware/lightpack-C3/releases/V0.4-pre/)**
+
+**lightpack (Devkit V1)** — **[📖 Firmware Documentation](Firmware/lightpack/README.md)**
+
 - Multi-channel WS2812B LED control with effects
 - OLED display integration
 - Power management and deep sleep support
 - User interface with button controls
-- Non-volatile storage for settings
 
 ##  Key Features
 
@@ -72,8 +84,10 @@ Arduino-based firmware for ESP32 with WiFi connectivity, OTA updates, and dynami
 ## 📚 Documentation
 
 - **[Hardware Documentation](Hardware/README.md)**: PCB design, assembly, and manufacturing
-- **[Firmware Documentation](Firmware/lightpack/README.md)**: Setup, configuration, and API reference
-- **Pinout Reference**: See firmware README for complete pin assignments
+- **[Portabilis V2 Firmware](Firmware/lightpack-C3/README.md)**: Download, flashing, controls, web API
+- **[Portabilis V2 Release notes](Firmware/lightpack-C3/CHANGELOG.md)**: What shipped, upgrade notes, known issues
+- **[Firmware Documentation](Firmware/lightpack/README.md)**: Devkit V1 setup, configuration, and API reference
+- **Pinout Reference**: See the per-board firmware README for complete pin assignments
 - **Manufacturing Files**: BOM, positions, and Gerbers in `Hardware/*/production/`
 
 ## 🧰 Technology Stack

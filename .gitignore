@@ -12,3 +12,12 @@
 /Hardware/5mm_WS2812B_breakout/production/backups
 /Hardware/lux_minimus/lux_minimus-backups
 /Hardware/C33S-manager/C33S-manager-backups
+
+# KiCad lock files, written while a project is open in the editor
+*.kicad_sch.lck
+*.kicad_pcb.lck
+*.kicad_pro.lck
+
+# PlatformIO build output (per-project .gitignores also cover this)
+.pio/
+
