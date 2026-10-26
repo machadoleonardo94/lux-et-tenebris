@@ -17,6 +17,12 @@ Nothing here needs a compiler, PlatformIO, or a checked-out repository.
 `manifest.json` in this folder is what the browser installer reads: it names this release and points
 at the factory image at offset `0`. It is not needed for the command-line routes.
 
+**Licensing.** These images are free to redistribute under this project's 0BSD license, but they
+link third-party libraries with real terms — the Arduino-ESP32 core (LGPL-2.1-or-later) and Adafruit
+NeoPixel (LGPL-3.0-or-later). [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) in this folder has
+the notices, the copyright lines and the license texts pointer; keep it with the images if you pass
+them on.
+
 ## Checksums and sizes
 
 ```

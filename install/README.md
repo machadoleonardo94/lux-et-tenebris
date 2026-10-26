@@ -113,7 +113,13 @@ The page loads the component from a pinned CDN URL:
 
 Pinned so an upstream release cannot change flashing behaviour under an existing tag. If unpkg is
 ever unreachable, the page shows its own "the installer component did not load" message instead of
-an inert button. To make the page work with no network at all, download
-`dist/install-button.js` and its `?module` dependencies once and point the `src` at a local copy —
-the component is Apache-2.0, so vendoring is fine; note that it pulls `esptool-js`, `lit` and
-`@material/web`, so the vendored set is more than one file.
+an inert button. To make the page work with no network at all, download `dist/install-button.js`
+and its `?module` dependencies once and point the `src` at a local copy — the component is
+Apache-2.0, so vendoring is allowed; note that it pulls `esptool-js`, `lit` and `@material/web`, so
+the vendored set is more than one file.
+
+**If you do vendor it, Apache-2.0 then applies to the copy:** ship its `LICENSE` and `NOTICE`
+alongside, state any modifications you made, and add the component to
+[`THIRD-PARTY-NOTICES.md`](../THIRD-PARTY-NOTICES.md). Loading it from the CDN — what the page does
+today — keeps the project free of that obligation entirely, which is the main reason it is not
+vendored.

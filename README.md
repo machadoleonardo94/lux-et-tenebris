@@ -3,6 +3,7 @@
 [![PlatformIO](https://img.shields.io/badge/PlatformIO-ESP32-orange.svg)](https://platformio.org/)
 [![KiCad](https://img.shields.io/badge/KiCad-8.0-blue.svg)](https://www.kicad.org/)
 [![Version](https://img.shields.io/badge/Version-2.0-green.svg)](https://github.com/machadoleonardo94/lux-et-tenebris)
+[![License](https://img.shields.io/badge/License-0BSD-blue.svg)](LICENSE)
 
 **Lux et Tenebris** is an open-source ESP32-based LED controller development platform featuring custom PCB hardware, firmware, and support for addressable LEDs, RGB strips, and various lighting effects.
 
@@ -134,6 +135,23 @@ Special thanks to:
 - KiCad development team
 - PlatformIO for the excellent development platform
 - All contributors and users of this project
+
+---
+
+## License
+
+This project is released under the **BSD Zero Clause License (0BSD)** — see [`LICENSE`](LICENSE).
+Use it, modify it, sell it, strip my name off it, no conditions and no attribution required.
+
+Two things that come with that:
+
+- **Compiled firmware images link third-party libraries** whose licenses travel with the binary. The
+  Arduino-ESP32 core (LGPL-2.1-or-later) and Adafruit NeoPixel (LGPL-3.0-or-later) are the ones with
+  real terms: keep their notices, keep them under LGPL, and make sure recipients can reach the source
+  to relink. Everything else is MIT/BSD/Apache. Full audit, per-library copyright lines and license
+  texts in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) and [`LICENSES/`](LICENSES/).
+- **The KiCad symbol libraries** used by the schematics are CC-BY-SA-4.0 with a design exception, so
+  using them imposes nothing on the boards. Their files are not redistributed here.
 
 ---
 

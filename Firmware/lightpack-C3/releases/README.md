@@ -19,6 +19,15 @@ live on the ESP32-C3 SuperMini's own BOOT switch. Read
 [`../CHANGELOG.md`](../CHANGELOG.md) §Known issues and [`../README.md`](../README.md) §8 before
 building one into a prop.
 
+## Licensing of the images
+
+This project's own code is **0BSD** ([`../../../LICENSE`](../../../LICENSE)) — no conditions, no
+attribution. The images also link third-party libraries whose terms travel with the binary, so each
+release folder carries a `THIRD-PARTY-NOTICES.md` next to its `.bin` files: the Arduino-ESP32 core
+(LGPL-2.1-or-later) and Adafruit NeoPixel (LGPL-3.0-or-later) are the ones with real obligations,
+everything else is MIT/BSD/Apache. Everything a redistributor has to keep is in
+[`../../../THIRD-PARTY-NOTICES.md`](../../../THIRD-PARTY-NOTICES.md).
+
 ## For maintainers — cutting a release
 
 1. Build: `pio run -e C3-USB` from `Firmware/lightpack-C3`.

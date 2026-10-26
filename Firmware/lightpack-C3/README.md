@@ -307,7 +307,18 @@ its saved networks and its page login — the reflash costs a cable, not a confi
 
 ---
 
-## 9. Layout
+## 9. License
+
+The firmware sources, this documentation and the release images are released under **0BSD**
+([`../../LICENSE`](../../LICENSE)): no conditions, no attribution, commercial use included.
+
+That covers *this project's* code only. The images also link the Arduino-ESP32 core
+(LGPL-2.1-or-later) and Adafruit NeoPixel (LGPL-3.0-or-later), plus MIT/BSD/Apache libraries — those
+terms travel with the binary. Before redistributing a `.bin`, read
+[`THIRD-PARTY-NOTICES.md`](../../THIRD-PARTY-NOTICES.md); each release folder carries its own copy
+next to the images for exactly that reason.
+
+## 10. Layout
 
 ```
 lightpack-C3/

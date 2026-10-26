@@ -137,6 +137,19 @@ Flash: 61.9% (1,256,946 / 2,031,616 bytes)
 - **Schematic only.** `lux-et-portabilis-V2.kicad_pcb` and the production files were **not**
   regenerated for `D7` — do not order boards expecting the clamp.
 
+### Licensing
+
+- **The project is now licensed 0BSD** ([`../../LICENSE`](../../LICENSE)) instead of being
+  all-rights-reserved by default. The README described itself as open source while carrying no
+  license, which left users with no explicit right to use or pass on the code.
+- **[`THIRD-PARTY-NOTICES.md`](../../THIRD-PARTY-NOTICES.md)** audits what the images actually link —
+  Arduino-ESP32 core (LGPL-2.1-or-later), Adafruit NeoPixel (LGPL-3.0-or-later), and the MIT/BSD/
+  Apache libraries — with per-library copyright lines, the unmodified-source statement and the
+  relink instructions the LGPL asks for. Full license texts in [`../../LICENSES/`](../../LICENSES/).
+- **Publishing these binaries is what made that necessary:** shipping a `.bin` that statically links
+  LGPL code carries notice obligations that a source-only project never met. Each release folder now
+  carries a copy of the notices beside the images.
+
 ### Upgrade notes
 
 - **V0.3 → V0.4-pre needs one USB flash**, because the partition table changed. A normal
