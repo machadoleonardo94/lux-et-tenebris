@@ -47,23 +47,6 @@ Get-FileHash lightpack-C3-V0.4-pre-factory.bin -Algorithm SHA256
 sha256sum lightpack-C3-V0.4-pre-factory.bin
 ```
 
-## Route 1 — USB, one command (fresh board, or coming from V0.3)
-
-```bash
-esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash 0x0 lightpack-C3-V0.4-pre-factory.bin
-```
-
-- `COM6` → whatever port the SuperMini enumerated as (`/dev/cu.usbmodem*` or `/dev/ttyACM0`
-  on macOS/Linux). `esptool.py --chip esp32c3 --port <PORT> chip_id` lists nothing but proves
-  the port.
-- If the board does not answer, hold **BOOT**, tap **RESET**, release **BOOT** — that is the
-  ROM's download mode. (Holding BOOT through a plain reset always enters it; no sketch can
-  intercept it.)
-- No `esptool.py`? `pip install esptool`, or use the version PlatformIO packages:
-  `pio pkg exec --package="tool-esptoolpy" -- esptool.py --chip esp32c3 ...`
-- Browsers can also flash this in one shot at <https://espressif.github.io/esptool-js/> —
-  connect, pick the port, offset `0x0`, choose the factory image, program.
-
 ## Route 1 — browser installer, no tools at all (recommended for a fresh board)
 
 Open [`install/`](../../../../install/) in **Chrome or Edge on a desktop**, plug the board in, click
