@@ -17,6 +17,19 @@ But you know what? Using Clankers' template made the doccumentation much more en
 https://github.com/user-attachments/assets/9bc4d82b-29f8-49ef-8373-876afc4fa7dd
 
 
+### [Install firmware](install/)
+A fresh, blank board needs nothing but a browser. Open the flasher in **Chrome or Edge on a
+desktop**, plug the ESP32-C3 in over USB-C, click **Install** — no Python, no esptool, no USB-serial
+driver, because the C3's USB is native.
+
+**[⚡ Browser installer](install/)** · **[⬇ Release downloads](Firmware/lightpack-C3/releases/)** · **[How the installer works](install/README.md)**
+
+- It explains itself when it cannot work (Firefox, Safari, mobile, or a `file://` copy) instead of
+  showing a dead button, and links the command-line fallback.
+- Works offline as well: serve this repository with `python -m http.server 8000` and open
+  <http://localhost:8000/install/>.
+- After flashing: join the `Lightpack-Devkit` hotspot, then use <http://lightpack.local>.
+
 ### [Hardware](Hardware/)
 Custom PCB designs created in KiCad for the Lux et Tenebris devkit. Includes production-ready files for JLCPCB assembly.
 
@@ -35,9 +48,9 @@ Custom PCB designs created in KiCad for the Lux et Tenebris devkit. Includes pro
 Arduino-based firmware with WiFi connectivity, OTA updates, and dynamic LED effects. Two
 boards, two projects:
 
-| Project | Board | Status | Compiled firmware |
+| Project | Board | Status | Install |
 |---|---|---|---|
-| **[lightpack-C3](Firmware/lightpack-C3/)** | Lux et Portabilis **V2** (ESP32-C3 SuperMini) | **Pre-release V0.4-pre** | **[⬇ Download](Firmware/lightpack-C3/releases/V0.4-pre/)** — no toolchain needed |
+| **[lightpack-C3](Firmware/lightpack-C3/)** | Lux et Portabilis **V2** (ESP32-C3 SuperMini) | **Pre-release V0.4-pre** | **[⚡ Browser installer](install/)** · **[⬇ Downloads](Firmware/lightpack-C3/releases/V0.4-pre/)** |
 | [lightpack](Firmware/lightpack/) | Lux et Tenebris **Devkit** (ESP32-WROOM) | V1.0 | Build from source |
 
 **lightpack-C3 (Portabilis V2)** — current work:
@@ -48,6 +61,7 @@ boards, two projects:
 - MPU6050 accelerometer, impact detector, I²C bus scan, rail-voltage telemetry
 - Battery latch power control, on-device menu, non-volatile storage for every setting
 - 5 versioned preset slots with web import/export
+- **[⚡ Browser installer](install/)**: Flash a blank board from Chrome/Edge — no tools, no drivers
 - **[📖 Firmware Documentation](Firmware/lightpack-C3/README.md)** · **[📋 Release notes](Firmware/lightpack-C3/CHANGELOG.md)** · **[⬇ V0.4-pre binaries](Firmware/lightpack-C3/releases/V0.4-pre/)**
 
 **lightpack (Devkit V1)** — **[📖 Firmware Documentation](Firmware/lightpack/README.md)**
@@ -84,6 +98,7 @@ boards, two projects:
 ## 📚 Documentation
 
 - **[Hardware Documentation](Hardware/README.md)**: PCB design, assembly, and manufacturing
+- **[Browser installer](install/)**: How to flash a fresh board, and how to run/host the flasher
 - **[Portabilis V2 Firmware](Firmware/lightpack-C3/README.md)**: Download, flashing, controls, web API
 - **[Portabilis V2 Release notes](Firmware/lightpack-C3/CHANGELOG.md)**: What shipped, upgrade notes, known issues
 - **[Firmware Documentation](Firmware/lightpack/README.md)**: Devkit V1 setup, configuration, and API reference

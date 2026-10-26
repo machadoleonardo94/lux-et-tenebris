@@ -17,6 +17,10 @@ format, the diagnostic tool, and the documentation — plus one schematic change
 Prebuilt images are committed in [`releases/V0.4-pre/`](releases/V0.4-pre/); flashing
 instructions and checksums in [`releases/V0.4-pre/FLASHING.md`](releases/V0.4-pre/FLASHING.md).
 
+**Easiest path for a fresh board: [`install/`](../../install/).** A browser flasher — Chrome or Edge,
+a USB-C cable, click Install. No Python, no esptool, no USB-serial driver; it fetches this release
+through [`manifest.json`](releases/V0.4-pre/manifest.json) and writes the factory image at `0x0`.
+
 | Artifact | Size | SHA-256 |
 |---|---:|---|
 | `lightpack-C3-V0.4-pre-factory.bin` (flash at `0x0`) | 1,334,544 B | `5A09F27515B0AF5E246A8E9A882FF508564AFAC4FFB62C98E399897E3E6956FC` |
@@ -93,6 +97,15 @@ Flash: 61.9% (1,256,946 / 2,031,616 bytes)
 
 ### Tooling
 
+- **`install/` — a browser flasher for fresh boards.** ESP Web Tools (pinned to 10.4.0) over the
+  Web Serial API, reading `releases/V0.4-pre/manifest.json`. It is the zero-install answer to
+  "flash a blank board": no interpreter, no toolchain, and no USB-serial driver, because the C3's
+  USB is native CDC. The page diagnoses itself — wrong browser, `file://`, missing secure context,
+  component failing to load — and links the command-line route instead of showing a dead button.
+  `install/README.md` documents how to run it locally (`python -m http.server` from the repository
+  root), how to publish it with Pages, and how to add a channel for the next release.
+  Binaries stay in the release folders rather than only on a GitHub Release because Web Serial
+  fetches them with `fetch()`, which is same-origin.
 - **`tools/button_probe/`** — a separate PlatformIO project (not an environment of the main
   one) that measures the touch module's polarity, so a dead pad can be told apart from a
   wrong-polarity module. It had to be separate: `src_dir` is only honoured in the global
@@ -103,11 +116,12 @@ Flash: 61.9% (1,256,946 / 2,031,616 bytes)
 
 ### Documentation
 
-- `README.md` (new) — user-facing: download, three flashing routes, controls, features, web API,
-  build, pinout, partition table, known limitations.
+- `README.md` (new) — user-facing: download, four flashing routes (browser installer first),
+  controls, features, web API, build, pinout, partition table, known limitations.
 - `docs/pre-release-plan.md` (new) — the feature tiers, the navigation design, the NVS wear
   analysis, the test matrix and the open items. Its status note records that the GPIO3 touch
   pad it was written around is dead on the bench board.
+- `install/README.md` — how to run the browser flasher, publish it, and add a release channel.
 - This changelog and `releases/` with prebuilt binaries.
 
 ### Hardware (same tree)

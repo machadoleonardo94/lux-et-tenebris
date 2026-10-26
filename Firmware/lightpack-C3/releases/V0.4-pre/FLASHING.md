@@ -3,6 +3,9 @@
 Prebuilt firmware for the **Lux et Portabilis V2** board (ESP32-C3 SuperMini, 4 MB flash).
 Nothing here needs a compiler, PlatformIO, or a checked-out repository.
 
+**In a hurry?** Use the browser installer — [Route 1](#route-1--browser-installer-no-tools-at-all-recommended-for-a-fresh-board)
+— which needs no command line at all. Everything below is the same operation by other means.
+
 | File | Flash offset | What it is |
 |---|---:|---|
 | `lightpack-C3-V0.4-pre-factory.bin` | `0x0` | **Bootloader + partition table + OTA selector + app**, one write |
@@ -10,6 +13,9 @@ Nothing here needs a compiler, PlatformIO, or a checked-out repository.
 | `bootloader.bin` | `0x0` | Second-stage bootloader |
 | `partitions.bin` | `0x8000` | Custom partition table (reasoning in `../../partitions_lightpack.csv`) |
 | `boot_app0.bin` | `0xE000` | OTA selector; makes the bootloader start `app0` |
+
+`manifest.json` in this folder is what the browser installer reads: it names this release and points
+at the factory image at offset `0`. It is not needed for the command-line routes.
 
 ## Checksums and sizes
 
@@ -52,7 +58,35 @@ esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash 0x0 lightpack-C3
 - Browsers can also flash this in one shot at <https://espressif.github.io/esptool-js/> —
   connect, pick the port, offset `0x0`, choose the factory image, program.
 
-## Route 2 — USB, individual images
+## Route 1 — browser installer, no tools at all (recommended for a fresh board)
+
+Open [`install/`](../../../../install/) in **Chrome or Edge on a desktop**, plug the board in, click
+**Install V0.4-pre**, pick the port. It flashes `lightpack-C3-V0.4-pre-factory.bin` at `0x0` through
+the ESP32-C3's native USB, so there is no Python, no esptool and no USB-serial driver to install.
+
+- The page needs `https://` or `localhost`; to run it locally, serve the repository **root** with
+  `python -m http.server 8000` and open `http://localhost:8000/install/`.
+- It reads this folder's [`manifest.json`](manifest.json), so no offsets are typed by hand.
+- Firefox, Safari and mobile browsers have no Web Serial — they get an explanation and a link here.
+
+## Route 2 — USB, one command
+
+```bash
+esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash 0x0 lightpack-C3-V0.4-pre-factory.bin
+```
+
+- `COM6` → whatever port the SuperMini enumerated as (`/dev/cu.usbmodem*` or `/dev/ttyACM0`
+  on macOS/Linux). `esptool.py --chip esp32c3 --port <PORT> chip_id` lists nothing but proves
+  the port.
+- If the board does not answer, hold **BOOT**, tap **RESET**, release **BOOT** — that is the
+  ROM's download mode. (Holding BOOT through a plain reset always enters it; no sketch can
+  intercept it.)
+- No `esptool.py`? `pip install esptool`, or use the version PlatformIO packages:
+  `pio pkg exec --package="tool-esptoolpy" -- esptool.py --chip esp32c3 ...`
+- Espressif's own hosted flasher also works: <https://espressif.github.io/esptool-js/> —
+  connect, pick the port, offset `0x0`, choose the factory image, program.
+
+## Route 3 — USB, individual images
 
 Use this when only the application needs replacing and the bootloader and partition table are
 already from V0.4-pre or later:
@@ -73,10 +107,10 @@ esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash \
 > esptool.py --chip esp32c3 --port COM6 erase_region 0xE000 0x2000
 > ```
 >
-> Route 1 (or any normal PlatformIO upload, which writes `boot_app0.bin` at `0xE000`) does this
-> for you. The full reasoning is in the header of `../../partitions_lightpack.csv`.
+> Route 1 or 2 (or any normal PlatformIO upload, which writes `boot_app0.bin` at `0xE000`) does
+> this for you. The full reasoning is in the header of `../../partitions_lightpack.csv`.
 
-## Route 3 — no cable, from the browser
+## Route 4 — no cable, from the device's own page
 
 For a board already running V0.4-pre or later:
 
@@ -89,7 +123,7 @@ A failed, truncated or bogus upload leaves the running firmware untouched. **The
 rollback if the new image boots but misbehaves** (for instance, cannot join your WiFi), so keep
 this folder around until the new build is proven.
 
-## Route 4 — ArduinoOTA
+## Route 5 — ArduinoOTA
 
 From a checkout, with the board on the same network:
 
@@ -117,7 +151,8 @@ pio run -e C3-OTA -t upload          # uploads to lightpack.local
 | Symptom | Cause / fix |
 |---|---|
 | Board boots to a blank page, serial shows `I2C FAILED` | Normal if no sensor is fitted; the strip still runs. Check SDA/SCL on `PORT1`. |
-| Bootloops after an OTA | The slot selector points at a broken image. Clear it (`erase_region 0xE000 0x2000`) and flash Route 1 over USB. |
+| Bootloops after an OTA | The slot selector points at a broken image. Clear it (`erase_region 0xE000 0x2000`) and flash the factory image over USB (Route 1 or 2). |
+| No port in the browser's picker | Hold BOOT, tap RESET, release BOOT. Then check the cable carries data and that no serial monitor already owns the port. |
 | Board appears as no COM port | Hold BOOT, tap RESET, release BOOT. If still absent, the cable is charge-only or the latch is off — power it from the battery. |
 | Page unreachable, no hotspot either | The BOOT switch 3 s hold toggles the radio; if it is off, hold 3 s again. 10 s hold wipes credentials and page login. |
 | Mode changes lag by a moment | By design: click gestures resolve 400 ms after release so 1/2/5-click gestures can be told apart. |

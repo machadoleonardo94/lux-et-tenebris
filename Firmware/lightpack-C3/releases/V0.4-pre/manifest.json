@@ -1,0 +1,12 @@
+{
+  "name": "lightpack-C3",
+  "version": "V0.4-pre",
+  "builds": [
+    {
+      "chipFamily": "ESP32-C3",
+      "parts": [
+        { "path": "lightpack-C3-V0.4-pre-factory.bin", "offset": 0 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install lightpack-C3 firmware — Lux et Portabilis V2</title>
+  <meta name="description" content="Flash lightpack-C3 firmware to a fresh Lux et Portabilis V2 board (ESP32-C3 SuperMini) from the browser. No tools, no drivers.">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --panel: #161a22;
+      --panel-2: #1d222c;
+      --line: #2a3140;
+      --text: #e7eaf0;
+      --muted: #9aa4b6;
+      --accent: #ffb347;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 50% -200px, #1b2130 0%, var(--bg) 60%);
+      color: var(--text);
+      font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 5rem;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 4vw, 2.1rem);
+      line-height: 1.2;
+      margin: 0 0 .5rem;
+      letter-spacing: -.02em;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      margin: 2.5rem 0 .75rem;
+      letter-spacing: .01em;
+    }
+
+    .lede { color: var(--muted); margin: 0 0 1.25rem; }
+
+    .pills { display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 1.5rem; }
+
+    .pill {
+      font-size: .78rem;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: .2rem .6rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .pill b { color: var(--text); font-weight: 600; }
+
+    code, kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .88em;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: .08em .35em;
+    }
+
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: .8rem 1rem;
+      overflow-x: auto;
+    }
+
+    pre code { background: none; border: 0; padding: 0; }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* environment banner */
+    #env {
+      display: flex;
+      gap: .7rem;
+      align-items: flex-start;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: .9rem 1rem;
+      font-size: .93rem;
+      margin-bottom: 1.75rem;
+    }
+
+    #env .dot {
+      flex: 0 0 auto;
+      width: .65rem;
+      height: .65rem;
+      margin-top: .5rem;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    #env[data-state="ok"] { border-color: #1f5f3c; }
+    #env[data-state="ok"] .dot { background: var(--ok); }
+    #env[data-state="warn"] { border-color: #6b5314; }
+    #env[data-state="warn"] .dot { background: var(--warn); }
+    #env[data-state="bad"] { border-color: #6d2b2b; }
+    #env[data-state="bad"] .dot { background: var(--bad); }
+
+    #env p { margin: .15rem 0 0; color: var(--muted); font-size: .87rem; }
+    #env strong { color: var(--text); }
+
+    /* steps */
+    ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+
+    ol.steps > li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 2.6rem;
+      margin-bottom: 1.05rem;
+    }
+
+    ol.steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: .05rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      display: grid;
+      place-items: center;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    ol.steps b { display: block; }
+
+    ol.steps span { color: var(--muted); font-size: .93rem; }
+
+    /* install card */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1.35rem;
+      margin: 1.5rem 0;
+    }
+
+    .card .head { display: flex; flex-wrap: wrap; gap: .6rem; align-items: baseline; justify-content: space-between; }
+
+    .card .version { font-weight: 700; }
+    .card .meta { color: var(--muted); font-size: .82rem; }
+
+    .install-slot { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; }
+
+    .install-slot button {
+      cursor: pointer;
+      font: inherit;
+      font-weight: 650;
+      font-size: .95rem;
+      padding: .7rem 1.4rem;
+      color: #10131a;
+      background: var(--accent);
+      border: 0;
+      border-radius: 999px;
+    }
+
+    .install-slot button:hover { filter: brightness(1.07); }
+    .install-slot button:active { transform: translateY(1px); }
+
+    .install-slot button[disabled] { opacity: .55; cursor: not-allowed; }
+
+    .slot-note { color: var(--muted); font-size: .85rem; }
+
+    /* details */
+    details {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      padding: .1rem 1rem;
+      margin: .6rem 0;
+    }
+
+    details > summary {
+      cursor: pointer;
+      padding: .75rem 0;
+      font-weight: 600;
+      font-size: .95rem;
+      list-style-position: outside;
+    }
+
+    details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: .6rem; }
+    details .body { padding-bottom: .8rem; font-size: .93rem; }
+    details .body ul { margin: .4rem 0 .4rem 1.1rem; padding: 0; }
+    details .body li { margin: .3rem 0; }
+
+    table { border-collapse: collapse; width: 100%; font-size: .88rem; margin: .5rem 0; }
+
+    th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 600; }
+    td.num { font-family: ui-monospace, monospace; }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    footer nav { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: .6rem; }
+
+    .warn-note {
+      border-left: 3px solid var(--warn);
+      background: #1e1a10;
+      padding: .7rem .9rem;
+      border-radius: 0 8px 8px 0;
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    .warn-note strong { color: var(--text); }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Install lightpack-C3 firmware</h1>
+    <p class="lede">
+      Flashes a fresh <strong>Lux et Portabilis V2</strong> board straight from this page. Nothing to
+      install on your computer — no Python, no toolchain, no USB-serial driver.
+    </p>
+
+    <div class="pills">
+      <span class="pill">Board <b>ESP32-C3 SuperMini</b></span>
+      <span class="pill">Flash <b>4 MB</b></span>
+      <span class="pill">Release <b>V0.4-pre</b></span>
+      <span class="pill">Connects over <b>USB-C (native)</b></span>
+    </div>
+
+    <div id="env" role="status" aria-live="polite" data-state="checking">
+      <span class="dot" aria-hidden="true"></span>
+      <div>
+        <strong id="env-title">Checking your browser…</strong>
+        <p id="env-detail"></p>
+      </div>
+    </div>
+
+    <h2>Before you start</h2>
+    <ol class="steps">
+      <li>
+        <b>Use Chrome or Edge on a computer</b>
+        <span>Firefox, Safari and every mobile browser lack the Web Serial API this page needs. There
+          is no way around it — the fallbacks are linked at the bottom.</span>
+      </li>
+      <li>
+        <b>Use a USB-C cable that carries data</b>
+        <span>Charge-only cables enumerate nothing, and they are the usual reason no port shows up.</span>
+      </li>
+      <li>
+        <b>Plug the board in — no buttons needed</b>
+        <span>A blank C3 already sits in its ROM bootloader, so it should appear immediately. If it
+          does not, see <em>No port appears</em> below.</span>
+      </li>
+    </ol>
+
+    <h2>Flash it</h2>
+    <div class="card">
+      <div class="head">
+        <span class="version">lightpack-C3 V0.4-pre</span>
+        <span class="meta">factory image · 1.27 MB · ESP32-C3</span>
+      </div>
+
+      <div class="install-slot">
+        <esp-web-install-button manifest="../Firmware/lightpack-C3/releases/V0.4-pre/manifest.json">
+          <button slot="activate" type="button">Install V0.4-pre</button>
+          <span slot="unsupported" class="slot-note">
+            This browser cannot install ESP devices. Open this page in Chrome or Edge on a desktop.
+          </span>
+          <span slot="not-allowed" class="slot-note">
+            This page must be served over <code>https://</code> or <code>localhost</code>. See
+            <em>Running it locally</em> below.
+          </span>
+        </esp-web-install-button>
+        <span class="slot-note" id="install-hint"></span>
+      </div>
+
+      <p class="slot-note" style="margin-bottom:0">
+        Click <strong>Install</strong>, pick the port when the browser asks, and leave the board
+        plugged in until it says it is done — usually 20–40 seconds. Then the board reboots.
+      </p>
+    </div>
+
+    <h2>After it finishes</h2>
+    <ol class="steps">
+      <li>
+        <b>Join the Wi-Fi hotspot <code>Lightpack-Devkit</code></b>
+        <span>First boot with no saved network raises this temporary access point for 60 seconds at a
+          time; the configuration page opens by itself.</span>
+      </li>
+      <li>
+        <b>Pick your own Wi-Fi network</b>
+        <span>The board keeps it, and drops the hotspot.</span>
+      </li>
+      <li>
+        <b>Open <a href="http://lightpack.local">http://lightpack.local</a></b>
+        <span>That is the full control page from then on. Buttons work without any browser: 1 click
+          next mode, 2 clicks previous mode, 5 clicks power off, 3 s hold radio on/off.</span>
+      </li>
+    </ol>
+
+    <h2>Details</h2>
+
+    <details>
+      <summary>What exactly gets written to the board?</summary>
+      <div class="body">
+        <p>One merged factory image at offset <code>0x0</code>, containing the whole boot chain:</p>
+        <table>
+          <thead>
+            <tr><th>Region</th><th>Offset</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Bootloader</td><td class="num">0x0</td><td>Second-stage bootloader</td></tr>
+            <tr><td>Partition table</td><td class="num">0x8000</td><td>Two 1.9375 MB OTA slots</td></tr>
+            <tr><td>OTA selector</td><td class="num">0xE000</td><td>Makes the bootloader start <code>app0</code></td></tr>
+            <tr><td>Application</td><td class="num">0x10000</td><td>lightpack-C3 V0.4-pre</td></tr>
+          </tbody>
+        </table>
+        <p><strong>NVS is not touched</strong>, so this is also a safe recovery path for a board that
+          misbehaves: presets, saved networks and the page login survive.</p>
+        <p>The exact same file, with checksums, is in
+          <a href="../Firmware/lightpack-C3/releases/V0.4-pre/FLASHING.md">FLASHING.md</a> if you would
+          rather flash it with <code>esptool</code>.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>No port appears in the browser dialog</summary>
+      <div class="body">
+        <ul>
+          <li><strong>Hold BOOT, tap RESET, release BOOT.</strong> That forces the ROM download mode and
+            is the fix in most cases.</li>
+          <li><strong>Swap the cable.</strong> Charge-only USB-C cables are extremely common.</li>
+          <li><strong>Check the board has power.</strong> A flat battery with no USB power shows nothing.</li>
+          <li><strong>Close anything else holding the port</strong> — PlatformIO's monitor, the Arduino
+            serial monitor, PuTTY. Web Serial cannot open a port another program owns.</li>
+          <li><strong>Linux:</strong> add yourself to the <code>dialout</code> group and log back in.</li>
+          <li><strong>macOS:</strong> no driver is needed for the C3's native USB; if the board has a
+            separate USB-UART chip on a clone, only then is a driver required.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>It says "Failed to connect" or the install stops part-way</summary>
+      <div class="body">
+        <ul>
+          <li>Unplug, hold <strong>BOOT</strong>, plug back in, release <strong>BOOT</strong>, then retry.</li>
+          <li>Flashed images are verified before they are made bootable, so an interrupted install
+            leaves the previous firmware running — retrying is safe.</li>
+          <li>If a board keeps failing, the fallback is the command line:
+            <code>esptool.py --chip esp32c3 write_flash 0x0 lightpack-C3-V0.4-pre-factory.bin</code>
+            (see <a href="../Firmware/lightpack-C3/releases/V0.4-pre/FLASHING.md">FLASHING.md</a>).</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Running it locally, or with no internet</summary>
+      <div class="body">
+        <p>Web Serial only works on <code>https://</code> or <code>localhost</code>, so opening
+          <code>install/index.html</code> off disk will not work. Serve the repository root:</p>
+        <pre><code>git clone https://github.com/machadoleonardo94/lux-et-tenebris.git
+cd lux-et-tenebris
+python -m http.server 8000</code></pre>
+        <p>then open <a href="http://localhost:8000/install/">http://localhost:8000/install/</a>.</p>
+        <p>Serve the <strong>repository root</strong>, not the <code>install/</code> folder — the page
+          fetches the firmware from <code>Firmware/lightpack-C3/releases/</code>, and it must be the
+          same origin as the page. The installer component itself loads from a CDN on first use, so
+          see <a href="README.md">install/README.md</a> for the fully offline setup.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Why the browser instead of a helper script?</summary>
+      <div class="body">
+        <p>Because a blank board is the one case where the user has nothing installed yet. A Python
+          script would mean requiring an interpreter, <code>pip install esptool</code>, and a driver
+          conversation before anything happens; the ESP32-C3's native USB plus Web Serial removes all
+          of it. The script-style routes still exist and are documented — they are just not the first
+          thing to hand someone.</p>
+      </div>
+    </details>
+
+    <div class="warn-note">
+      <strong>This is a pre-release.</strong> Known issues, including a dead touch-pad input on the
+      reference board, are listed in the
+      <a href="../Firmware/lightpack-C3/CHANGELOG.md">changelog</a>. All user gestures work from the
+      board's own BOOT switch, so the firmware is fully usable — just not what V0.3 promised.
+    </div>
+
+    <footer>
+      <nav>
+        <a href="../Firmware/lightpack-C3/README.md">Firmware documentation</a>
+        <a href="../Firmware/lightpack-C3/CHANGELOG.md">Release notes</a>
+        <a href="../Firmware/lightpack-C3/releases/V0.4-pre/FLASHING.md">Flash by command line</a>
+        <a href="README.md">How this page works</a>
+      </nav>
+      <div>
+        Powered by <a href="https://esphome.github.io/esp-web-tools/" rel="noopener">ESP Web Tools</a>
+        (pinned to 10.4.0, Apache-2.0) over the browser's Web Serial API. It can only write when you
+        click Install and choose a port.
+      </div>
+    </footer>
+  </main>
+
+  <script type="module"
+          src="https://unpkg.com/esp-web-tools@10.4.0/dist/install-button.js?module"></script>
+
+  <script>
+    (function () {
+      const box = document.getElementById('env');
+      const title = document.getElementById('env-title');
+      const detail = document.getElementById('env-detail');
+      const hint = document.getElementById('install-hint');
+
+      function set(state, heading, text) {
+        box.dataset.state = state;
+        title.textContent = heading;
+        detail.innerHTML = text || '';
+      }
+
+      const hasSerial = 'serial' in navigator;
+      const secure = window.isSecureContext;
+      const isFile = location.protocol === 'file:';
+
+      if (isFile) {
+        set('bad', 'This page is open from a file on disk',
+          'Browsers refuse Web Serial for <code>file://</code> pages. Serve the repository root ' +
+          'with <code>python -m http.server 8000</code> and open ' +
+          '<a href="http://localhost:8000/install/">http://localhost:8000/install/</a> instead. ' +
+          'See <em>Running it locally</em> below.');
+      } else if (!hasSerial) {
+        set('bad', 'This browser cannot flash ESP devices',
+          'Web Serial is missing. Use <strong>Chrome or Edge on a desktop</strong> — Firefox, Safari ' +
+          'and all mobile browsers do not have it. The command-line route in ' +
+          '<a href="../Firmware/lightpack-C3/releases/V0.4-pre/FLASHING.md">FLASHING.md</a> works anywhere.');
+      } else if (!secure) {
+        set('bad', 'This page must be served over https or localhost',
+          'Web Serial is restricted to secure contexts. Use the published https address, or run ' +
+          '<code>python -m http.server 8000</code> from the repository root and open ' +
+          '<a href="http://localhost:8000/install/">http://localhost:8000/install/</a>.');
+      } else {
+        set('ok', 'Ready — Chrome/Edge on desktop, secure context, Web Serial available.',
+          'Plug the board in and click Install. It does not need to be in download mode.');
+        hint.textContent = 'the browser will ask which serial port to use';
+      }
+
+      // The component is loaded from a pinned CDN. If it never defines itself, say so
+      // instead of leaving an inert button on a page full of promises.
+      if (hasSerial && secure && !isFile) {
+        const timer = setTimeout(function () {
+          if (!window.customElements.get('esp-web-install-button')) {
+            set('warn', 'The installer component did not load',
+              'It is fetched from unpkg.com, so this is usually a network or content blocker. ' +
+              'Check the browser console, or use the command-line route in ' +
+              '<a href="../Firmware/lightpack-C3/releases/V0.4-pre/FLASHING.md">FLASHING.md</a>.');
+          }
+        }, 8000);
+        customElements.whenDefined('esp-web-install-button')
+          .then(function () { clearTimeout(timer); });
+      }
+    })();
+  </script>
+</body>
+
+</html>

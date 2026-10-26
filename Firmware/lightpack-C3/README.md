@@ -12,6 +12,7 @@ BOOT switch.
 
 - **Board:** Lux et Portabilis V2 (ESP32-C3 SuperMini, 4 MB flash)
 - **Image:** `C3-USB` / `C3-OTA` in `platformio.ini`
+- **Install it:** [`install/`](../../install/) — browser flasher, nothing to install
 - **Downloads:** [`releases/`](releases/) — prebuilt binaries, no toolchain needed
 - **Version history:** [`CHANGELOG.md`](CHANGELOG.md)
 - **Not this board?** The Devkit V1 firmware (ESP32-WROOM) lives in `Firmware/lightpack/`.
@@ -35,7 +36,21 @@ Prebuilt, already-compiled images are committed in [`releases/V0.4-pre/`](releas
 | `partitions.bin` | `0x8000` | Custom partition table (see §7) |
 | `boot_app0.bin` | `0xE000` | OTA selector; makes the bootloader pick `app0` |
 
-### Option A — one command over USB (recommended for a fresh board)
+### Option A — browser installer (recommended for a fresh board)
+
+Open [`install/`](../../install/) in **Chrome or Edge on a desktop**, plug the board in, click
+**Install V0.4-pre**, pick the port. Nothing to install on the computer: no Python, no esptool, no
+USB-serial driver — the C3's USB is native. The page diagnoses its own prerequisites (wrong
+browser, `file://`, no secure context) and links the command-line fallback when it cannot work.
+
+The page reads its image from [`releases/V0.4-pre/manifest.json`](releases/V0.4-pre/manifest.json).
+To run it locally, serve the **repository root** and open `/install/`:
+
+```bash
+python -m http.server 8000      # then http://localhost:8000/install/
+```
+
+### Option B — one command over USB
 
 ```bash
 esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash 0x0 lightpack-C3-V0.4-pre-factory.bin
@@ -45,14 +60,14 @@ esptool.py --chip esp32c3 --port COM6 --baud 460800 write_flash 0x0 lightpack-C3
 `/dev/cu.usbmodem*` or `/dev/ttyACM0`. Put the board in download mode by holding **BOOT**
 while tapping **RESET** if it does not answer.
 
-### Option B — from the browser, no cable
+### Option C — from the device's own page, no cable
 
 With the board already running any version of this firmware, open `http://lightpack.local`,
 go to the firmware section and upload `firmware.bin`. It is written to the **inactive** OTA
 slot and the board reboots into it; a failed or truncated upload leaves the running image
 untouched.
 
-### Option C — individual images
+### Option D — individual images
 
 ```bash
 esptool.py --chip esp32c3 --port COM6 write_flash \
@@ -303,7 +318,7 @@ lightpack-C3/
 ├── CHANGELOG.md                version history; V0.4-pre entry documents the release
 ├── releases/
 │   ├── README.md               release index + how to cut a release
-│   ├── V0.4-pre/               prebuilt binaries + FLASHING.md + checksums
+│   ├── V0.4-pre/               prebuilt binaries + FLASHING.md + manifest.json + checksums
 │   └── V0.3/                   lightpack_V03-source.zip (sources only)
 ├── docs/
 │   └── pre-release-plan.md     feature list, menu design, NVS cost analysis, open items
@@ -326,3 +341,7 @@ lightpack-C3/
     │   └── serial_outputs.h    boot report, telemetry
     └── shared/                 pinout, variables, dependencies, library objects
 ```
+
+Folder names are under `Firmware/lightpack-C3/` except at the top of the list. Two things live
+outside it: `install/` at the **repository root** (the browser flasher, which consumes
+`releases/*/manifest.json`) and `docs/pre-release-plan.md`'s design notes for the unbuilt menu.

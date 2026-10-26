@@ -3,9 +3,12 @@
 Every published build of the Lux et Portabilis V2 firmware, newest first. Each folder is
 self-contained: download it, follow its `FLASHING.md`, done. No toolchain required.
 
+**Prefer clicking to typing?** [`install/`](../../../install/) flashes the current release straight
+from the browser — Chrome or Edge, a USB-C cable, nothing installed.
+
 | Release | Date | Contents | Notes |
 |---|---|---|---|
-| [`V0.4-pre/`](V0.4-pre/) | 2026-10-26 | **Compiled binaries** — factory image, app image, bootloader, partition table, OTA selector | First pre-release with prebuilt firmware. Custom partition table, browser OTA upload, input rework onto the BOOT switch. |
+| [`V0.4-pre/`](V0.4-pre/) | 2026-10-26 | **Compiled binaries** — factory image, app image, bootloader, partition table, OTA selector, `manifest.json` for the browser installer | First pre-release with prebuilt firmware. Custom partition table, browser OTA upload, input rework onto the BOOT switch. |
 | [`V0.3/`](V0.3/) | 2026-10-06 | **Source snapshot only** (`lightpack_V03-source.zip`) | No compiled images were published. Build it yourself from the zip. |
 
 ## What "pre-release" means here
@@ -28,6 +31,18 @@ building one into a prop.
      -o lightpack-C3-V<x.y>-factory.bin --flash_mode qio --flash_freq 80m --flash_size 4MB \
      0x0 bootloader.bin 0x8000 partitions.bin 0xe000 boot_app0.bin 0x10000 firmware.bin
    ```
-4. Record sizes, SHA-256 hashes and the RAM/flash figures from the build in a `FLASHING.md`,
+4. Add the browser-installer manifest next to the binaries — copy `V0.4-pre/manifest.json`, change
+   `version` and the `path`, and keep the part at offset `0` pointing at the **factory** image:
+   ```json
+   { "name": "lightpack-C3", "version": "V<x.y>",
+     "builds": [ { "chipFamily": "ESP32-C3",
+                   "parts": [ { "path": "lightpack-C3-V<x.y>-factory.bin", "offset": 0 } ] } ] }
+   ```
+   Then add a button for it in [`install/`](../../../install/) — see
+   [`install/README.md`](../../../install/README.md).
+5. Record sizes, SHA-256 hashes and the RAM/flash figures from the build in a `FLASHING.md`,
    add the row above, and add a version section to `../CHANGELOG.md`.
-5. Tag the commit `lightpack-C3-v<x.y>` and push with `--follow-tags`.
+6. Sanity-check the manifest before publishing: `chipFamily` must be exactly `ESP32-C3`, offsets are
+   decimal, and `python -m http.server` from the repository root must serve both the page and the
+   `.bin` from the same origin (Web Serial fetches, so CORS applies).
+7. Tag the commit `lightpack-C3-v<x.y>` and push with `--follow-tags`.
