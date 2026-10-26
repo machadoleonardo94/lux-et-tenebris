@@ -1762,6 +1762,155 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Diode:BZV55B2V7"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "BZV55B2V7"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Diode_SMD:D_MiniMELF"
+				(at 0 -4.445 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BZV55_SER.pdf"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "2.7V, 500mW, 2%, Zener diode, MiniMELF"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "zener diode"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "D*MiniMELF*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "BZV55B2V7_0_1"
+				(polyline
+					(pts
+						(xy -1.27 -1.27) (xy -1.27 1.27) (xy -0.762 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 -1.27) (xy 1.27 1.27) (xy -1.27 0) (xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "BZV55B2V7_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Diode:SS14"
 			(pin_numbers
 				(hide yes)
@@ -4038,6 +4187,17 @@
 		)
 		(uuid "c6232088-76ee-45f5-a56a-e47d2317b7c5")
 	)
+	(text "Warning: 4.2V fries the button GPIO"
+		(exclude_from_sim no)
+		(at 184.912 44.45 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "db145d37-0a6f-4e0e-823c-09cc90b40b58")
+	)
 	(junction
 		(at 123.19 45.72)
 		(diameter 0)
@@ -4099,6 +4259,12 @@
 		(uuid "591de613-09d7-45fe-b350-761236c38ccf")
 	)
 	(junction
+		(at 185.42 50.8)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "594c14aa-cd4f-4b2c-b009-c9fa06ce68a7")
+	)
+	(junction
 		(at 194.31 21.59)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -4157,12 +4323,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d584edf0-e9b1-4801-9c70-ee48aab634a8")
-	)
-	(junction
-		(at 185.42 50.8)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d887025f-7985-4b96-818d-10fe5d225df4")
 	)
 	(junction
 		(at 172.72 88.9)
@@ -4228,7 +4388,7 @@
 	)
 	(wire
 		(pts
-			(xy 185.42 50.8) (xy 185.42 54.61)
+			(xy 185.42 46.99) (xy 185.42 50.8)
 		)
 		(stroke
 			(width 0)
@@ -4428,7 +4588,17 @@
 	)
 	(wire
 		(pts
-			(xy 220.98 50.8) (xy 224.79 50.8)
+			(xy 226.06 63.5) (xy 232.41 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "422793ee-2db4-4a73-a735-2149fc7661ec")
+	)
+	(wire
+		(pts
+			(xy 220.98 50.8) (xy 222.25 50.8)
 		)
 		(stroke
 			(width 0)
@@ -5088,6 +5258,16 @@
 	)
 	(wire
 		(pts
+			(xy 185.42 50.8) (xy 185.42 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c635a3fb-d725-4229-be55-fb4914f0d7a3")
+	)
+	(wire
+		(pts
 			(xy 49.53 76.2) (xy 52.07 76.2)
 		)
 		(stroke
@@ -5335,16 +5515,6 @@
 			(type default)
 		)
 		(uuid "f5540d12-98c1-4459-99c1-21ad0d8fb87f")
-	)
-	(wire
-		(pts
-			(xy 185.42 46.99) (xy 185.42 50.8)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f85b3678-559f-4bc8-a1ee-da93e0b3256d")
 	)
 	(wire
 		(pts
@@ -5874,22 +6044,22 @@
 	)
 	(global_label "Button_GPIO"
 		(shape input)
-		(at 232.41 63.5 180)
+		(at 226.06 63.5 90)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "fa3cc30b-c62a-4cb4-88ad-13d80a126eb7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 217.8135 63.5 0)
+			(at 226.06 48.9035 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -5952,7 +6122,7 @@
 			(uuid "6c90e90d-d23b-4995-a104-753dd5f37312")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR014")
 					(unit 1)
@@ -6019,7 +6189,7 @@
 			(uuid "63e83fcc-a9d3-4c44-a607-f2dd99723709")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR04")
 					(unit 1)
@@ -6125,7 +6295,7 @@
 			(uuid "35798ef3-22e9-47a0-b9d8-271a08c8dd10")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D5")
 					(unit 1)
@@ -6229,7 +6399,7 @@
 			(uuid "e1b17787-d091-4c71-bd62-295c3ec08e48")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R1")
 					(unit 1)
@@ -6341,7 +6511,7 @@
 			(uuid "c9e94595-9be8-4b3d-af08-2aa432762756")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "PORT1")
 					(unit 1)
@@ -6406,7 +6576,7 @@
 			(uuid "5b6446f2-7493-42ec-92ba-a7e2e7ec9b3e")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR029")
 					(unit 1)
@@ -6511,7 +6681,7 @@
 			(uuid "d0d3c4ba-5172-4434-83f6-ed56b62f24a6")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C3")
 					(unit 1)
@@ -6575,7 +6745,7 @@
 			)
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "H1")
 					(unit 1)
@@ -6640,7 +6810,7 @@
 			(uuid "251e786f-9c39-44f2-967a-dff89525f71d")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR021")
 					(unit 1)
@@ -6705,7 +6875,7 @@
 			(uuid "6220d0e7-10b5-41ef-818b-0a9ef2e35d8a")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR030")
 					(unit 1)
@@ -6874,7 +7044,7 @@
 			(uuid "93fb086c-1502-4ded-8a88-0b32a8a19ce7")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R4")
 					(unit 1)
@@ -6940,7 +7110,7 @@
 			(uuid "254c1a51-e672-40ea-a43f-a865ed1f843d")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR019")
 					(unit 1)
@@ -6950,7 +7120,7 @@
 	)
 	(symbol
 		(lib_id "power:+BATT")
-		(at 224.79 50.8 0)
+		(at 222.25 50.8 0)
 		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
@@ -6960,7 +7130,7 @@
 		(fields_autoplaced yes)
 		(uuid "2151bcee-51a6-4be8-ac04-64846c07a348")
 		(property "Reference" "#PWR040"
-			(at 224.79 54.61 0)
+			(at 222.25 54.61 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6969,7 +7139,7 @@
 			)
 		)
 		(property "Value" "V_REG"
-			(at 224.79 45.72 0)
+			(at 222.25 45.72 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6977,7 +7147,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 224.79 50.8 0)
+			(at 222.25 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6986,7 +7156,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 224.79 50.8 0)
+			(at 222.25 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6995,7 +7165,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 224.79 50.8 0)
+			(at 222.25 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7007,7 +7177,7 @@
 			(uuid "15f4337d-6733-4e4b-afb0-831b8cc7bf58")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR040")
 					(unit 1)
@@ -7080,7 +7250,7 @@
 			(uuid "74eb46a1-ebc2-47e5-b11f-d45eb0b36ee1")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "J1")
 					(unit 1)
@@ -7213,7 +7383,7 @@
 			(uuid "f979eb55-883c-4e17-a2d5-862c03257660")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR05")
 					(unit 1)
@@ -7326,7 +7496,7 @@
 			(uuid "15a63f02-dd45-478d-af73-833f49050a85")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R15")
 					(unit 1)
@@ -7390,7 +7560,7 @@
 			)
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "H2")
 					(unit 1)
@@ -7456,7 +7626,7 @@
 			(uuid "01183ae8-d507-487c-a16e-a7dd118c4867")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR017")
 					(unit 1)
@@ -7521,7 +7691,7 @@
 			(uuid "4ee00c7f-d9bd-401e-9a84-2fc67f725371")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR01")
 					(unit 1)
@@ -7586,7 +7756,7 @@
 			(uuid "70d70be9-65bd-41ed-9f89-6e750f1b091f")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR028")
 					(unit 1)
@@ -7650,7 +7820,7 @@
 			)
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "H4")
 					(unit 1)
@@ -7755,7 +7925,7 @@
 			(uuid "41e362dc-9a79-4068-bae3-0e660a77a6e2")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C1")
 					(unit 1)
@@ -7867,7 +8037,7 @@
 			(uuid "8a339738-8feb-4a1a-8a6b-ab633d0dfd00")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "PORT2")
 					(unit 1)
@@ -7933,7 +8103,7 @@
 			(uuid "05d59c40-6b04-42b5-a578-bfa27c53b981")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR015")
 					(unit 1)
@@ -7999,7 +8169,7 @@
 			(uuid "cd5d2038-c4fc-4f58-80f0-4645f8375083")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR038")
 					(unit 1)
@@ -8177,7 +8347,7 @@
 			(uuid "3beca200-ef65-4772-8fbd-54e5cf9ebc90")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR022")
 					(unit 1)
@@ -8281,7 +8451,7 @@
 			(uuid "593813f7-53a7-4fd3-ad98-8a379580ac57")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R12")
 					(unit 1)
@@ -8384,7 +8554,7 @@
 			(uuid "6e79f4af-fb1f-4b60-a40a-ca46c3f8bb86")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R6")
 					(unit 1)
@@ -8449,7 +8619,7 @@
 			(uuid "61a20e04-c7c3-4431-b269-8858d55d73ac")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR025")
 					(unit 1)
@@ -8537,7 +8707,7 @@
 			(uuid "156e463d-119a-4a46-b09d-8a51a0e297b4")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "BATT1")
 					(unit 1)
@@ -8616,7 +8786,7 @@
 			(uuid "2637b3d9-61a3-495e-8c5a-46a5fce14c36")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D4")
 					(unit 1)
@@ -8681,7 +8851,7 @@
 			(uuid "649de011-b302-4970-847d-25389ccf5a0d")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR012")
 					(unit 1)
@@ -8770,7 +8940,7 @@
 			(uuid "99da5ce4-fa6d-4d46-95f3-ee7974a75808")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "BT1")
 					(unit 1)
@@ -8966,7 +9136,7 @@
 			(uuid "9a89153a-3452-4679-ba2f-9ed7043b25c5")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR09")
 					(unit 1)
@@ -9039,7 +9209,7 @@
 			(uuid "5fe487a1-509d-409c-946a-181e1d213148")
 		)
 		(instances
-			(project ""
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "TOUCH1")
 					(unit 1)
@@ -9104,7 +9274,7 @@
 			(uuid "0868e68b-b6e6-4c70-8a88-6f19c8bc2ff6")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR032")
 					(unit 1)
@@ -9169,7 +9339,7 @@
 			(uuid "a33dccde-8b4c-42c2-a957-e16103b64ef8")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR016")
 					(unit 1)
@@ -9446,7 +9616,7 @@
 			(uuid "f75d1a7d-88c5-4c26-ade4-3b6f9f43ad4a")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C2")
 					(unit 1)
@@ -9522,7 +9692,7 @@
 			(uuid "04e2244d-b869-4a7e-916d-5f5dc2a62315")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R9")
 					(unit 1)
@@ -9587,7 +9757,7 @@
 			(uuid "67e222b0-bd44-4fed-bf52-8e40d40301a5")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR037")
 					(unit 1)
@@ -9690,7 +9860,7 @@
 			(uuid "436cb7f5-34f7-4e94-ad6b-ffc51fe774bc")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R7")
 					(unit 1)
@@ -9795,7 +9965,7 @@
 			(uuid "afb15718-72e8-49e2-a718-2dd97d13f8fe")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C7")
 					(unit 1)
@@ -9860,7 +10030,7 @@
 			(uuid "e6420e7f-3db0-45dd-a61c-2ab359ac98fe")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR036")
 					(unit 1)
@@ -9930,6 +10100,72 @@
 			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 226.06 71.12 0)
+		(mirror y)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9624b683-c233-48a2-b5c2-5a2983688867")
+		(property "Reference" "#PWR010"
+			(at 226.06 77.47 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 226.06 75.184 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 226.06 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 226.06 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+			(at 226.06 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b71603da-e18a-415f-8f5a-4ff10070f7a7")
+		)
+		(instances
+			(project "lux-et-portabilis-V2"
+				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
@@ -10031,7 +10267,7 @@
 			(uuid "9aa0e15a-8ae5-48b4-a782-fff058063191")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R2")
 					(unit 1)
@@ -10107,7 +10343,7 @@
 			(uuid "f12669db-de62-4d16-9077-5b36f9ce689a")
 		)
 		(instances
-			(project ""
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "J3")
 					(unit 1)
@@ -10172,7 +10408,7 @@
 			(uuid "cec996d8-1d10-44dd-b54e-770119858134")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR024")
 					(unit 1)
@@ -10251,7 +10487,7 @@
 			(uuid "911046f7-c03f-4ad3-b947-8bd6c225dc99")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D3")
 					(unit 1)
@@ -10354,7 +10590,7 @@
 			(uuid "5168b2b9-ba14-46f8-b1e4-d4fd6f29d3b7")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R11")
 					(unit 1)
@@ -10419,7 +10655,7 @@
 			(uuid "c06ddd98-ae3d-409c-ba95-998cf56fbdf2")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR026")
 					(unit 1)
@@ -10637,7 +10873,7 @@
 			(uuid "18d40cc8-4615-48ad-99fb-370e9c7968c2")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C4")
 					(unit 1)
@@ -10750,7 +10986,7 @@
 			(uuid "875b60a8-df85-48ea-953c-ca9df4e39cd2")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R14")
 					(unit 1)
@@ -10923,7 +11159,7 @@
 			(uuid "22568340-af43-4a2d-9885-8df3f3d29c69")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "U2")
 					(unit 1)
@@ -11034,7 +11270,7 @@
 			(uuid "1e4c9ee3-4b3c-4ac7-a375-04a919b83a6a")
 		)
 		(instances
-			(project ""
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "U1")
 					(unit 1)
@@ -11099,7 +11335,7 @@
 			(uuid "e5fceb58-51d1-476b-9be3-a7037815b539")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR08")
 					(unit 1)
@@ -11211,7 +11447,7 @@
 			(uuid "368cbe8f-5280-4858-99db-c8c55127548d")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "Q2")
 					(unit 1)
@@ -11389,7 +11625,7 @@
 			(uuid "5cafe0ab-c4d7-4e35-acba-b6eb01a42c41")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR034")
 					(unit 1)
@@ -11467,7 +11703,7 @@
 			(uuid "3f7eb353-4610-4805-984c-054c015c636f")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R8")
 					(unit 1)
@@ -11572,7 +11808,7 @@
 			(uuid "cdb93146-6c12-43aa-990e-27c55bd7a0db")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D6")
 					(unit 1)
@@ -11638,7 +11874,7 @@
 			(uuid "1ae7ffa2-e43e-4be2-91c7-a9df0afb1237")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR03")
 					(unit 1)
@@ -11741,7 +11977,7 @@
 			(uuid "11d89ee7-b5fa-4501-8ba4-5257ee7b1656")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R3")
 					(unit 1)
@@ -11920,7 +12156,7 @@
 			(uuid "38b0e861-b6a3-4990-a5e9-8dd2acf256b4")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR07")
 					(unit 1)
@@ -12023,7 +12259,7 @@
 			(uuid "7a700ccd-789f-4013-8413-28554ccc13a7")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R13")
 					(unit 1)
@@ -12182,7 +12418,7 @@
 			(uuid "643317f9-b680-4ba7-9984-5ce7b74e669d")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D2")
 					(unit 1)
@@ -12272,7 +12508,7 @@
 			(uuid "a2932e74-de50-492c-83b0-7f909edf20f5")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "Q3")
 					(unit 1)
@@ -12337,7 +12573,7 @@
 			(uuid "b821f994-cae0-4398-aa61-737b76e99c40")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR033")
 					(unit 1)
@@ -12442,7 +12678,7 @@
 			(uuid "ba49e39b-4fa5-40db-9fa3-765766a836b4")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C6")
 					(unit 1)
@@ -12507,7 +12743,7 @@
 			(uuid "75e54478-98a3-4eb6-b388-a56761993288")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR020")
 					(unit 1)
@@ -12595,7 +12831,7 @@
 			(uuid "f3365672-8aab-4b52-98c5-1aa77eabf2d8")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "D1")
 					(unit 1)
@@ -12661,7 +12897,7 @@
 			(uuid "37e0f20e-ff1f-4588-af6b-5ab74c3f490a")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR02")
 					(unit 1)
@@ -12739,7 +12975,7 @@
 			(uuid "0c38bbf1-269f-4505-b0ac-c3ac293a370a")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "R10")
 					(unit 1)
@@ -12804,7 +13040,7 @@
 			(uuid "fd2b5930-f594-47cc-90cb-c80758f0b91a")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR027")
 					(unit 1)
@@ -12892,7 +13128,7 @@
 			(uuid "1653a259-77cf-48a5-ab15-14b9234b2c33")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "C5")
 					(unit 1)
@@ -12957,7 +13193,7 @@
 			(uuid "3223c962-b598-46d6-b028-219e90ff8a5a")
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR023")
 					(unit 1)
@@ -13020,9 +13256,78 @@
 			)
 		)
 		(instances
-			(project "Aranakin"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "H3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Diode:BZV55B2V7")
+		(at 226.06 67.31 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f211c140-15bc-4285-bac8-6943f70c5703")
+		(property "Reference" "D7"
+			(at 228.6 66.0399 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "BZV55B2V7"
+			(at 223.52 66.802 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Diode_SMD:D_MiniMELF"
+			(at 221.615 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/BZV55_SER.pdf"
+			(at 226.06 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "2.7V, 500mW, 2%, Zener diode, MiniMELF"
+			(at 226.06 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "9a610942-709b-492d-8b20-af4c4be56c66")
+		)
+		(pin "1"
+			(uuid "0b2565b7-4038-4b0b-aace-2d3dbc1b3826")
+		)
+		(instances
+			(project "lux-et-portabilis-V2"
+				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
+					(reference "D7")
 					(unit 1)
 				)
 			)
@@ -13086,7 +13391,7 @@
 			(uuid "db3cfd3d-2819-44d4-a8e3-c5bdfffbf599")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR039")
 					(unit 1)
@@ -13151,7 +13456,7 @@
 			(uuid "f5157c76-d7cd-49f5-aee5-2aaa680a8b22")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR031")
 					(unit 1)
@@ -13216,7 +13521,7 @@
 			(uuid "f4201f10-f46c-4ad3-b2df-4816698e18a8")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "#PWR035")
 					(unit 1)
@@ -13289,7 +13594,7 @@
 			(uuid "5529efd6-6490-4884-b054-929c31d59f08")
 		)
 		(instances
-			(project "lux_et_portabilis"
+			(project "lux-et-portabilis-V2"
 				(path "/435bb94e-d379-4041-9433-e08282ea3ba2"
 					(reference "J2")
 					(unit 1)
