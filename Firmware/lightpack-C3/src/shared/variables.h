@@ -7,14 +7,42 @@
 //?   1. the DHCP hostname the router's client list and its DNS record show
 //?      (WiFiManager.setHostname, src/services/wifi_settings.h);
 //?   2. the mDNS responder that actually answers <name>.local
-//?      (ArduinoOTA in setup_ESP32, and setup_webpage);
+//?      (ArduinoOTA in setup_OTA, and setup_webpage);
 //?   3. the OTA target name listed by the Arduino IDE / espota.
-//! The mDNS responder can only be initialised ONCE per boot: a second MDNS.begin()
-//! calls mdns_init() again, which fails with ESP_ERR_INVALID_STATE and returns
-//! false. Whichever name reaches the responder FIRST is therefore the only name
-//! that ever resolves, and any mismatch silently pins the board to the wrong
-//! .local name. Never hardcode a hostname at one of those sites.
+//* The responder is started once per join and torn down with the OTA listener when
+//* the board goes offline (see net_enter_offline in wifi_settings.h), so the name
+//! has to be stated at each start - nothing re-registers it on its own.
+//! The note that used to sit here said a second MDNS.begin() fails with
+//! ESP_ERR_INVALID_STATE. That is not true of this framework: mdns_init() is
+//! idempotent and returns success when it has already run, and the boot log shows
+//! no failure from the second call. The reason to define the name once is simply
+//! that three advertisements have to agree.
 #define NETWORK_HOSTNAME "lightpack"
+
+//* ---------------------- NETWORK STATE ----------------------
+//? The board is in exactly one of these three states. It lives here rather than in
+//? services/wifi_settings.h, which owns the transitions, because the onboard
+//? status blink in services/led_scripts.h reads it and that header is included
+//* first. Nothing outside wifi_settings.h may WRITE it - see the note there.
+//?
+//?   NET_OFFLINE     The radio is off. No join attempts, no hotspot, no page and
+//?                   no OTA listener. This is the persisted "offline mode" switch
+//?                   and it survives a reboot; a 1 s press of GPIO9 flips it.
+//?   NET_CONNECTING  The radio is up, the saved network is not joined. The join is
+//?                   retried every WIFI_RETRY_INTERVAL_MS, forever. There is no
+//?                   address to serve on, so there is still no page and no OTA.
+//?   NET_CONNECTED   Joined. The configuration page and the OTA listener are live.
+//!
+//! The numbers are the blink's case labels (services/led_scripts.h) and the wire
+//? format of /api/state, so append to this enum rather than reordering it.
+enum : uint8_t
+{
+    NET_OFFLINE = 0,
+    NET_CONNECTING,
+    NET_CONNECTED
+};
+
+uint8_t net_state = NET_OFFLINE;
 
 //* ---------------------- GLOBAL COMPONENT VARIABLES ----------------------
 
@@ -58,23 +86,55 @@ typedef struct ledstrip
 
 struct_ledstrip status_led;
 struct_ledstrip led_strip;
-struct_ledstrip majora_strip;
+
+//* ---------------------- STATUS LED NOTICE ----------------------
+//? update_onboard_LED() (services/led_scripts.h) repaints the onboard pixel from
+//? the gyro every 5 ms, so anything that writes a colour there is overwritten
+//? before a human could see it. A notice is a colour plus a deadline: while the
+//? deadline is in the future the gyro repaint stands down and the notice stands,
+//? and when it expires the gyro display resumes on its own.
+//! Deliberately not a blocking delay. The button actions that use this run inside
+//? loop(), and blocking there is what the whole input path was rewritten to avoid
+//* (see the note over the button table in services/readings.h).
+uint32_t led_notice_until_ms = 0;
+uint8_t led_notice_r = 0;
+uint8_t led_notice_g = 0;
+uint8_t led_notice_b = 0;
 
 uint32_t adcReading = 0;
 uint32_t adcVoltage = 0;
 #define MAX_ADC_SAMPLES 8
 #define OVERSAMPLING_RESOLUTION 3 // 2^3 = 8 samples
 
-typedef struct buttonState
-{
-    bool currentState = LOW; // Last confirmed debounced state
-    bool lastState = LOW;    // Previous raw reading (used for debounce)
-    uint32_t lastDebounceTime = 0;
-    uint32_t debounceDelay = 50; // ms
-    uint8_t counter = 0;
-} struct_buttonState;
+//* ---------------------- LAST BOOT REPORT ----------------------
+//? Why the PREVIOUS run ended, and what the LED rail did while it did so. These
+//? live here rather than in main.cpp because services/serial_outputs.h replays
+//! them in the periodic telemetry - see the note over boot_report_print() for
+//? why printing them at boot alone is not readable on this board.
+//?
+//? Captured as early in setup() as the reason can be read, before this boot has
+//* a chance to overwrite it with a reset of its own.
+esp_reset_reason_t boot_reset_reason = ESP_RST_UNKNOWN;
 
-struct_buttonState button_states;
+//? V_REG before any LED drew current. The baseline the sag below is measured
+//* against.
+uint32_t boot_rail_mv = 0;
+
+//? Lowest V_REG seen while the strip self-test lit the strip, on the same boot.
+//* 0 means the self-test did not run or never reported - not "zero volts".
+uint32_t boot_rail_min_mv = 0;
+
+//* The button state lives with the button code, not here: services/readings.h
+//? owns both switches (GPIO3 touch, GPIO9 boot) in one `buttonInput` table, which
+//? is what the configuration page enumerates. What used to sit here was a single
+//? `buttonState` with a debounce timer and a press counter that the blocking
+//? handler maintained by hand; the non-blocking state machine needs press start,
+//? release, last event and event count per switch, and keeping a second copy of
+//? any of that here would just be a global nobody reads.
+//!
+//! A second `buttonState` typedef, for a `button_states[4]` array, was removed
+//! from this file before that: it was a redefinition error waiting to happen and
+//! nothing anywhere indexed the array.
 
 //* ---------------------- USER PALETTE ----------------------
 //? The colour selected on the configuration page. Modes read this; only the
@@ -94,13 +154,6 @@ typedef struct colorRGB
 } struct_colorRGB;
 
 struct_colorRGB palette;
-
-//! A second `buttonState` typedef used to sit here, for a
-//! `button_states[4]` array. It was left behind by the move to a single
-//! debounced button: check_button() (services/readings.h) reads
-//! `button_states.counter` on the scalar instance declared above, and nothing
-//! anywhere indexes the array. Keeping both was a redefinition error, so the
-//! array version is gone.
 
 //* ---------------------- PULSE WHIP TUNABLES (mode 5) ----------------------
 //? Exposed on the device configuration webpage. The dynamics that consume these
@@ -179,10 +232,13 @@ struct_stripSettings strip_settings;
 //? brightness, so overlapping steps brighten the strip rather than restarting it
 //? dimmer than it already was.
 //?
-//? The three *_gain fields are intensity scalers applied as each LED is drawn.
-//? They re-tint the flame - a green or amber one instead of the magenta - with no
-//? reflash and without disturbing the brightness maths above them. A gain is a
-//? percentage: 100 is unity.
+//? The flame is drawn in the PALETTE colour: `power` decides how bright each LED
+//? is and the palette decides what colour that brightness is, exactly as Solid
+//? color does. One consequence worth knowing: a palette of black draws no flame,
+//? because there is no channel intensity in it to scale.
+//! Three fixed per-channel gains used to sit here instead, and they are gone
+//? rather than kept beside the palette - two controls for one colour is how this
+//* mode came to ignore the colour picked on the page and always come out magenta.
 
 typedef struct flameSettings
 {
@@ -191,9 +247,6 @@ typedef struct flameSettings
     float power_slope = 5.0f; // Brightness gained per unit of magnitude
     uint8_t power_max = 75;   // Ceiling on the flash brightness, 0-255
     uint8_t power_idle = 5;   // Brightness the strip rests at, 0-255
-    uint8_t red_gain = 100;   // Intensity scaler, per cent, applied to the red channel
-    uint8_t green_gain = 0;   // Intensity scaler, per cent, applied to the green channel
-    uint8_t blue_gain = 100;  // Intensity scaler, per cent, applied to the blue channel
 } struct_flameSettings;
 
 struct_flameSettings flame;

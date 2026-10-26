@@ -30,12 +30,28 @@
 //? also the widest label the page will ever be handed back.
 #define PRESET_NAME_LEN 16
 
-//! Bump this whenever struct_preset changes shape. Both the stored blob length
-//! and this byte are checked on every read, and a slot that fails either check
-//! reads as EMPTY rather than as garbage: a struct that gained a field, or a
-//! toolchain that laid the old one out differently, would otherwise hand the
-//! render maths whatever bytes happened to sit at those offsets.
-#define PRESET_FORMAT_VERSION 1
+//! Bump this EVERY time struct_preset changes shape: a member added, removed or
+//! reordered, or a member whose own size changed. Both the stored blob length and
+//? this byte are checked on every read, and a slot that fails either check is
+//* reported as unusable rather than handed to the render maths as garbage - a
+//! struct whose layout moved would otherwise feed it whatever bytes happened to
+//! sit at those offsets.
+//?
+//! VERSION HISTORY
+//?   1  struct_preset = 100 bytes, 31 preset fields. Carried flame red/green/
+//?      blue_gain.
+//?   2  struct_preset =  96 bytes, 28 preset fields. The three gains are gone -
+//?      the flame is drawn in the palette colour instead.
+//!      Removing three uint8_t removed FOUR bytes from struct_preset, because of
+//!      trailing padding: struct_flameSettings went from 20 bytes to 16.
+//*
+//! Version 1 was never bumped when those fields went away, so a 100-byte struct
+//! and a 96-byte one both shipped as version 1 and the version check could not see
+//? the change. The length check did catch it - which is why the board reported the
+//? slots as empty instead of drawing nonsense - but it did so silently, as a single
+//* [E] line in the serial log. PRESET_INCOMPATIBLE below is what makes that state
+//* visible instead of indistinguishable from an empty slot.
+#define PRESET_FORMAT_VERSION 2
 
 //* ---------------------- STORED FORM ----------------------
 
@@ -105,9 +121,6 @@ const struct_presetField PRESET_FIELDS[] = {
     {"flame_power_slope", PRESET_F32, PRESET_NEST(flame, struct_flameSettings, power_slope)},
     {"flame_power_max", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, power_max)},
     {"flame_power_idle", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, power_idle)},
-    {"flame_red_gain", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, red_gain)},
-    {"flame_green_gain", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, green_gain)},
-    {"flame_blue_gain", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, blue_gain)},
     {"step_baseline_tau_ms", PRESET_U16, PRESET_NEST(step, struct_stepSettings, baseline_tau_ms)},
     {"step_threshold", PRESET_F32, PRESET_NEST(step, struct_stepSettings, threshold)},
     {"step_release", PRESET_F32, PRESET_NEST(step, struct_stepSettings, release)},
@@ -135,25 +148,91 @@ const char *preset_key(uint8_t slot)
     return key;
 }
 
-//* Read one slot. False means "nothing usable here": absent, a blob of another
-//* length, or one written by a different PRESET_FORMAT_VERSION.
-bool preset_read(uint8_t slot, struct_preset &out)
+//* What a slot turned out to hold. "Empty" and "written by a build I cannot read"
+//? are different facts, and the page has to be able to say which one it is looking
+//* at - that distinction is the whole reason this enum exists.
+enum : uint8_t
+{
+    PRESET_OK = 0,      // Present, current format, safe to apply
+    PRESET_EMPTY,       // Nothing stored in the slot
+    PRESET_INCOMPATIBLE // Something is stored, but this firmware cannot read it
+};
+
+const char *preset_state_name(uint8_t state)
+{
+    switch (state)
+    {
+    case PRESET_OK:
+        return "ok";
+    case PRESET_INCOMPATIBLE:
+        return "incompatible";
+    default:
+        return "empty";
+    }
+}
+
+//* Read one slot and report what was found. `out` is only filled on PRESET_OK.
+//? One implementation behind both views: preset_read() wants a yes/no and
+//* preset_slot_state() wants to know why not, and the two must never disagree.
+uint8_t preset_read_checked(uint8_t slot, struct_preset &out)
 {
     if (slot >= PRESET_SLOTS)
-        return false;
+        return PRESET_EMPTY;
 
     //! Read-only handle. Listing the slots must not take a write lock on NVS,
     //! and a read on a namespace that does not exist yet is simply a miss.
     if (!preferences.begin(WEBPAGE_NVS_NAMESPACE, true))
-        return false;
+        return PRESET_EMPTY;
 
-    size_t stored = preferences.getBytes(preset_key(slot), &out, sizeof(out));
+    uint8_t state;
+
+    //! isKey() first, never getBytesLength(): both answer "is anything here", but
+    //? getBytesLength() calls nvs_get_blob() with a null buffer and an absent key
+    //? makes the Preferences library log [E] "len fail: NOT_FOUND" for what is an
+    //* ordinary miss on an empty slot - one line per empty slot per page load,
+    //? which is noise that buries the line that actually matters. isKey() reaches
+    //* the same answer through getType(), which logs nothing at all.
+    if (!preferences.isKey(preset_key(slot)))
+    {
+        state = PRESET_EMPTY;
+    }
+    else if (preferences.getBytesLength(preset_key(slot)) != sizeof(out))
+    {
+        //? The right key, the wrong size: a preset written by a build whose
+        //* struct_preset was laid out differently. Deliberately not read.
+        state = PRESET_INCOMPATIBLE;
+    }
+    else
+    {
+        //? Zeroed first so a failed read cannot leave the caller's struct holding
+        //* a mixture of the stored bytes and whatever was in it before.
+        memset(&out, 0, sizeof(out));
+        const size_t stored = preferences.getBytes(preset_key(slot), &out, sizeof(out));
+
+        //? getBytes() copies nothing and returns 0 when the stored blob is longer
+        //? than the buffer, so a preset written by a future firmware carrying more
+        //* fields lands here rather than overrunning the struct.
+        state = (stored == sizeof(out) && out.version == PRESET_FORMAT_VERSION)
+                    ? PRESET_OK
+                    : PRESET_INCOMPATIBLE;
+    }
+
     preferences.end();
+    return state;
+}
 
-    //? Preferences::getBytes() copies nothing and returns 0 when the stored
-    //? blob is LONGER than the buffer, so a preset written by a future firmware
-    //! with more fields lands on the version check rather than overrunning it.
-    return stored == sizeof(out) && out.version == PRESET_FORMAT_VERSION;
+//* Read one slot. True means "usable and current".
+bool preset_read(uint8_t slot, struct_preset &out)
+{
+    return preset_read_checked(slot, out) == PRESET_OK;
+}
+
+//* Why a slot is unusable, for the page: PRESET_OK, PRESET_EMPTY, or
+//* PRESET_INCOMPATIBLE.
+uint8_t preset_slot_state(uint8_t slot)
+{
+    struct_preset scratch;
+    return preset_read_checked(slot, scratch);
 }
 
 //* Copy the live configuration into a slot.
@@ -289,25 +368,31 @@ void preset_json_config(String &json, const struct_preset &p)
 
 //* ---------------------- HANDLERS ----------------------
 
-//* GET /api/presets - what the page needs to draw the slot bar: which slots
-//* hold something and what they are called. Values are fetched per slot, so a
-//* page load does not pay for four presets it will not show.
+//* GET /api/presets - what the page needs to draw the slot bar: which slots hold
+//? something, what they are called, and whether this firmware can read them.
+//? `used` deliberately means USABLE rather than "something is stored here", so
+//? every existing caller keeps its meaning: only an OK slot can be applied or
+//* exported. `state` is what separates the two ways a slot can be unusable, and it
+//* is why a slot written by another build no longer looks like an empty one.
 void webpage_handle_presets()
 {
     String json;
-    json.reserve(320);
+    json.reserve(480);
     json += '[';
     for (uint8_t i = 0; i < PRESET_SLOTS; i++)
     {
         struct_preset p;
-        bool used = preset_read(i, p);
+        const bool used = preset_read(i, p);
+        const uint8_t state = used ? (uint8_t)PRESET_OK : preset_slot_state(i);
         if (i > 0)
             json += ',';
         json += F("{\"slot\":");
         json += String(i);
         json += F(",\"used\":");
         json += used ? "true" : "false";
-        json += F(",\"name\":\"");
+        json += F(",\"state\":\"");
+        json += preset_state_name(state);
+        json += F("\",\"name\":\"");
         if (used)
             json += webpage_json_escape(p.name);
         json += F("\"}");
@@ -378,7 +463,15 @@ void webpage_handle_set_preset()
     {
         if (!preset_apply((uint8_t)slot))
         {
-            web_server.send(404, "application/json", "{\"ok\":false,\"error\":\"nothing to apply\"}\n");
+            //? Two different refusals, and the page shows the message. "A slot
+            //? written by another build" is not the same answer as "nothing was
+            //* ever written here", and telling them apart is what stops a user
+            //* re-saving over a preset that is still recoverable from an export.
+            const bool incompatible = preset_slot_state((uint8_t)slot) == PRESET_INCOMPATIBLE;
+            web_server.send(incompatible ? 409 : 404, "application/json",
+                            incompatible
+                                ? "{\"ok\":false,\"error\":\"slot holds a preset from another firmware version\"}\n"
+                                : "{\"ok\":false,\"error\":\"nothing to apply\"}\n");
             return;
         }
         webpage_handle_state(); // Reply with the resulting state

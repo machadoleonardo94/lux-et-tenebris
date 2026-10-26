@@ -1,0 +1,43 @@
+# Lightpack C3 partition table - selected by board_build.partitions in platformio.ini.
+#
+# WHY THIS EXISTS
+# The Arduino core's default.csv reserved 0x160000 (1,441,792 bytes, 1.375 MB) for a
+# SPIFFS partition this firmware never mounts: <LittleFS.h> is included in
+# shared/dependencies.h and nothing anywhere calls it. Measured against the built
+# image, that left the app partition at 1,310,720 bytes with 1,242,766 bytes used -
+# 68 KB of headroom in a 4 MB flash chip.
+#
+# WHAT CHANGED
+# The SPIFFS region is gone and the two OTA slots take its space: each goes from
+# 1,310,720 to 2,031,616 bytes (1.9375 MB), so the app now has ~770 KB of headroom
+# instead of 68 KB. Both slots stay the same size, which is what OTA requires, and
+# otadata and coredump keep their exact sizes so nothing new has to be explained to
+# the bootloader.
+#
+# NVS KEEPS ITS OFFSET AND SIZE ON PURPOSE
+# 0x9000 / 0x5000 is byte-for-byte where default.csv put it, and the app slots grow
+# around it rather than through it. So a board reflashed with this table keeps its
+# mode, palette, every tunable, its presets, its saved networks and its page login -
+# the reflash costs a cable, not a configuration.
+#
+# THE ONE THING THAT MOVES
+# app1 moves from 0x150000 to 0x200000. A board that was last updated over the air
+# is running from app1 with otadata pointing there, so the first flash has to leave
+# otadata selecting app0 - and a normal upload does exactly that. The Arduino core's
+# own tools/platformio-build.py puts its boot_app0.bin at 0xE000 on every upload
+# (this framework never runs the platform's IDF script), and that image is checked
+# here: 8192 bytes, ota_seq 1 in the first sector, and seq 1 is ota_0.
+#
+# Anything that does NOT rewrite otadata - a raw write_flash of the app on its own,
+# or an over-the-air update - needs it cleared by hand before the first USB flash:
+#     esptool.py --chip esp32c3 --port <PORT> erase_region 0xE000 0x2000
+# Without that the bootloader would fall back to app0 on its own, because the new
+# app1 region is blank and an unloadable image is not a candidate - but this is not
+# a fallback to design around when clearing the sector takes two seconds.
+#
+# Name,   Type, SubType,  Offset,   Size,     Flags
+nvs,      data, nvs,      0x9000,   0x5000,
+otadata,  data, ota,      0xE000,   0x2000,
+app0,     app,  ota_0,    0x10000,  0x1F0000,
+app1,     app,  ota_1,    0x200000, 0x1F0000,
+coredump, data, coredump, 0x3F0000, 0x10000,

@@ -3,13 +3,12 @@
 
 #include "shared/dependencies.h"
 
-void run_majoras();
 void update_onboard_LED();
 void update_strip(int mode);
 void flame_steps();
 void flame_sanitize();
 uint8_t flame_power_for(float magnitude);
-uint8_t flame_channel(uint8_t value, uint8_t gain);
+uint8_t flame_shade(uint8_t power, uint8_t channel);
 void fade_strip();
 void constant_brightness();
 void strip_sanitize();
@@ -48,10 +47,6 @@ void strip_report_config();
 #define FLAME_SPATIAL_MIN 0.0f
 #define FLAME_SPATIAL_MAX 10.0f
 #define FLAME_POWER_SLOPE_MAX 25.0f
-//* The gains are percentages, so 100 is unity. 255 is the uint8_t ceiling and
-//* simply saturates the channel; the limit exists to bound the slider, not to
-//* protect the maths.
-#define FLAME_GAIN_MAX 255
 
 //* Pulse whip limits. WHIP_MAX_HEADS caps how many whips may share the strip;
 //* launches that find no free head are dropped rather than queued.
@@ -124,49 +119,168 @@ const struct_ledMode *find_led_mode_by_key(const char *key);
 const struct_ledMode *led_mode_at(uint8_t index);
 uint8_t led_mode_count();
 
-void run_majoras()
+//* Select the next entry in the table above, wrapping at the end. This is what
+//* the user button drives (see check_button() in services/readings.h): a 1 s
+//* press walks the strip to the next script without a phone in hand.
+void led_mode_next();
+
+//* Persistence lives in services/webpage.h, which is included after this header
+//* (see shared/dependencies.h). A mode picked with the button has to survive a
+//* reboot exactly like one picked on the page, so this one name is declared
+//* ahead of its definition - the same arrangement services/webpage.h uses for
+//* the preset handlers.
+void webpage_config_save();
+
+//* Show one colour on the onboard pixel for a moment, over the top of the steady
+//? display. Used by the network transitions in services/wifi_settings.h to mark a
+//* state CHANGE; the blink below is what reports the state it settled into.
+void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms);
+
+void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms)
 {
-    static uint32_t lastUpdate = 0;
-    if (millis() - lastUpdate < 10)
-        return;
-    lastUpdate = millis();
-    static uint8_t step = 0; // From 0 to 127 positions
-    uint8_t red = 0;
-    uint8_t green = 0;
-    uint8_t blue = 0;
-
-    float sin1 = sin(((millis() * (2 * PI)) / 1500.0));
-    float sin2 = sin(((millis() * (2 * PI)) / 4000.0));
-    float sin3 = sin(((millis() * (2 * PI)) / 1200.0));
-
-    red = (40 + 80 * sin1 > 0 ? 40 + 80 * sin1 : 0);
-    green = (40 + 80 * sin2 > 0 ? 40 + 80 * sin2 : 0);
-    blue = (40 + 80 * sin3 > 0 ? 40 + 80 * sin3 : 0);
-    uint16_t total = red + green + blue;
-
-    for (int i = 0; i < MAJORAS_LEDS - 2; i++)
-    {
-        if (i == 10 || i == 11) // Removes offset and dims for first 16 LEDs
-            strip.setPixelColor(i, strip.Color(red / 5, green / 10, blue / 10));
-        else
-            strip.setPixelColor(i, strip.Color(red, green, blue));
-    }
-    strip.setPixelColor(MAJORAS_LEDS - 2, red, 0, 0);
-    strip.setPixelColor(MAJORAS_LEDS - 1, red, 0, 0);
-    strip.show();
+    led_notice_r = r;
+    led_notice_g = g;
+    led_notice_b = b;
+    led_notice_until_ms = millis() + ms;
+    onboard_led.setPixelColor(0, strip.Color(r, g, b));
+    onboard_led.show();
 }
 
+//* ---------------------- ONBOARD LED ----------------------
+//? What the single onboard pixel is for. It used to mirror the gyro, which looked
+//? like nothing: the channel assignment was `abs(g.gyro.x)` straight into a
+//? uint8_t, and the gyro sits at 0.01-0.3 rad/s at rest, so every channel
+//! truncated to 0 and the pixel was black at all times. It is a status light now:
+//* one blink per period, whose colour is the network state.
+//* 1 = the network state blink; 0 = the old gyro display.
+#define ONBOARD_LED_NETWORK_BLINK 1
+
+//* One blink every LED_BLINK_PERIOD_MS, lit for LED_BLINK_ON_MS.
+//? 200 ms out of 5 s catches the eye in peripheral vision and leaves the pixel
+//? dark 96% of the time, which is what makes it read as a signal rather than as a
+//* faint glow you have to check for.
+#define LED_BLINK_PERIOD_MS 5000
+#define LED_BLINK_ON_MS 200
+
+//? Shared with the transition notices above, so a state change and the steady
+//* state that follows it are the same brightness.
+#define LED_BLINK_LEVEL 45
+
+//* ---------------------- BUTTON FEEDBACK ----------------------
+//? Solid colours that report the two switches directly, so a press can be seen on
+//? the board without a serial console attached. They exist because the onboard
+//* pixel is otherwise only ever the network blink, which says nothing about input.
+//! Level, not the classified press: this reads the PIN, so it lights for any touch
+//? at all - including a 20 ms tap that is too short to become a BUTTON_EVENT_SHORT
+//* and would therefore look like a dead button with nothing on screen to say why.
+//? Notices (the recovery countdown, the portal warning) still own the pixel, so
+//* this is checked AFTER them and never hides a countdown.
+#define ONBOARD_LED_BUTTON_FEEDBACK 1
+#define BUTTON_LED_TOUCH_R 0 // green: GPIO3 is HIGH, the touch net is asserted
+#define BUTTON_LED_TOUCH_G 10
+#define BUTTON_LED_TOUCH_B 0
+#define BUTTON_LED_BOOT_R 7 // purple: GPIO9 is held (active LOW)
+#define BUTTON_LED_BOOT_G 0
+#define BUTTON_LED_BOOT_B 7
+
+//* Colour: green joined, cyan not joined, red radio off. One blink, then dark.
 void update_onboard_LED()
 {
+    //* A notice owns the pixel until its deadline. Checked before the repaint
+    //? gate below, so a notice is drawn on the very next pass rather than up to
+    //* 5 ms later.
+    if (led_notice_until_ms != 0)
+    {
+        if ((int32_t)(millis() - led_notice_until_ms) < 0)
+            return;
+        led_notice_until_ms = 0; // Expired: fall through and let the steady display retake it
+    }
+
     if (millis() - status_led.update_time < 5)
         return;
     status_led.update_time = millis();
-    // status_led.blue = 10 * (1 + sin(millis() * 0.01));
+
+#if ONBOARD_LED_BUTTON_FEEDBACK
+    //* Switch state outranks the blink: while a switch is asserted the pixel is a
+    //? level indicator rather than a status report. The boot button is tested
+    //* second so a touch and a BOOT hold at once resolve to the touch net.
+    if (button_is_down(touch_button))
+    {
+        onboard_led.setPixelColor(0, strip.Color(BUTTON_LED_TOUCH_R, BUTTON_LED_TOUCH_G, BUTTON_LED_TOUCH_B));
+        onboard_led.show();
+        return;
+    }
+    if (button_is_down(boot_button))
+    {
+        //* Holds act on RELEASE (a reset with GPIO9 still held lands in the ROM's
+        //! download mode), so without a progress colour the user gets no feedback
+        //? at all while holding - they cannot tell 2 s from 5 s. These three
+        //* colours are that feedback: they change AT each threshold, so releasing
+        //? now would do exactly what the colour already announces.
+        //? Purple below 3 s, amber from 3 s (radio), blue from 6 s (hotspot).
+        uint32_t held = 0;
+        if (boot_button.pressed)
+            held = millis() - boot_button.press_start_ms;
+
+        uint8_t r = BUTTON_LED_BOOT_R;
+        uint8_t g = BUTTON_LED_BOOT_G;
+        uint8_t b = BUTTON_LED_BOOT_B;
+
+        if (held >= BUTTON_PORTAL_HOLD_MS)
+        {
+            r = 0;
+            g = 16;
+            b = 25;
+        }
+        else if (held >= BUTTON_WIFI_HOLD_MS)
+        {
+            r = 25;
+            g = 15;
+            b = 0;
+        }
+
+        onboard_led.setPixelColor(0, strip.Color(r, g, b));
+        onboard_led.show();
+        return;
+    }
+#endif
+
+#if ONBOARD_LED_NETWORK_BLINK
+    //* millis() % PERIOD is the position in the current blink, so the pixel is lit
+    //? for the first LED_BLINK_ON_MS of every period and dark for the remainder.
+    const bool lit = (millis() % LED_BLINK_PERIOD_MS) < LED_BLINK_ON_MS;
+
+    status_led.red = 0;
+    status_led.green = 0;
+    status_led.blue = 0;
+
+    if (lit)
+    {
+        switch (net_state)
+        {
+        case NET_CONNECTED:
+            status_led.green = LED_BLINK_LEVEL;
+            break;
+        case NET_CONNECTING:
+            //? Green plus blue: cyan, the "radio is up but nothing is joined yet"
+            //* state, which is the one a user is most likely to be staring at.
+            status_led.green = LED_BLINK_LEVEL;
+            status_led.blue = LED_BLINK_LEVEL;
+            break;
+        default: // NET_OFFLINE
+            status_led.red = LED_BLINK_LEVEL;
+            break;
+        }
+    }
+#else
+    //* The old gyro display, kept behind the flag above. Note that these values
+    //! truncate to 0 for any realistic reading - see the note over the flag.
     status_led.red = abs(g.gyro.x);
     status_led.green = abs(g.gyro.y);
     status_led.blue = abs(g.gyro.z);
+#endif
 
-    onboard_led.setPixelColor(0, strip.Color(status_led.red, status_led.green, status_led.blue)); // Green status LED with same brightness
+    onboard_led.setPixelColor(0, strip.Color(status_led.red, status_led.green, status_led.blue));
     onboard_led.show();
     /*
     Serial.printf(">Gyro_X: %.2f \n", g.gyro.x);
@@ -235,15 +349,15 @@ uint8_t flame_power_for(float magnitude)
     return (uint8_t)power;
 }
 
-uint8_t flame_channel(uint8_t value, uint8_t gain)
+//* One channel of the flame: the brightness this LED's step maths arrived at,
+//? scaled by how much of that channel the PALETTE colour asks for.
+//? 255 in a channel means "as much as the step asked for", so a white palette
+//* leaves the brightness maths exactly as it was and a saturated one simply
+//? removes the other channels. Kept in one function so the three channels cannot
+//* drift apart, which is what a per-channel gain used to guard against here.
+uint8_t flame_shade(uint8_t power, uint8_t channel)
 {
-    //? Intensity scaler: multiplies one channel by a percentage, 100 being unity.
-    //? Kept in one function so the three gains cannot drift apart, and so a gain
-    //! above 100 saturates here instead of wrapping round to black.
-    uint16_t scaled = ((uint16_t)value * (uint16_t)gain) / 100;
-    if (scaled > 255)
-        scaled = 255;
-    return (uint8_t)scaled;
+    return (uint8_t)(((uint16_t)power * (uint16_t)channel) / 255);
 }
 
 void flame_steps()
@@ -303,8 +417,11 @@ void flame_steps()
         keep *= keep_step;
     }
 
-    //* 3. Draw. led_strip.* is this mode's scratch colour and has nothing to do
-    //! with the user's palette, as in fade_strip().
+    //* 3. Draw, in the palette colour. `power` is how bright this LED is; the
+    //? palette is what colour that brightness is, so the mode follows the colour
+    //* picked on the page like every other mode does.
+    //! led_strip.* stays this mode's scratch colour - see the note in
+    //* shared/variables.h about never keeping the palette there.
     for (uint16_t i = 0; i < leds; i++)
     {
         float value = level[i];
@@ -312,9 +429,9 @@ void flame_steps()
             value = 255.0f;
         const uint8_t power = (uint8_t)value;
 
-        led_strip.red = flame_channel(power, flame.red_gain);
-        led_strip.green = flame_channel(power, flame.green_gain);
-        led_strip.blue = flame_channel(power, flame.blue_gain);
+        led_strip.red = flame_shade(power, palette.red);
+        led_strip.green = flame_shade(power, palette.green);
+        led_strip.blue = flame_shade(power, palette.blue);
 
         strip.setPixelColor(i, strip.Color(led_strip.red, led_strip.green, led_strip.blue));
     }
@@ -753,36 +870,41 @@ void rainbow_flow()
 //? colour order or power - and no firmware setting can fix it.
 void strip_channel_test()
 {
-    const struct
-    {
-        const char *name;
-        uint8_t r, g, b;
-    } steps[] = {
-        {"RED", 25, 0, 0},
-        {"GREEN", 0, 25, 0},
-        {"BLUE", 0, 0, 25},
-        {"WHITE", 15, 15, 15},
-    };
-    const uint8_t step_count = sizeof(steps) / sizeof(steps[0]);
 
     //! Neutralise brightness scaling first: a stored brightness of 0 or 1 would
     //! render every channel as black and make a healthy strip look dead.
-    strip.setBrightness(255);
+    strip.setBrightness(50);
+    Serial.printf("[STRIP] channel test\n");
 
-    for (uint8_t s = 0; s < step_count; s++)
-    {
-        Serial.printf("[STRIP] channel test: %s\n", steps[s].name);
-        for (int i = 0; i < strip_leds(); i++)
-            strip.setPixelColor(i, strip.Color(steps[s].r, steps[s].g, steps[s].b));
-        strip.show();
-        delay(700);
-    }
+    //* Baseline for the sag reported in the boot report: V_REG with the strip
+    //? powered but still black. Taken here rather than in main.cpp because this
+    //* is the first place that knows it is about to load the rail, and because
+    //! these three steps are the only LED current the boot draws before loop().
+    boot_rail_baseline(supply_rail_mv());
+
+    for (int i = 0; i < strip_leds(); i++)
+        strip.setPixelColor(i, strip.Color(25, 0, 0));
+    strip.show();
+    delay(500);
+    boot_rail_note_step("RED");
+
+    for (int i = 0; i < strip_leds(); i++)
+        strip.setPixelColor(i, strip.Color(0, 25, 0));
+    strip.show();
+    delay(500);
+    boot_rail_note_step("GREEN");
+
+    for (int i = 0; i < strip_leds(); i++)
+        strip.setPixelColor(i, strip.Color(0, 0, 25));
+    strip.show();
+    delay(500);
+    boot_rail_note_step("BLUE");
 
     strip.clear();
     strip.show();
+    delay(500);
 
     Serial.println("[STRIP] channel test done.");
-    Serial.println("[STRIP] If GREEN and BLUE never lit, the fault is hardware, not config.");
 }
 
 void strip_report_config()
@@ -790,9 +912,9 @@ void strip_report_config()
     Serial.printf("[STRIP] mode=%d palette=%u,%u,%u brightness=%u\n",
                   mode, palette.red, palette.green, palette.blue, led_strip.brightness);
     Serial.printf("[STRIP] size=%u of %d LEDs\n", strip_leds(), NUM_LEDS);
-    Serial.printf("[STRIP] flame: decay=%.3f spatial=%.2f power=%.1f/mag max=%u idle=%u gains=%u/%u/%u%%\n",
+    Serial.printf("[STRIP] flame: decay=%.3f spatial=%.2f power=%.1f/mag max=%u idle=%u (drawn in the palette)\n",
                   flame.decay, flame.spatial, flame.power_slope, flame.power_max,
-                  flame.power_idle, flame.red_gain, flame.green_gain, flame.blue_gain);
+                  flame.power_idle);
     const struct_ledMode *entry = find_led_mode((uint8_t)mode);
     if (entry != nullptr)
         Serial.printf("[STRIP] active mode '%s' (%s)\n", entry->key, entry->label);
@@ -810,11 +932,17 @@ void strip_report_config()
 }
 
 //* ---------------------- MODE TABLE ----------------------
-//? Ids 1..5 preserve the original switch cases in update_strip().
+//? The ids are STABLE and persisted: the selected mode and every saved preset
+//? store the numeric id from this table (see webpage_config_load() and
+//? presets.h), so an entry may be removed but the surviving entries must keep
+//? the id they already had. The gap below is one such retired mode - do not
+//! renumber to close it, or every device in the field silently switches mode
+//! and every stored preset starts naming a different script.
+//? A mode whose stored id is no longer here is not an error: the config load
+//? falls back to the first entry, so an old device boots lit rather than dark.
 const struct_ledMode led_modes[] = {
     {1, "solid", "Solid color", constant_brightness},
     {2, "flame", "Step flame", flame_steps},
-    {3, "majora", "Majora's pulse", run_majoras},
     {4, "fade", "Gyro fade", fade_strip},
     {5, "whip", "Pulse whip", pulse_whip},
     {6, "rainbow", "Rainbow flow", rainbow_flow},
@@ -848,6 +976,57 @@ const struct_ledMode *find_led_mode_by_key(const char *key)
         if (strcmp(led_modes[i].key, key) == 0)
             return &led_modes[i];
     return nullptr;
+}
+
+void led_mode_next()
+{
+    //? Find where the current mode sits in the table, then step one position.
+    //! Step by POSITION, never by `mode + 1`: the ids have gaps on purpose (see
+    //! the note above the table), so an id-plus-one walk would land on an id that
+    //! is not in the registry, update_strip() would refuse to draw it, and the
+    //! strip would sit frozen on its last frame.
+    uint8_t index = 0;
+    const struct_ledMode *current = find_led_mode((uint8_t)mode);
+    if (current != nullptr)
+        index = (uint8_t)(current - led_modes);
+
+    index = (uint8_t)((index + 1) % led_mode_count());
+
+    const struct_ledMode *entry = led_mode_at(index);
+    if (entry == nullptr)
+        return; // Empty table: nothing to switch to
+
+    mode = entry->id;
+    webpage_config_save();
+
+    Serial.printf("[MODE] Button -> %u (%s)\n", entry->id, entry->key);
+}
+
+//* The same walk, one step the other way. Added for the boot button's double
+//? click, which is the only caller; it is a separate function rather than a
+//* signed argument so neither direction has to reason about unsigned wrap-around.
+//? Stepping backwards off the front of the table lands on the LAST entry, so the
+//* two directions are exact inverses of each other.
+void led_mode_prev()
+{
+    uint8_t index = 0;
+    const struct_ledMode *current = find_led_mode((uint8_t)mode);
+    if (current != nullptr)
+        index = (uint8_t)(current - led_modes);
+
+    //? `+ count` before the modulo: the count is small enough that the addition
+    //! cannot overflow a uint8_t, and doing it this way avoids relying on the
+    //* signedness of the intermediate.
+    index = (uint8_t)((index + led_mode_count() - 1) % led_mode_count());
+
+    const struct_ledMode *entry = led_mode_at(index);
+    if (entry == nullptr)
+        return; // Empty table: nothing to switch to
+
+    mode = entry->id;
+    webpage_config_save();
+
+    Serial.printf("[MODE] Button -> %u (%s) [backwards]\n", entry->id, entry->key);
 }
 
 void update_strip(int mode)

@@ -22,7 +22,29 @@ void setup_ESP32()
 
     // esp_sleep_enable_ext0_wakeup(prog_switch, LOW);
 
-    setup_OTA();
+    //! setup_OTA() is deliberately NOT called here any more. Running it from this
+    //! function means running it before setup_WIFI(), and that is too early for
+    //! both of the things it starts - there is no station interface yet, only the
+    //! softAP, and WiFiManager reconfigures the radio afterwards.
+    //* What that cost, measured against the board over the LAN before the move:
+    //!   * ArduinoOTA never answered. Ten invitations in the exact wire format
+    //!     espota.py sends, one per second, and not one reply - so `pio run -e
+    //!     C3-OTA -t upload` failed before it sent a single byte. (The invite
+    //!     itself was checked against ArduinoOTA::_onRx(): command 0, port, size,
+    //!     a 32-character MD5 and no password is the path that answers "OK".)
+    //!   * lightpack.local resolved to nothing, while two neighbouring ESP32
+    //!     boards on the same LAN answered both a multicast browse and a direct
+    //!     unicast query on port 5353. The responder was started here, before the
+    //!     station had an address, and nothing re-registered it once the station
+    //!     came up.
+    //? The responder is not left half-initialised by the second MDNS.begin(): that
+    //? call is idempotent in this framework. mdns_init() returns success when it
+    //? has already run, so the MDNS.begin() in setup_webpage() logs neither
+    //? "Failed starting MDNS" nor the "already running" branch. That is measured
+    //! from the boot log, and it is why the failure above was silent - the caller
+    //! had no way to tell that the responder was bound to the wrong interface.
+    //* Both are now started from main.cpp, immediately after a successful join,
+    //? when there is a station address for them to bind to.
 
     //! Do NOT configure the ADC here. This used to run the legacy ESP-IDF driver:
     //!     adc1_config_width(ADC_WIDTH_BIT_12);

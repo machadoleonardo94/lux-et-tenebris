@@ -7,7 +7,6 @@
 //* ---------------------- GLOBAL OBJECT INSTANCES ----------------------
 
 #define NUM_LEDS 250
-#define MAJORAS_LEDS 28
 
 Adafruit_NeoPixel strip(NUM_LEDS, strip_pin, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel onboard_led(1, status_led_pin, NEO_GRB + NEO_KHZ800);
