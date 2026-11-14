@@ -1,0 +1,9 @@
+{
+  "name": "lightpack-console",
+  "private": true,
+  "type": "module",
+  "description": "Zero-install Web Serial console for the lightpack-C3 firmware",
+  "scripts": {
+    "test": "node tests/protocol.test.mjs"
+  }
+}

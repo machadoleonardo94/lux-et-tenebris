@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Lightpack &middot; USB console</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3 29 16 16 29 3 16Z' fill='none' stroke='%238a63e8' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%238a63e8'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<noscript>
+  <div class="gate">
+    <div class="gate-card">
+      <h1>This console needs JavaScript</h1>
+      <p>The page is a static Web Serial client; without JavaScript it cannot open the port.
+         Enable JavaScript for this page, or use any serial terminal and
+         <code>docs/usb-control.md</code>.</p>
+    </div>
+  </div>
+</noscript>
+
+<!-- Shown instead of the console when the browser cannot run it. The reasons
+     are filled in by app.js so the page can explain itself without a build. -->
+<section id="gate" class="gate" hidden>
+  <div class="gate-card">
+    <div class="gate-mark" aria-hidden="true">
+      <svg viewBox="0 0 40 40"><path d="M20 3 37 20 20 37 3 20Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M20 9 31 20 20 31 9 20Z" fill="none" stroke="currentColor" stroke-width="1" opacity=".5"/><circle cx="20" cy="20" r="3" fill="currentColor"/></svg>
+    </div>
+    <h1 id="gateTitle">This page needs Chrome or Edge</h1>
+    <p id="gateBody"></p>
+    <p id="gateFix" class="gate-fix"></p>
+    <p class="gate-links">
+      <a href="../../../install/README.md">Installer notes</a>
+      <a href="../README.md">Firmware README</a>
+    </p>
+  </div>
+</section>
+
+<div id="app" hidden>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 3 37 20 20 37 3 20Z" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M20 9 31 20 20 31 9 20Z" fill="none" stroke="currentColor" stroke-width="1" opacity=".55"/>
+        <circle cx="20" cy="20" r="3" fill="currentColor"/>
+      </svg>
+      <div class="brand-type">
+        <span class="brand-name">LIGHTPACK</span>
+        <span class="brand-sub">USB CONSOLE</span>
+      </div>
+    </div>
+
+    <div class="conn">
+      <button id="btnConnect" class="btn solid" type="button">Connect</button>
+      <button id="btnReconnect" class="btn ghost" type="button" hidden>Reconnect</button>
+      <span id="connDot" class="dot" aria-hidden="true"></span>
+      <span id="connText">Not connected</span>
+      <span id="fwTag" class="tag" hidden></span>
+    </div>
+
+    <div class="actions">
+      <label class="switch" title="Write the configuration to flash about a second after the last edit">
+        <input id="autoCommit" type="checkbox" checked>
+        <span>Auto-save</span>
+      </label>
+      <label class="switch" title="Ask the board for a telemetry frame at the chosen rate">
+        <input id="streamOn" type="checkbox">
+        <span>Live</span>
+      </label>
+      <select id="streamHz" title="Telemetry rate">
+        <option value="5">5 Hz</option>
+        <option value="10" selected>10 Hz</option>
+        <option value="20">20 Hz</option>
+        <option value="50">50 Hz</option>
+      </select>
+      <span class="sep"></span>
+      <button id="btnSave" class="btn primary" type="button" disabled>Save to flash</button>
+      <button id="btnRevert" class="btn ghost" type="button" disabled>Revert</button>
+      <span id="dirtyFlag" class="dirty" title="RAM differs from flash" hidden>unsaved</span>
+    </div>
+  </header>
+
+  <div class="modebar">
+    <span class="modebar-label">Mode</span>
+    <div id="modes" class="modes" role="group" aria-label="Active LED mode"></div>
+    <span id="modeNote" class="mode-note"></span>
+  </div>
+
+  <main class="grid">
+    <nav id="nav" class="sidebar" aria-label="Parameter pages"></nav>
+
+    <section class="content">
+      <div id="banner" class="banner" hidden>
+        <span id="bannerText"></span>
+        <button id="bannerClose" class="banner-close" type="button" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <section id="page-shared" class="page" aria-labelledby="page-shared-title">
+        <div class="page-head">
+          <h1 id="page-shared-title">Shared</h1>
+          <p>These apply to every mode. The palette drives Solid color, the whip hump and the flame; the
+             gyro-driven modes and Rainbow flow compute their own colour.</p>
+        </div>
+
+        <div class="panel palette-panel">
+          <div class="panel-head"><h2>Palette</h2><span id="paletteHex" class="mono muted">#ff00ff</span></div>
+          <div class="palette-row">
+            <input id="colorPicker" type="color" value="#ff00ff" aria-label="Palette colour">
+            <div id="swatches" class="swatches" aria-label="Palette presets"></div>
+          </div>
+        </div>
+
+        <div id="sharedFields" class="fields"></div>
+        <p class="hint" id="stripInfo">Connect to read the strip length the firmware was built for.</p>
+      </section>
+
+      <section id="page-flame" class="page" hidden aria-labelledby="page-flame-title">
+        <div class="page-head">
+          <h1 id="page-flame-title">Step flame</h1>
+          <p>An impact lights the whole strip, then every LED keeps a fraction of its own brightness per
+             frame. The far end goes dark first, so the flame reads as retreating toward the start.</p>
+        </div>
+
+        <div id="flameFields" class="fields"></div>
+        <p class="hint" id="flameDerived"></p>
+
+        <div class="panel inline-panel">
+          <div class="panel-head"><h2>Preview an impact</h2></div>
+          <p class="hint">Injects a magnitude into the detector's latch, so the flame can be tuned without
+             knocking the board. The detector's own counters are untouched.</p>
+          <div class="inline-row">
+            <label for="impactMag">Magnitude</label>
+            <input id="impactMag" type="number" min="0" max="255" step="1" value="12">
+            <button id="btnImpact" class="btn" type="button" disabled>Flash</button>
+            <span id="impactNote" class="muted"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-impact" class="page" hidden aria-labelledby="page-impact-title">
+        <div class="page-head">
+          <h1 id="page-impact-title">Impact detector</h1>
+          <p>Runs from <span class="mono">loop()</span> on a fixed cadence, independent of the selected mode.
+             It works on the magnitude of the acceleration vector, learns a slow resting baseline, and reports
+             one peak per impact.</p>
+        </div>
+        <div id="impactFields" class="fields"></div>
+        <p class="hint" id="impactDerived"></p>
+      </section>
+
+      <section id="page-whip" class="page" hidden aria-labelledby="page-whip-title">
+        <div class="page-head">
+          <h1 id="page-whip-title">Pulse whip</h1>
+          <p>A half-sine hump leaves the start of the strip and travels outward. If the period is shorter than
+             the crossing time, several humps coexist and their light adds up.</p>
+        </div>
+        <div id="whipFields" class="fields"></div>
+        <p class="hint" id="whipDerived"></p>
+      </section>
+
+      <section id="page-rainbow" class="page" hidden aria-labelledby="page-rainbow-title">
+        <div class="page-head">
+          <h1 id="page-rainbow-title">Rainbow flow</h1>
+          <p>The starting LED gets a new random colour after a wait drawn between Min and Max, then that
+             colour travels toward the far end. Every LED changes colour once per wait, whatever the speed.</p>
+        </div>
+        <div id="rainbowFields" class="fields"></div>
+        <p class="hint" id="rainbowDerived"></p>
+      </section>
+
+      <section id="page-fade" class="page" hidden aria-labelledby="page-fade-title">
+        <div class="page-head">
+          <h1 id="page-fade-title">Gyro fade</h1>
+          <p>This mode has no tunables. It derives its colour and the number of lit LEDs from the gyro
+             directly, so the only controls that affect it are the strip length and brightness on the
+             Shared page.</p>
+        </div>
+        <p class="hint">Open Diagnostics for the live gyro numbers while the mode runs.</p>
+      </section>
+
+      <section id="page-presets" class="page" hidden aria-labelledby="page-presets-title">
+        <div class="page-head">
+          <h1 id="page-presets-title">Presets</h1>
+          <p>A slot holds everything on this console: mode, colour, brightness, strip length, the impact
+             detector and every tunable. Applying one also writes it as the boot configuration.</p>
+        </div>
+
+        <div class="row">
+          <button id="btnPresetExport" class="btn" type="button" disabled>Export all</button>
+          <label class="btn filebtn" for="presetFile">Import file
+            <input id="presetFile" type="file" accept=".json,application/json" hidden>
+          </label>
+          <span id="presetInfo" class="muted"></span>
+        </div>
+
+        <div id="presetSlots" class="preset-slots"></div>
+        <p class="hint">The export file is the same format the device page writes, so a preset can be moved
+           between the browser page and this console unchanged. Import applies each preset and saves it into
+           its slot; the board is left on the last one in the file.</p>
+      </section>
+
+      <section id="page-diagnostics" class="page" hidden aria-labelledby="page-diagnostics-title">
+        <div class="page-head">
+          <h1 id="page-diagnostics-title">Diagnostics</h1>
+          <p>Everything the board reports about itself. This is also where the radio can be switched off:
+             the USB link keeps working, which is the point of this console.</p>
+        </div>
+
+        <div class="panel danger-panel">
+          <div class="panel-head"><h2>WiFi radio</h2></div>
+          <div class="inline-row">
+            <label class="switch">
+              <input id="radioOn" type="checkbox" disabled>
+              <span>Radio on</span>
+            </label>
+            <span id="radioState" class="muted">Connect to read the radio state.</span>
+          </div>
+          <p class="hint">Switching the radio off leaves USB, the strip and every mode working. Switching it
+             on joins the saved network in the background; this console never needs that join.</p>
+        </div>
+
+        <dl id="diag" class="diag"></dl>
+
+        <div class="row">
+          <button id="btnReboot" class="btn danger" type="button" disabled>Restart board</button>
+          <button id="btnCopyDiag" class="btn ghost" type="button">Copy diagnostics</button>
+        </div>
+      </section>
+    </section>
+
+    <aside class="rightcol">
+      <section class="panel live-panel">
+        <div class="panel-head">
+          <h2>Live</h2>
+          <span id="liveRate" class="muted mono"></span>
+        </div>
+        <dl class="live">
+          <dt>Mode</dt><dd id="lv-mode">&mdash;</dd>
+          <dt>Accel</dt><dd id="lv-accel" class="mono">&mdash;</dd>
+          <dt>Gyro</dt><dd id="lv-gyro" class="mono">&mdash;</dd>
+          <dt>Impact</dt><dd id="lv-impact" class="mono">&mdash;</dd>
+          <dt>Loop</dt><dd id="lv-loop" class="mono">&mdash;</dd>
+          <dt>Rail</dt><dd id="lv-rail" class="mono">&mdash;</dd>
+          <dt>Heap</dt><dd id="lv-heap" class="mono">&mdash;</dd>
+          <dt>Network</dt><dd id="lv-net">&mdash;</dd>
+          <dt>Buttons</dt><dd id="lv-buttons">&mdash;</dd>
+        </dl>
+      </section>
+
+      <section class="panel log-panel">
+        <div class="panel-head">
+          <h2>Device log</h2>
+          <div class="log-actions">
+            <label class="switch mini" title="Show the human-readable console lines">
+              <input id="showLog" type="checkbox" checked>
+              <span>Show</span>
+            </label>
+            <button id="btnLogClear" class="mini" type="button">Clear</button>
+            <button id="btnLogDownload" class="mini" type="button">Save</button>
+          </div>
+        </div>
+        <div id="log" class="log" aria-live="polite"></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="statusbar">
+    <span id="statusLeft">disconnected</span>
+    <span id="statusRight" class="muted">proto 1</span>
+  </footer>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

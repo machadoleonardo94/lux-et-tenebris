@@ -1,0 +1,366 @@
+# Lightpack USB control protocol (v1)
+
+This is the wire contract for the USB console. It lives on the ESP32-C3's
+**USB Serial/JTAG** port — the same CDC-ACM device the firmware uses as its
+console — and needs no driver on Windows 10+, macOS or Linux (Linux needs the
+usual `dialout`/udev access).
+
+The point is the antenna: configuration must not depend on a WiFi link. This
+path works with the radio switched off, and it keeps working while the board is
+sitting in its 60-second configuration hotspot.
+
+> The browser console in [`../console/`](../console/) speaks this protocol. It is
+> the reference client; this document is the reference for anything else.
+
+---
+
+## 1. Framing
+
+The console is not quiet. Boot report, WiFi events, `[MODE]`, `[ADC]` and the
+10-second telemetry block all use the same port. The protocol therefore does not
+assume it owns the stream:
+
+* One message is one line, `\n` terminated. `\r` is ignored.
+* **Every protocol line starts with `@`.** Nothing else in the firmware starts a
+  line with `@`; a host ignores every other line and may show it as a device log.
+* Device → host frames are `@` + compact JSON + `\n`.
+* Host → device commands are `@` + verb + arguments + `\n`.
+* The maximum inbound line is **1024 bytes**; a longer line is discarded to the
+  next newline and answered with an error. A `SET` with all 28 fields is ~700 B.
+* A device frame is written with **one** `Serial.write()`. `HWCDC::write()` holds
+  its transmit mutex for the whole call, so another task's log print can land
+  before or after a frame, never inside it.
+* Text is ASCII/UTF-8. There is no binary, base64 or escaping layer: every value
+  is a number, and the only free text is a preset name.
+
+Open the port at **115200** for convention. The C3's USB CDC ignores the baud
+rate; the link is USB full speed.
+
+---
+
+## 2. Handshake
+
+Send `@PING` after opening the port. The board may still be in `setup()` (the
+strip self-test and gyro probe take a few seconds) or pumping the config portal,
+so allow up to ten seconds for the first answer and send `@PING` again if the
+first one is lost.
+
+```json
+@{"t":"pong","v":1,"proto":1,"fw":"0.4-pre","build":"Nov 13 2026 22:00:00",
+  "chip":"ESP32-C3","cpu_mhz":160,"mac":"AA:BB:CC:DD:EE:FF","uptime_ms":123456}
+```
+
+Check `proto` before anything else. Version 1 is what this document describes.
+Unknown fields in a reply must be ignored; a new field is not a version bump.
+
+The browser client then reads:
+
+```
+@MODES
+@GET
+@PRESET LIST
+```
+
+and enables the controls only when all four replies have arrived.
+
+---
+
+## 3. Commands
+
+Verbs are case-insensitive. Field names are **lowercase and exact**. `seq` is
+optional on `SET` and is echoed there; the user-paced commands are one at a time
+and do not use it.
+
+| Command | Reply | Purpose |
+|---|---|---|
+| `@PING` | `pong` | Identity, protocol version, build date |
+| `@GET` | `state` | Read the whole live configuration |
+| `@MODES` | `modes` | The mode registry, for the mode buttons |
+| `@SET k=v&k=v…` | `ack` + `changed` | Apply a batch in RAM, then sanitise |
+| `@COMMIT` | `ack` | Write the live configuration to NVS |
+| `@RELOAD` | `ack` + `state` | Discard RAM edits, reload NVS |
+| `@STREAM hz` | `ack` | Telemetry ticks at 0–50 Hz; 0 stops |
+| `@PRESET LIST` | `presets` | Slot list + names + states |
+| `@PRESET GET n` | `preset` | One slot, the export payload |
+| `@PRESET SAVE n [name=…]` | `presets` | Capture the live configuration into slot `n` |
+| `@PRESET APPLY n` | `state` | Apply a slot, and save it as the boot configuration |
+| `@PRESET CLEAR n` | `presets` | Empty a slot |
+| `@IMPACT mag` | `ack` | Inject a preview impact (0–255) for flame tuning |
+| `@RADIO on\|off\|toggle` | `ack` | Switch the WiFi radio; USB is unaffected |
+| `@REBOOT` | `ack`, then reset | Restart the board |
+
+`n` is 0-based (slots 0–4), matching `/api/preset` and the JSON files.
+
+### 3.1 `SET` — the batch primitive
+
+```
+@SET mode=5&red=255&green=140&blue=0&brightness=180&leds=60&whip_speed=4.5&seq=7
+```
+
+Rules:
+
+1. **All-or-nothing.** Every key must be one of the 28 `/api/config` fields in
+   the table below, every value must parse as a number, and a `mode` value must
+   name a live mode. If one pair fails, *nothing* is applied and the ack names
+   the offending token.
+2. **Transient.** `SET` changes RAM and the strip but writes no flash. `COMMIT`
+   is the only USB path that persists. This is what lets a UI send edits at
+   drag rate without hammering NVS.
+3. `seq` is a host request id, not a config field. It is parsed out before
+   validation and echoed in the ack.
+4. Fields are applied in the order the line gives them. The sanitisers then run
+   once on the final values, so a batch may move both sides of a relation
+   (`threshold` and `release`, `leds` and `whip_length`) without an intermediate
+   state being rejected.
+5. At most 32 pairs are accepted (28 fields + `seq` + headroom).
+
+Ack:
+
+```json
+@{"t":"ack","v":1,"ok":true,"cmd":"set","seq":7,"dirty":true,"n":6,
+  "changed":{"mode":5,"whip_length":24}}
+```
+
+`changed` contains **only the fields whose value actually moved**, after
+sanitising. It includes fields that were not in the request (shrinking `leds`
+pulls `whip_length` down; lowering `threshold` pulls `release` down). This is
+why the ack is not a full state: building the state opens NVS for the saved
+SSID, which is not something a slider tick should pay for.
+
+`dirty` is the device's own view: true means RAM differs from flash.
+
+### 3.2 `COMMIT` and `RELOAD`
+
+* `@COMMIT` calls the same writer as the web page's `POST /api/config`. It writes
+  all configuration keys; NVS skips the ones that did not change. A mode change
+  made with the physical switches also saves the whole live configuration —
+  including any unsaved USB edits — because it calls the same writer. That is
+  the one cross-surface surprise worth knowing.
+* `@RELOAD` re-reads NVS and replies with a fresh `state`. Unsaved edits are
+  gone.
+
+### 3.3 `STREAM` and ticks
+
+```
+@STREAM 20
+@{"t":"ack","v":1,"ok":true,"cmd":"stream","dirty":false,"hz":20}
+```
+
+Ticks are paced by `millis()`, never by loop count. If the loop is slower than
+the requested rate, ticks arrive at the loop rate; `lp` in the frame says what
+that is. Stop with `@STREAM 0` (or unplugging; the firmware stops the stream on
+disconnect).
+
+```json
+@{"t":"tick","v":1,"ms":123456,"mode":2,
+  "ax":-0.12,"ay":0.03,"az":9.81,
+  "gx":0.10,"gy":-0.20,"gz":0.00,
+  "imp":12,"ic":3,"ia":850,
+  "lp":19,"rail":4012,"heap":123456,
+  "net":0,"dirty":true,"portal":false,"btn":0}
+```
+
+| Field | Meaning |
+|---|---|
+| `ms` | `millis()` |
+| `mode` | Active mode id |
+| `ax`/`ay`/`az` | Acceleration, m/s² |
+| `gx`/`gy`/`gz` | Angular rate, rad/s |
+| `imp` | Last reported impact magnitude (0–255) |
+| `ic` | Total accepted impacts since boot |
+| `ia` | Age of the last impact, ms (0 when `ic` is 0) |
+| `lp` | Loop iterations per second, measured over the last second |
+| `rail` | V_REG in mV, refreshed once a second |
+| `heap` | Free heap, bytes |
+| `net` | 0 offline, 1 connecting, 2 connected |
+| `dirty` | RAM differs from flash |
+| `portal` | The provisioning hotspot is open; `RADIO` is refused while this is true |
+| `btn` | Bit 0 touch switch down, bit 1 BOOT switch down |
+
+`imp`/`ic`/`ia` read the detector's diagnostics. They do **not** consume the
+impact latch, so watching telemetry cannot steal an event from Step flame.
+
+### 3.4 Events
+
+Emitted whenever a host is attached, even with `STREAM 0`:
+
+```json
+@{"t":"evt","v":1,"k":"mode","id":5,"key":"whip","label":"Pulse whip"}
+@{"t":"evt","v":1,"k":"impact","mag":12,"count":3,"ms":123456}
+@{"t":"evt","v":1,"k":"button","b":"touch","e":"short","n":4}
+```
+
+Events are source-agnostic: a mode changed from the pad, the web page, a preset
+or a USB `SET` all produce the same `mode` event.
+
+### 3.5 Presets
+
+`@PRESET LIST`:
+
+```json
+@{"t":"presets","v":1,"slots":[
+  {"slot":0,"used":true,"state":"ok","name":"Bench warm"},
+  {"slot":1,"used":false,"state":"empty","name":""}
+]}
+```
+
+`state` is `ok`, `empty` or `incompatible` (a slot written by a firmware whose
+packed preset struct had another layout). `used` means usable, not merely
+occupied.
+
+`@PRESET GET 2`:
+
+```json
+@{"t":"preset","v":1,"preset":{
+  "slot":2,"name":"Case fitted","format":2,"fields":28,
+  "config":{"mode":5,"red":255,…}
+}}
+```
+
+`SAVE` takes the **live** configuration; it has no way to write values straight
+into a slot. Import therefore applies a config with `SET` and then saves it, in
+that order. The JSON shape is exactly what the device page exports:
+
+```json
+{"lightpack_presets":1,"device":"lightpack","slots":1,
+ "presets":[{"slot":2,"name":"Case fitted","format":2,"fields":28,"config":{…}}]}
+```
+
+`name=` is the rest of the line, so spaces are fine. Newlines are not; a host
+should strip them. An empty name keeps the slot's existing label or falls back
+to `Preset N`.
+
+### 3.6 Radio
+
+`@RADIO off` stores the offline switch and takes the radio down; `on` clears the
+switch and starts a join in the background; `toggle` inverts the live state.
+The USB link, strip and every mode keep working either way.
+
+While the configuration hotspot is open, the board is still inside `setup()`;
+the USB console is serviced from the portal's own loop, and `RADIO` is refused
+with `"the config hotspot is open - close it before switching the radio"`. That
+is deliberate: tearing the radio down underneath WiFiManager is not a supported
+transition. Every other command works in that window, and the strip renders
+`SET` changes there too.
+
+The reply carries the resulting truth, which may differ from the request (for
+example, turning the radio on with no saved network leaves it off):
+
+```json
+@{"t":"ack","v":1,"ok":true,"cmd":"radio","dirty":false,
+  "offline":true,"net":"offline","rssi":0}
+```
+
+### 3.7 Impact preview
+
+`@IMPACT 24` writes the magnitude into the detector's latch, exactly as a real
+impact would. The flame mode consumes it on its next frame. The detector's
+counters are untouched. In a mode other than Step flame the value waits in the
+latch, so select the mode first if you want to see it immediately.
+
+---
+
+## 4. Configuration fields
+
+The 28 names are the `/api/config` argument names and the keys of the preset
+struct. They are declared once in `src/services/presets.h` (`PRESET_FIELDS`), and
+the browser copies them in `console/js/spec.js`; a test asserts the two lists
+match.
+
+```
+mode
+red green blue brightness
+whip_speed whip_length whip_period whip_peak whip_offset
+rainbow_speed rainbow_min_ms rainbow_max_ms
+leds
+flame_decay flame_spatial flame_power_slope flame_power_max flame_power_idle
+step_baseline_tau_ms step_threshold step_release step_jerk_min step_min_gap_ms
+step_impact_min step_impact_max step_magnitude_min step_magnitude_max
+```
+
+`GET` returns these plus the derived values and the limits the UI needs. The
+limits are the firmware's own constants, exported so a host does not have to
+keep a second copy:
+
+`whip_speed_min/max`, `whip_length_min`, `whip_period_min/max`,
+`rainbow_speed_min/max`, `rainbow_gap_floor_ms`, `rainbow_gap_ceiling_ms`,
+`flame_decay_min/max`, `flame_spatial_min/max`, `flame_power_slope_max`,
+`step_baseline_tau_min_ms/max`, `step_threshold_min/max`, `step_release_min`,
+`step_jerk_floor/max`, `step_gap_min_ms/max`, `step_impact_min_floor`,
+`step_impact_max_ceiling`, `strip_leds_min`, `num_leds`, plus
+`dirty` and `portal`.
+
+The device clamps every write; a host that sends a value outside the range still
+gets a successful ack with the clamped value in `changed`.
+
+---
+
+## 5. Errors
+
+An error is a normal ack with `ok:false`:
+
+```json
+@{"t":"ack","v":1,"ok":false,"cmd":"set","seq":7,"err":"unknown field 'widht'"}
+```
+
+The connection stays open. Typical messages: `unknown field '…'`,
+`value for '…' is not a number`, `unknown mode id`, `expected key=value`,
+`no fields`, `line too long`, `slot out of range`, `nothing to apply`,
+`slot holds a preset from another firmware version`, `write failed`,
+`unknown command`.
+
+A host should render `err` verbatim; it is written for a person.
+
+---
+
+## 6. Implementation notes
+
+* **Buffers.** `main.cpp` raises the HWCDC RX and TX rings to 4 KB before
+  `Serial.begin()`; the default RX queue is 256 bytes and a full `SET` would not
+  fit. The TX timeout is lowered from 100 ms to 10 ms so a host that stops
+  reading cannot hold the LED loop up for longer than that.
+* **Loop budget.** `usb_control_loop()` reads at most 256 bytes and executes at
+  most 8 completed lines per pass. A pipelined host cannot starve the strip; the
+  rest stays in the CDC queue for the next pass.
+* **Portal window.** `run_config_portal()` calls `usb_control_loop()` and
+  `update_strip(mode)` on every pass, so the console and the lamp work while the
+  board is inside the 60-second hotspot. `RADIO` is refused there.
+* **Reset.** `@REBOOT` sends the ack, flushes the CDC ring, waits 100 ms and
+  restarts. The port re-enumerates; a host must reconnect.
+* **Opening the port resets the C3.** The USB Serial/JTAG resets when the host
+  asserts DTR/RTS (`rst:0x15 USB_UART_CHIP_RESET`). A host should expect the
+  boot logs, wait for the firmware, and retry `@PING` for several seconds rather
+  than sending one request into the reset. Do not toggle the control lines after
+  opening: measured on the bench board, low/low resets again and low/high enters
+  download mode.
+* **Version.** `PING` reports `proto`; `state`/`modes`/`presets` carry `v`. Add
+  fields without bumping; bump only for a breaking change.
+
+---
+
+## 7. Trying it without the browser
+
+Any serial terminal works. Close the browser console first — one process owns
+the port.
+
+```
+@PING
+@GET
+@SET brightness=80&mode=1&seq=1
+@COMMIT
+@STREAM 5
+```
+
+You should see the pong, a state document, an ack with `changed`, a commit ack,
+and one tick every 200 ms interleaved with the normal `[ADC]`/telemetry log
+lines. The `@` prefix is how a host tells them apart.
+
+---
+
+## 8. Compatibility
+
+The HTTP API and this protocol share the same state builder, the same config
+clamp function and the same preset store. They cannot disagree about a limit, a
+field name or what a preset contains. The one intentional difference is
+persistence: `POST /api/config` saves immediately, `SET` is transient and
+`COMMIT` persists.
