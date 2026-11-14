@@ -40,6 +40,7 @@ const MODE_NOTES = {
 
 const EDIT_DEBOUNCE_MS = 90;
 const COMMIT_DEBOUNCE_MS = 900;
+const UPDATE_MANIFEST_URL = '../releases/latest/manifest.json';
 
 const app = {
   link: null,
@@ -72,6 +73,10 @@ const app = {
 
   lastTickFrame: null,
   diagAt: 0,
+
+  updateManifest: null,
+  updateElement: null,
+  espToolsPromise: null,
 };
 
 //* ---------------------- BOOT ----------------------
@@ -118,6 +123,12 @@ function boot() {
         }
       })
       .catch(() => {});
+  }
+
+  // A small test hook: ?check runs the update check on load. It is used to
+  // verify the manifest path and the installer component without a board.
+  if (params.has('check')) {
+    setTimeout(() => checkLatestBuild(), 250);
   }
 }
 
@@ -430,6 +441,12 @@ function bindEvents() {
   });
 
   $('#radioOn').addEventListener('change', () => applyRadio());
+
+  $('#btnCheckUpdate').addEventListener('click', () => checkLatestBuild());
+  $('#btnUpdateDisconnect').addEventListener('click', async () => {
+    if (app.connected) await disconnect();
+    renderUpdatePanel();
+  });
 
   $('#btnReboot').addEventListener('click', () => rebootBoard());
   $('#btnCopyDiag').addEventListener('click', () => copyDiagnostics());
@@ -1241,6 +1258,149 @@ function renderConnectionUI() {
   if (!app.connected) {
     $('#btnConnect').disabled = app.connecting;
   }
+
+  renderUpdatePanel();
+}
+
+//* ---------------------- FIRMWARE UPDATE ----------------------
+//? The update is an ESP Web Tools install over the same USB port. It is not part
+//? of the `@` protocol: the installer puts the C3 into its ROM bootloader and
+//? writes two parts, so the console must let go of the port first.
+//!
+//? Parts, not a factory image:
+//?   boot_app0.bin at 0xE000 makes the bootloader start app0.
+//?   firmware.bin  at 0x10000 is the app.
+//? NVS (0x9000-0xE000) is deliberately not in the list, so mode, palette,
+//* presets, networks and the page login survive the update.
+
+async function checkLatestBuild() {
+  setText('updateInfo', 'Checking…');
+
+  try {
+    const response = await fetch(UPDATE_MANIFEST_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`manifest -> HTTP ${response.status}`);
+    const manifest = await response.json();
+    validateUpdateManifest(manifest);
+
+    app.updateManifest = manifest;
+    const size = Number(manifest.size) || 0;
+    const when = manifest.built ? new Date(manifest.built) : null;
+    const stamp = when && !Number.isNaN(when.getTime()) ? when.toLocaleString() : 'unknown date';
+    setText('updateInfo',
+      `${manifest.version} · ${formatBytes(size)} · ${stamp}` +
+      (manifest.source ? ` · ${manifest.source}` : ''));
+    log(`latest build: ${manifest.version} (${manifest.source || 'source unknown'})`);
+
+    await mountLatestInstaller();
+  } catch (error) {
+    setText('updateInfo', `Could not read the latest build: ${error.message}`);
+    showError(`Could not read the latest build manifest: ${error.message}`);
+  }
+}
+
+function validateUpdateManifest(manifest) {
+  if (!manifest || manifest.name !== 'lightpack-C3') {
+    throw new Error('the manifest is not for lightpack-C3');
+  }
+
+  const build = Array.isArray(manifest.builds) ? manifest.builds[0] : null;
+  if (!build || build.chipFamily !== 'ESP32-C3') {
+    throw new Error('the manifest is not for an ESP32-C3');
+  }
+
+  if (!Array.isArray(build.parts) || build.parts.length === 0) {
+    throw new Error('the manifest has no image parts');
+  }
+
+  for (const part of build.parts) {
+    if (typeof part.path !== 'string' || part.path.length === 0) {
+      throw new Error('the manifest has a part without a path');
+    }
+    if (part.path.includes('..') || /^[a-z][a-z0-9+.-]*:/i.test(part.path)) {
+      throw new Error('the manifest points outside this site');
+    }
+    if (!Number.isFinite(Number(part.offset)) || Number(part.offset) < 0) {
+      throw new Error('the manifest has an invalid offset');
+    }
+  }
+}
+
+async function mountLatestInstaller() {
+  const box = $('#updateInstall');
+
+  if (!app.updateElement) {
+    await loadEspWebTools();
+
+    const element = document.createElement('esp-web-install-button');
+    // The version in the query busts the component's own manifest cache when a
+    // new build is published under the same path. Relative part paths still
+    // resolve against releases/latest/.
+    const version = encodeURIComponent(app.updateManifest?.source || app.updateManifest?.version || Date.now());
+    element.setAttribute('manifest', `${UPDATE_MANIFEST_URL}?v=${version}`);
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.slot = 'activate';
+    button.className = 'btn primary';
+    button.textContent = 'Install latest';
+    element.append(button);
+
+    const unsupported = document.createElement('span');
+    unsupported.slot = 'unsupported';
+    unsupported.className = 'muted';
+    unsupported.textContent = 'This browser cannot install ESP devices. Use Chrome or Edge on a desktop.';
+    element.append(unsupported);
+
+    box.append(element);
+    app.updateElement = element;
+  }
+
+  box.hidden = false;
+  renderUpdatePanel();
+}
+
+function loadEspWebTools() {
+  if (customElements.get('esp-web-install-button')) return Promise.resolve();
+
+  if (!app.espToolsPromise) {
+    // Pinned exactly like install/: a moving upstream must not change what a
+    // flash does. Loaded lazily so the console itself stays dependency-free.
+    app.espToolsPromise = import('https://unpkg.com/esp-web-tools@10.4.0/dist/install-button.js?module')
+      .then(() => customElements.whenDefined('esp-web-install-button'))
+      .catch((error) => {
+        app.espToolsPromise = null;
+        throw new Error(`installer component failed to load (${error.message})`);
+      });
+  }
+
+  return app.espToolsPromise;
+}
+
+function renderUpdatePanel() {
+  const current = app.pong ? `current ${app.pong.fw}` : 'current unknown';
+  setText('updateCurrent', current);
+
+  const disconnect = $('#btnUpdateDisconnect');
+  if (disconnect) disconnect.disabled = !app.connected;
+
+  if (!app.updateElement) return;
+
+  const button = app.updateElement.querySelector('[slot="activate"]');
+  if (!button) return;
+
+  button.disabled = app.connected || app.demo;
+  button.title = app.demo
+    ? 'Demo mode: there is no board to update'
+    : app.connected
+      ? 'Disconnect the console first: the installer needs the port'
+      : 'Install the latest build over USB';
+}
+
+function formatBytes(bytes) {
+  const number = Number(bytes);
+  if (!Number.isFinite(number) || number <= 0) return 'size unknown';
+  if (number >= 1024 * 1024) return `${(number / (1024 * 1024)).toFixed(2)} MB`;
+  return `${Math.round(number / 1024)} KB`;
 }
 
 function renderDirty() {

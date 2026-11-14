@@ -292,6 +292,10 @@ board whose antenna cannot hold a link, and for a board parked in offline mode. 
   refused there; everything else works.
 - **One owner:** close `pio device monitor`, the Arduino IDE or any other terminal before
   clicking Connect. The page reports a busy port rather than hanging.
+- **Firmware update:** Diagnostics → **Firmware update** checks the `releases/latest` channel,
+  disconnects, and writes the app over USB with ESP Web Tools. It writes the app slot and the
+  OTA selector only, so NVS and every saved setting survive. The installer component is
+  fetched from unpkg on first use; the offline fallback is the browser installer.
 - **Connecting resets the board once.** The C3's USB Serial/JTAG resets when the host asserts
   DTR/RTS, so opening the port reboots it; the console waits for the boot and retries the
   handshake. The saved configuration is restored. Unsaved edits do not survive a reconnect.

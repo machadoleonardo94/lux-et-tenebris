@@ -8,6 +8,7 @@ from the browser — Chrome or Edge, a USB-C cable, nothing installed.
 
 | Release | Date | Contents | Notes |
 |---|---|---|---|
+| [`latest/`](latest/) | dev | App-only `firmware.bin`, `boot_app0.bin`, manifest, hashes | **Development channel**, replaced in place. What the USB console's firmware update button reads. Not a tagged release. |
 | [`V0.4-pre/`](V0.4-pre/) | 2026-10-26 | **Compiled binaries** — factory image, app image, bootloader, partition table, OTA selector, `manifest.json` for the browser installer | First pre-release with prebuilt firmware. Custom partition table, browser OTA upload, input rework onto the BOOT switch. |
 | [`V0.3/`](V0.3/) | 2026-10-06 | **Source snapshot only** (`lightpack_V03-source.zip`) | No compiled images were published. Build it yourself from the zip. |
 
@@ -55,3 +56,25 @@ everything else is MIT/BSD/Apache. Everything a redistributor has to keep is in
    decimal, and `python -m http.server` from the repository root must serve both the page and the
    `.bin` from the same origin (Web Serial fetches, so CORS applies).
 7. Tag the commit `lightpack-C3-v<x.y>` and push with `--follow-tags`.
+
+## For maintainers — the `latest/` channel
+
+`latest/` is what the USB console's **Firmware update** button reads. It is not a
+release: update it in place after a firmware build that should be installable
+from the console.
+
+```bash
+pio run -e C3-USB
+cp .pio/build/C3-USB/firmware.bin releases/latest/firmware.bin
+cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app0.bin releases/latest/
+sha256sum releases/latest/firmware.bin releases/latest/boot_app0.bin > releases/latest/SHA256SUMS.txt
+```
+
+Update `latest/manifest.json` (`version`, `built`, `source`, `size`, `sha256`)
+and `latest/BUILD.txt`. The manifest lists **two parts** — `boot_app0.bin` at
+`0xE000` and `firmware.bin` at `0x10000` — and deliberately no factory image:
+a merged factory image spans the NVS region with `0xFF` padding and would wipe
+the saved configuration. `latest/README.md` has the full reasoning.
+
+The console fetches the manifest with `cache: no-store`; no front-end change is
+needed for a new build.

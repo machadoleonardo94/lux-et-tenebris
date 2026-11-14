@@ -146,6 +146,33 @@ While the board's configuration hotspot is open, the page says *config hotspot
 open* and the radio toggle is disabled. The console still works there — that is
 the whole reason the firmware services USB from the portal loop.
 
+### Firmware update
+
+Diagnostics → **Firmware update** turns the console into a USB updater:
+
+1. **Check for latest build** fetches `releases/latest/manifest.json` from this
+   repository and shows the version, build date, size and source commit.
+2. **Disconnect console** commits any unsaved configuration and releases the
+   serial port. The installer cannot share it.
+3. **Install latest** (ESP Web Tools) asks for the port, resets the board into
+   the ROM bootloader, writes `boot_app0.bin` at `0xE000` and `firmware.bin` at
+   `0x10000`, and reboots.
+4. Click **Connect** again. The console reconnects to the new build.
+
+The update deliberately writes **parts, not a factory image**: NVS
+(`0x9000`–`0xE000`) is not in the list, so mode, palette, every tunable, the
+preset slots, the saved networks and the page login survive. `boot_app0` makes
+the bootloader start `app0`; the next WiFi/OTA update uses `app1` as usual.
+
+Do not unplug during the write. If it is interrupted, the board may have no
+valid app; recover with the [browser installer](../../../install/) or a full
+release image. The installer component (ESP Web Tools 10.4.0) is fetched from
+unpkg on first use, pinned exactly like the installer page; if that is blocked,
+the fallback links are in the panel.
+
+`releases/latest/` is a development channel replaced in place — not a tagged
+release. For a blank board or a full recovery, use a versioned release folder.
+
 ### Diagnostics
 
 Firmware/build/chip, port, protocol, uptime, mode, loop rate, LED rail, free
@@ -168,6 +195,10 @@ reconnects by itself.
 | Port opens, then "the board did not answer the handshake" | The board may still be booting, in its config hotspot, or in download mode. The page retries `PING` for ~12 s; if it still fails, disconnect and connect again. A board in the ROM bootloader runs no firmware and cannot answer. |
 | The board is in its config hotspot | The console still works; the page shows *config hotspot open*. Radio switching is refused until the portal closes. |
 | Board resets when the page connects | **Expected on this board.** The C3's USB Serial/JTAG resets when the host asserts DTR/RTS, so opening the port reboots it once. The page waits for the boot and retries `PING`; the saved configuration is restored. Closing the port can reset it again. Unsaved edits do not survive a reconnect. |
+| "Check for latest build" says 404 | The page is being served without the firmware folder's `releases/latest/` next to it. Serve the repository root or `Firmware/lightpack-C3`; see *Locally* above. |
+| Install latest is disabled | Either the console is still connected (click **Disconnect console**) or the page is in `?demo` mode. |
+| The update finishes but the board still runs the old build | The update writes app0 and forces the OTA selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
+| The update was interrupted | Do not keep retrying from the console. The application may be incomplete; recover with the [browser installer](../../../install/) or a full release image. |
 | The values snap back | The firmware clamps every write, and `changed` reports what it actually stored. The UI follows the device. |
 | Preset import says "old firmware format" | The slot was written by a different preset struct version. Save over it or import the matching JSON. |
 

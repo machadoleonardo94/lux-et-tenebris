@@ -63,6 +63,12 @@ No release images yet.
 - **New `console/` page: zero-install, Chrome/Edge, Web Serial.** Mode bar, parameter pages,
   live telemetry, presets import/export (the same JSON the device page writes), a device log
   pane and a radio toggle. `?demo` renders it with no board. No build step, no dependency.
+- **The console can update the firmware over the same USB cable.** Diagnostics → Firmware
+  update checks `releases/latest/manifest.json`, disconnects the control port, and hands the
+  board to ESP Web Tools (pinned 10.4.0, loaded on demand). It writes `boot_app0.bin` at
+  `0xE000` and the app at `0x10000`, so NVS — mode, palette, tunables, presets, networks and
+  login — is preserved; `app0` is selected. `releases/latest/` is a development channel,
+  replaced in place, with its own manifest and SHA-256 sums.
 - **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
   DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
   one request into the reset. The saved configuration is restored; unsaved edits do not

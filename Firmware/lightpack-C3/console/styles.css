@@ -401,6 +401,18 @@ input[type="color"] {
 .diag dd { margin: 0; font-family: var(--mono); word-break: break-word; }
 .danger-panel { border-color: rgba(251, 113, 133, 0.25); }
 
+/* ── Firmware update ──────────────────────────────────────────────────────── */
+
+.update-panel { border-color: rgba(138, 99, 232, 0.28); }
+.update-panel .hint { margin-top: 0; }
+.update-install {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 4px;
+}
+.update-install .btn { height: 32px; padding: 0 14px; }
+
 /* ── Right column ─────────────────────────────────────────────────────────── */
 
 .rightcol {
