@@ -41,6 +41,7 @@ const MODE_NOTES = {
 const EDIT_DEBOUNCE_MS = 90;
 const COMMIT_DEBOUNCE_MS = 900;
 const UPDATE_MANIFEST_URL = '../releases/latest/manifest.json';
+const ESPTOOL_URL = 'https://cdn.jsdelivr.net/npm/esptool-js@0.6.0/+esm';
 
 const app = {
   link: null,
@@ -75,8 +76,8 @@ const app = {
   diagAt: 0,
 
   updateManifest: null,
-  updateElement: null,
-  espToolsPromise: null,
+  esptoolPromise: null,
+  updateBusy: false,
 };
 
 //* ---------------------- BOOT ----------------------
@@ -447,6 +448,7 @@ function bindEvents() {
     if (app.connected) await disconnect();
     renderUpdatePanel();
   });
+  $('#btnInstallUpdate').addEventListener('click', () => installLatest());
 
   $('#btnReboot').addEventListener('click', () => rebootBoard());
   $('#btnCopyDiag').addEventListener('click', () => copyDiagnostics());
@@ -1263,9 +1265,9 @@ function renderConnectionUI() {
 }
 
 //* ---------------------- FIRMWARE UPDATE ----------------------
-//? The update is an ESP Web Tools install over the same USB port. It is not part
-//? of the `@` protocol: the installer puts the C3 into its ROM bootloader and
-//? writes two parts, so the console must let go of the port first.
+//? The update is esptool-js over the same USB port. It is not part of the `@`
+//? protocol: esptool-js puts the C3 into its ROM bootloader and writes two
+//? parts, so the console must let go of the port first.
 //!
 //? Parts, not a factory image:
 //?   boot_app0.bin at 0xE000 makes the bootloader start app0.
@@ -1275,6 +1277,8 @@ function renderConnectionUI() {
 
 async function checkLatestBuild() {
   setText('updateInfo', 'Checking…');
+  const progress = $('#updateProgress');
+  if (progress) progress.hidden = true;
 
   try {
     const response = await fetch(UPDATE_MANIFEST_URL, { cache: 'no-store' });
@@ -1290,9 +1294,10 @@ async function checkLatestBuild() {
       `${manifest.version} · ${formatBytes(size)} · ${stamp}` +
       (manifest.source ? ` · ${manifest.source}` : ''));
     log(`latest build: ${manifest.version} (${manifest.source || 'source unknown'})`);
-
-    await mountLatestInstaller();
+    renderUpdatePanel();
   } catch (error) {
+    app.updateManifest = null;
+    renderUpdatePanel();
     setText('updateInfo', `Could not read the latest build: ${error.message}`);
     showError(`Could not read the latest build manifest: ${error.message}`);
   }
@@ -1322,90 +1327,194 @@ function validateUpdateManifest(manifest) {
     if (!Number.isFinite(Number(part.offset)) || Number(part.offset) < 0) {
       throw new Error('the manifest has an invalid offset');
     }
+    if (part.sha256 !== undefined && !/^[0-9a-f]{64}$/i.test(String(part.sha256))) {
+      throw new Error('the manifest has an invalid SHA-256');
+    }
   }
 }
 
-async function mountLatestInstaller() {
-  const box = $('#updateInstall');
-  // The version in the query busts the component's own manifest cache when a
-  // new build is published under the same path. Relative part paths still
-  // resolve against releases/latest/.
-  const version = encodeURIComponent(app.updateManifest?.source || app.updateManifest?.version || Date.now());
-  const manifestUrl = `${UPDATE_MANIFEST_URL}?v=${version}`;
-
-  if (!app.updateElement) {
-    await loadEspWebTools();
-
-    const element = document.createElement('esp-web-install-button');
-    element.setAttribute('manifest', manifestUrl);
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.slot = 'activate';
-    button.className = 'btn primary';
-    button.textContent = 'Install latest';
-    element.append(button);
-
-    const unsupported = document.createElement('span');
-    unsupported.slot = 'unsupported';
-    unsupported.className = 'muted';
-    unsupported.textContent = 'This browser cannot install ESP devices. Use Chrome or Edge on a desktop.';
-    element.append(unsupported);
-
-    // Backstop for the disabled state: if the component ever re-enables the
-    // slotted button, a click must still not steal a port the console owns.
-    element.addEventListener('click', (event) => {
-      if (!app.connected) return;
-      event.preventDefault();
-      event.stopPropagation();
-      showError('Disconnect the console before installing an update.');
-    }, true);
-
-    box.append(element);
-    app.updateElement = element;
-  } else {
-    app.updateElement.setAttribute('manifest', manifestUrl);
+async function installLatest() {
+  if (app.demo) {
+    showError('Demo mode: there is no board to update.');
+    return;
   }
+  if (!app.updateManifest) {
+    showError('Check for a latest build first.');
+    return;
+  }
+  if (app.updateBusy) return;
 
-  box.hidden = false;
+  app.updateBusy = true;
   renderUpdatePanel();
+  setUpdateProgress('Preparing…', 0);
+
+  let port = app.port;
+  let transport = null;
+  let loader = null;
+  let opened = false;
+
+  try {
+    if (app.connected || app.link) await disconnect();
+
+    if (!port) {
+      const ports = await navigator.serial.getPorts().catch(() => []);
+      port = ports.find((candidate) => candidate.getInfo?.().usbVendorId === 0x303a) ||
+        (ports.length === 1 ? ports[0] : null);
+      if (!port) port = await navigator.serial.requestPort();
+    }
+    app.port = port;
+
+    const manifest = app.updateManifest;
+    const build = manifest.builds[0];
+    const source = manifest.source || manifest.version || String(Date.now());
+    const base = new URL(UPDATE_MANIFEST_URL, window.location.href);
+
+    setUpdateProgress('Downloading firmware…', 0);
+    const parts = [];
+    let totalBytes = 0;
+    for (const part of build.parts) {
+      const url = new URL(part.path, base);
+      url.searchParams.set('v', source);
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`download ${part.path} -> HTTP ${response.status}`);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (part.sha256 && (await sha256Hex(bytes)) !== String(part.sha256).toLowerCase()) {
+        throw new Error(`checksum mismatch for ${part.path}`);
+      }
+      parts.push({ data: bytes, address: Number(part.offset) });
+      totalBytes += bytes.length;
+    }
+
+    setUpdateProgress('Opening port…', 0);
+    await port.open({ baudRate: 115200, bufferSize: 8192 });
+    opened = true;
+
+    setUpdateProgress('Loading esptool-js…', 0);
+    const { ESPLoader, Transport } = await loadEsptool();
+
+    transport = new Transport(port);
+    loader = new ESPLoader({ transport, baudrate: 115200, enableTracing: false });
+
+    setUpdateProgress('Connecting to ROM bootloader…', 0);
+    await loader.main();
+
+    setUpdateProgress('Writing firmware…', 0);
+    await loader.writeFlash({
+      fileArray: parts,
+      flashSize: 'keep',
+      flashMode: 'keep',
+      flashFreq: 'keep',
+      eraseAll: false,
+      compress: true,
+      reportProgress: (fileIndex, written, total) => {
+        const part = parts[fileIndex];
+        const prior = parts.slice(0, fileIndex).reduce((sum, item) => sum + item.data.length, 0);
+        const partial = total ? (written / total) * part.data.length : 0;
+        const percent = totalBytes ? ((prior + partial) / totalBytes) * 100 : 0;
+        setUpdateProgress(`Writing ${fileIndex === 0 ? 'OTA selector' : 'application'}…`, percent);
+      },
+    });
+
+    setUpdateProgress('Resetting board…', 100);
+    await transport.setRTS(true);
+    await sleep(100);
+    await loader.after();
+    await transport.disconnect().catch(() => {});
+    try {
+      await port.close();
+    } catch {}
+    opened = false;
+    transport = null;
+
+    setUpdateProgress('Update complete — reconnecting…', 100);
+    app.manualDisconnect = false;
+    app.reconnectAttempts = 0;
+    setTimeout(() => tryReconnect(), 1800);
+  } catch (error) {
+    setUpdateProgress(`Update failed: ${error.message}`, null);
+    showError(`Firmware update failed: ${error.message}`);
+    try {
+      if (loader) await loader.after();
+    } catch {}
+    try {
+      if (transport) await transport.disconnect();
+    } catch {}
+    try {
+      if (opened && port) await port.close();
+    } catch {}
+  } finally {
+    app.updateBusy = false;
+    renderUpdatePanel();
+  }
 }
 
-function loadEspWebTools() {
-  if (customElements.get('esp-web-install-button')) return Promise.resolve();
-
-  if (!app.espToolsPromise) {
-    // Pinned exactly like install/: a moving upstream must not change what a
-    // flash does. Loaded lazily so the console itself stays dependency-free.
-    app.espToolsPromise = import('https://unpkg.com/esp-web-tools@10.4.0/dist/install-button.js?module')
-      .then(() => customElements.whenDefined('esp-web-install-button'))
-      .catch((error) => {
-        app.espToolsPromise = null;
-        throw new Error(`installer component failed to load (${error.message})`);
-      });
+function loadEsptool() {
+  if (!app.esptoolPromise) {
+    // Pinned: a moving upstream must not change what an update writes. Loaded
+    // lazily so checking for a build does not pay for it.
+    app.esptoolPromise = import(ESPTOOL_URL).catch((error) => {
+      app.esptoolPromise = null;
+      throw new Error(`esptool-js failed to load (${error.message})`);
+    });
   }
 
-  return app.espToolsPromise;
+  return app.esptoolPromise;
+}
+
+async function sha256Hex(bytes) {
+  if (!globalThis.crypto?.subtle) throw new Error('SHA-256 is unavailable in this context');
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function setUpdateProgress(status, percent) {
+  const box = $('#updateProgress');
+  if (box) box.hidden = false;
+  setText('updateStatus', status);
+
+  const numeric = Number(percent);
+  const value = Number.isFinite(numeric) ? Math.max(0, Math.min(100, numeric)) : null;
+  setText('updatePercent', value === null ? '' : `${Math.round(value)}%`);
+
+  const bar = $('#updateBar');
+  if (bar) bar.style.width = `${value === null ? 0 : value}%`;
 }
 
 function renderUpdatePanel() {
   const current = app.pong ? `current ${app.pong.fw}` : 'current unknown';
   setText('updateCurrent', current);
 
+  const busy = app.updateBusy;
+  const check = $('#btnCheckUpdate');
+  if (check) check.disabled = busy;
+
   const disconnect = $('#btnUpdateDisconnect');
-  if (disconnect) disconnect.disabled = !app.connected;
+  if (disconnect) disconnect.disabled = !app.connected || busy;
 
-  if (!app.updateElement) return;
+  const install = $('#btnInstallUpdate');
+  if (install) {
+    install.disabled = !app.updateManifest || app.demo || busy || app.connecting;
+    install.title = app.demo
+      ? 'Demo mode: there is no board to update'
+      : !app.updateManifest
+        ? 'Check for a build first'
+        : busy
+          ? 'An update is already running'
+          : 'Disconnects the console, then writes the latest build over USB';
+  }
 
-  const button = app.updateElement.querySelector('[slot="activate"]');
-  if (!button) return;
-
-  button.disabled = app.connected || app.demo;
-  button.title = app.demo
-    ? 'Demo mode: there is no board to update'
-    : app.connected
-      ? 'Disconnect the console first: the installer needs the port'
-      : 'Install the latest build over USB';
+  const hint = $('#updateHint');
+  if (hint) {
+    if (busy) hint.textContent = 'Updating — keep the board plugged in.';
+    else if (app.demo) hint.textContent = 'Demo mode: no board to update.';
+    else if (!app.updateManifest) hint.textContent = 'Check for a build first.';
+    else if (app.connected) hint.textContent = 'Install disconnects the console first, then writes over USB.';
+    else hint.textContent = 'Ready. The board will reset and reconnect.';
+  }
 }
 
 function formatBytes(bytes) {

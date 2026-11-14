@@ -152,26 +152,26 @@ Diagnostics → **Firmware update** turns the console into a USB updater:
 
 1. **Check for latest build** fetches `releases/latest/manifest.json` from this
    repository and shows the version, build date, size and source commit.
-2. **Disconnect console** commits any unsaved configuration and releases the
-   serial port. The installer cannot share it.
-3. **Install latest** (ESP Web Tools) asks for the port, resets the board into
-   the ROM bootloader, writes `boot_app0.bin` at `0xE000` and `firmware.bin` at
-   `0x10000`, and reboots. In the installer's **Erase device** step, leave the
-   checkbox **unchecked** — that is the default. Unchecked writes only the two
-   parts; checked erases the whole flash, including the saved configuration.
-4. Click **Connect** again. The console reconnects to the new build.
+2. **Install latest** disconnects the console if it is still connected, commits
+   any unsaved configuration, downloads both parts, verifies each part's
+   SHA-256, resets the board into the ROM bootloader, writes `boot_app0.bin` at
+   `0xE000` and `firmware.bin` at `0x10000`, and reboots.
+3. The progress area in the panel reports **Downloading firmware → Opening port
+   → Connecting to ROM bootloader → Writing OTA selector/application (%) →
+   Resetting board → Update complete — reconnecting**. There is no separate
+   installer modal and no erase prompt.
+4. The console reconnects automatically; **Connect** is there if it does not.
 
-The update writes **parts, not a factory image**: NVS (`0x9000`–`0xE000`) is not
-in the list, so mode, palette, every tunable, the preset slots, the saved
-networks and the page login survive — provided the erase checkbox is left
-unchecked. `boot_app0` makes the bootloader start `app0`; the next WiFi/OTA
-update uses `app1` as usual.
+The update writes **parts, not a factory image**, with `eraseAll: false`: NVS
+(`0x9000`–`0xE000`) is not in the list, so mode, palette, every tunable, the
+preset slots, the saved networks and the page login always survive. `boot_app0`
+makes the bootloader start `app0`; the next WiFi/OTA update uses `app1` as
+usual.
 
 Do not unplug during the write. If it is interrupted, the board may have no
 valid app; recover with the [browser installer](../../../install/) or a full
-release image. The installer component (ESP Web Tools 10.4.0) is fetched from
-unpkg on first use, pinned exactly like the installer page; if that is blocked,
-the fallback links are in the panel.
+release image. esptool-js is pinned to 0.6.0 and fetched from jsDelivr on first
+use; if that is blocked, the fallback links are in the panel.
 
 `releases/latest/` is a development channel replaced in place — not a tagged
 release. For a blank board or a full recovery, use a versioned release folder.
@@ -199,20 +199,25 @@ reconnects by itself.
 | The board is in its config hotspot | The console still works; the page shows *config hotspot open*. Radio switching is refused until the portal closes. |
 | Board resets when the page connects | **Expected on this board.** The C3's USB Serial/JTAG resets when the host asserts DTR/RTS, so opening the port reboots it once. The page waits for the boot and retries `PING`; the saved configuration is restored. Closing the port can reset it again. Unsaved edits do not survive a reconnect. |
 | "Check for latest build" says 404 | The page is being served without the firmware folder's `releases/latest/` next to it. Serve the repository root or `Firmware/lightpack-C3`; see *Locally* above. |
-| Install latest is disabled | Either the console is still connected (click **Disconnect console**) or the page is in `?demo` mode. |
+| Install latest is disabled | No build has been checked yet, the page is in `?demo` mode, an update is already running, or the console is reconnecting. Check for a build first; Install can disconnect the console itself. |
+| Install starts but stops at "Connecting to ROM bootloader" | The board did not enter the ROM bootloader. Hold **BOOT** while clicking Install latest, or use the browser installer. |
+| No progress appears after Install | The progress line starts with **Downloading firmware**; if it does not, esptool-js could not load from jsDelivr or the manifest fetch failed. Check the device log and the error banner. |
 | The update finishes but the board still runs the old build | The update writes app0 and forces the OTA selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
 | The update was interrupted | Do not keep retrying from the console. The application may be incomplete; recover with the [browser installer](../../../install/) or a full release image. |
 | The values snap back | The firmware clamps every write, and `changed` reports what it actually stored. The UI follows the device. |
 | Preset import says "old firmware format" | The slot was written by a different preset struct version. Save over it or import the matching JSON. |
 
-The console never flashes firmware. Use the [browser installer](../../../install/)
-or `pio run -e C3-USB -t upload` / `pio run -e C3-OTA -t upload`.
+The console writes firmware only when you click **Install latest** after a
+successful **Check for latest build**. For recovery, use the
+[browser installer](../../../install/) or `pio run -e C3-USB -t upload` /
+`pio run -e C3-OTA -t upload`.
 
 ---
 
 ## 5. How it is built
 
-Static files, no bundler, no runtime dependency:
+Static files, no bundler. esptool-js is the one runtime dependency and is
+imported only when you install an update:
 
 ```
 console/

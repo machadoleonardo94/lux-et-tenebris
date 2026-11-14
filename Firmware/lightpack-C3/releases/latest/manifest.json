@@ -1,18 +1,25 @@
 {
   "name": "lightpack-C3",
   "version": "0.4-pre+usb",
-  "new_install_prompt_erase": true,
   "built": "2026-11-14T00:07:35-03:00",
   "source": "934a3fa",
   "size": 1281168,
   "sha256": "41DC033743BDCAC67549BCFB8FA4899B57BA16012011EAE22752457D5D5B64F4",
-  "notes": "App-only USB update. NVS is preserved; app0 is selected.",
+  "notes": "App-only USB update. NVS is preserved; app0 is selected; eraseAll is false.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
-        { "path": "boot_app0.bin", "offset": 57344 },
-        { "path": "firmware.bin", "offset": 65536 }
+        {
+          "path": "boot_app0.bin",
+          "offset": 57344,
+          "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0"
+        },
+        {
+          "path": "firmware.bin",
+          "offset": 65536,
+          "sha256": "41DC033743BDCAC67549BCFB8FA4899B57BA16012011EAE22752457D5D5B64F4"
+        }
       ]
     }
   ]

@@ -228,18 +228,27 @@
             <span id="updateCurrent" class="muted mono"></span>
           </div>
           <p class="hint">Checks the repository's <code>releases/latest</code> channel and installs the app
-             over USB. The app slot and OTA selector are written, not NVS — in the installer dialog,
-             <strong>leave Erase device unchecked</strong> (the default) to keep mode, palette, presets,
-             networks and login. Checking it wipes them. Disconnect the console first: the installer
-             needs the port and resets the board into the ROM bootloader.</p>
+             over USB. The app slot and the OTA selector are written; NVS is left alone, so mode, palette,
+             presets, networks and login survive. Disconnecting the console is part of the install.</p>
           <div class="row">
             <button id="btnCheckUpdate" class="btn" type="button">Check for latest build</button>
             <button id="btnUpdateDisconnect" class="btn ghost" type="button" disabled>Disconnect console</button>
-            <span id="updateInfo" class="muted"></span>
+            <button id="btnInstallUpdate" class="btn primary" type="button" disabled>Install latest</button>
           </div>
-          <div id="updateInstall" class="update-install" hidden></div>
-          <p class="hint">The installer component is fetched from unpkg on first use. If that is blocked,
-             use the <a href="../../../install/">browser installer</a> or the <code>firmware.bin</code> in
+          <div class="row">
+            <span id="updateInfo" class="muted"></span>
+            <span id="updateHint" class="muted"></span>
+          </div>
+          <div id="updateProgress" class="update-progress" hidden>
+            <div class="update-bar"><div id="updateBar"></div></div>
+            <div class="update-line">
+              <span id="updateStatus"></span>
+              <span id="updatePercent" class="mono"></span>
+            </div>
+          </div>
+          <p class="hint">The update runs in this panel with esptool-js (pinned 0.6.0, fetched from jsDelivr
+             on first use) and shows byte progress below. If that is blocked, use the
+             <a href="../../../install/">browser installer</a> or the <code>firmware.bin</code> in
              <a href="../releases/latest/README.md">releases/latest</a>.</p>
         </div>
 

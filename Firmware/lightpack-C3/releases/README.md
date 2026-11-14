@@ -70,11 +70,12 @@ cp ~/.platformio/packages/framework-arduinoespressif32/tools/partitions/boot_app
 sha256sum releases/latest/firmware.bin releases/latest/boot_app0.bin > releases/latest/SHA256SUMS.txt
 ```
 
-Update `latest/manifest.json` (`version`, `built`, `source`, `size`, `sha256`)
-and `latest/BUILD.txt`. The manifest lists **two parts** — `boot_app0.bin` at
-`0xE000` and `firmware.bin` at `0x10000` — and deliberately no factory image:
-a merged factory image spans the NVS region with `0xFF` padding and would wipe
-the saved configuration. `latest/README.md` has the full reasoning.
+Update `latest/manifest.json` (`version`, `built`, `source`, `size`, `sha256`,
+and both part `sha256` values) and `latest/BUILD.txt`. The console verifies each
+part's hash before it opens the port. The manifest lists **two parts** —
+`boot_app0.bin` at `0xE000` and `firmware.bin` at `0x10000` — and deliberately no
+factory image: a merged factory image spans the NVS region with `0xFF` padding and
+would wipe the saved configuration. `latest/README.md` has the full reasoning.
 
 The console fetches the manifest with `cache: no-store`; no front-end change is
 needed for a new build.
