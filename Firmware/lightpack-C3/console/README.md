@@ -157,11 +157,15 @@ Diagnostics → **Firmware update** turns the console into a USB updater:
    SHA-256, resets the board into the ROM bootloader, writes `boot_app0.bin` at
    `0xE000` and `firmware.bin` at `0x10000`, and reboots.
 
-   The most reliable path is to reload the page and go straight to
+   If the console is connected, the page **reloads once** before installing.
+   The unload is the only port close Chrome always completes; trying to close
+   it from script after the C3 resets can leave the `SerialPort` wedged. The
+   page reads `sessionStorage`, reloads, re-checks the manifest and resumes the
+   update automatically. The reload is expected, not an error.
+
+   The most reliable path is still to reload the page and go straight to
    **Check → Install without connecting first**: the updater can take a closed
-   port and resets the board itself. If you do connect first, Install releases
-   the console and the updater waits for the C3 to re-enumerate before opening.
-   Connecting first is not required to install.
+   port and resets the board itself.
 3. The progress area in the panel reports **Downloading firmware → Opening port
    → Connecting to ROM bootloader → Writing OTA selector/application (%) →
    Resetting board → Update complete — reconnecting**. There is no separate

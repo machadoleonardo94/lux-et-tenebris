@@ -229,7 +229,8 @@
           </div>
           <p class="hint">Checks the repository's <code>releases/latest</code> channel and installs the app
              over USB. The app slot and the OTA selector are written; NVS is left alone, so mode, palette,
-             presets, networks and login survive. Disconnecting the console is part of the install.</p>
+             presets, networks and login survive. If the console is connected when you click Install, the
+             page reloads once to release the port cleanly and resumes the update; this is normal.</p>
           <div class="row">
             <button id="btnCheckUpdate" class="btn" type="button">Check for latest build</button>
             <button id="btnUpdateDisconnect" class="btn ghost" type="button" disabled>Disconnect console</button>

@@ -72,8 +72,9 @@ No release images yet.
   preserved and `app0` is selected. `releases/latest/` is a development channel, replaced in
   place, with its own manifest, per-part SHA-256 sums and a pinned tool. The update owns the
   port end to end: console reconnect is suspended, a stale `SerialPort` is closed, and opens
-  retry while the C3 re-enumerates; a port held by another tab or program now says so instead
-  of surfacing a bare browser error.
+  retry while the C3 re-enumerates; if the console was connected, the page reloads once so the
+  unload closes the port and then resumes the update. A port held by another tab or program now
+  says so instead of surfacing a bare browser error.
 - **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
   DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
   one request into the reset. The saved configuration is restored; unsaved edits do not

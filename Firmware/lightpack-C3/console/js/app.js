@@ -42,6 +42,7 @@ const EDIT_DEBOUNCE_MS = 90;
 const COMMIT_DEBOUNCE_MS = 900;
 const UPDATE_MANIFEST_URL = '../releases/latest/manifest.json';
 const ESPTOOL_URL = 'https://cdn.jsdelivr.net/npm/esptool-js@0.6.0/+esm';
+const UPDATE_ARMED_KEY = 'lightpack-update-armed';
 
 const app = {
   link: null,
@@ -126,9 +127,25 @@ function boot() {
       .catch(() => {});
   }
 
-  // A small test hook: ?check runs the update check on load. It is used to
-  // verify the manifest path and the installer component without a board.
-  if (params.has('check')) {
+  // If Install had to unload the page to release a wedged SerialPort, resume
+  // once from the fresh page. The flag is cleared before anything else runs so
+  // a failed update can never cause a reload loop.
+  let resumeUpdate = false;
+  try {
+    resumeUpdate = sessionStorage.getItem(UPDATE_ARMED_KEY) === '1';
+    if (resumeUpdate) sessionStorage.removeItem(UPDATE_ARMED_KEY);
+  } catch {}
+
+  if (resumeUpdate) {
+    setTimeout(async () => {
+      await checkLatestBuild();
+      if (!app.updateManifest) return;
+      setUpdateProgress('Port released by reload. Starting update…', 0);
+      await installLatest();
+    }, 400);
+  } else if (params.has('check')) {
+    // A small test hook: ?check runs the update check on load. It is used to
+    // verify the manifest path and the installer component without a board.
     setTimeout(() => checkLatestBuild(), 250);
   }
 }
@@ -1343,6 +1360,29 @@ async function installLatest() {
     return;
   }
   if (app.updateBusy) return;
+
+  // Chrome can keep a SerialPort wedged after the C3 resets on close: the old
+  // link is gone, port.close() has failed, and open() keeps saying "already
+  // open". A page unload is the one close Chrome always completes, so when the
+  // port is held, reload, then resume from boot with a genuinely closed port.
+  const portHeld = app.connected || Boolean(app.link) ||
+    Boolean(app.port && (app.port.readable || app.port.writable));
+  if (portHeld) {
+    if (app.connected && app.state?.dirty) {
+      try {
+        await commit();
+      } catch {}
+    }
+    let armed = false;
+    try {
+      sessionStorage.setItem(UPDATE_ARMED_KEY, '1');
+      armed = true;
+    } catch {}
+    if (armed) {
+      location.reload();
+      return;
+    }
+  }
 
   // From here until the write finishes, the update owns the port. Stop the
   // console's reconnect timer now: a stale link's disconnect event used to
