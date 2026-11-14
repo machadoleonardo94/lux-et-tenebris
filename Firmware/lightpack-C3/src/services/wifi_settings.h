@@ -130,6 +130,16 @@ const char *const WIFI_CREDENTIAL_PASS_KEYS[WIFI_CREDENTIAL_SLOTS] = {"pass0", "
 //? Set to 0 to drop the scan/status reporting from the failure path.
 #define WIFI_DIAGNOSTICS 1
 
+//* How long the station may sit in NET_CONNECTING without joining before the
+//* attempt is thrown away and rebuilt from scratch.
+//! Two failures make this necessary and they present identically. An association
+//? that completes but is never given an address leaves the driver in "connecting"
+//? forever, and an AP that keeps refusing the credentials does the same between
+//* attempts. In both cases Arduino's WiFi.disconnect() is a no-op unless the
+//? station is already WL_CONNECTED, so the retry below was refused with
+//* ESP_ERR_WIFI_CONN (0x3007) and changed nothing at all.
+#define WIFI_CONNECT_STALL_MS 45000UL
+
 //* ---------------------- RADIO POWER SAVE ----------------------
 //? With modem sleep on, the radio dozes between access point beacons and the AP
 //? holds everything addressed to this board until the next delivery window.
@@ -191,7 +201,7 @@ bool wifi_portal_requested()
 //?
 //?   NET_OFFLINE     The radio is off. No join attempts, no hotspot, no page and
 //?                   no OTA listener. This is the persisted "offline mode" switch
-//?                   and it survives a reboot; a 1 s press of GPIO9 flips it.
+//?                   and it survives a reboot; a 3 s hold of either switch flips it.
 //?   NET_CONNECTING  The radio is up, the saved network is not joined. The join is
 //?                   retried every WIFI_RETRY_INTERVAL_MS, forever. There is no
 //?                   address to serve on, so there is still no page and no OTA.
@@ -209,6 +219,15 @@ bool wifi_portal_requested()
 //* When the next join retry is due, and when the current drop was first seen.
 uint32_t wifi_retry_at = 0;
 uint32_t wifi_lost_at = 0;
+
+//* When the current NET_CONNECTING attempt began, for the stall watchdog.
+//? 0 while the board is in any other state, so the watchdog only ever times an
+//* actual join attempt.
+uint32_t wifi_connecting_since = 0;
+
+//* When the failure status block was last printed, so a board that cannot join
+//? does not print it on every pass.
+uint32_t wifi_status_at = 0;
 
 //* The join the page asked for: which slot it targeted, when the window opened,
 //? and what to tell the user if it closes without a connection. An attempt time of
@@ -279,6 +298,14 @@ void net_set_state(uint8_t next)
         return;
     net_state = next;
 
+    //* Armed here rather than in net_enter_connecting(): a link that drops while
+    //? NET_CONNECTED also lands in NET_CONNECTING, and that path never goes
+    //* through the entry function. Both are the same stall risk.
+    if (next == NET_CONNECTING)
+        wifi_connecting_since = millis();
+    else
+        wifi_connecting_since = 0;
+
     //* The same colour language the rest of the firmware uses on the onboard
     //? pixel: green means it is on the network, amber means it is trying, red
     //* means the radio is off and only a button will bring it back.
@@ -343,6 +370,40 @@ void net_enter_connecting()
     wifi_lost_at = 0;
     wifi_retry_at = millis();
     net_set_state(NET_CONNECTING);
+}
+
+//* Throw away whatever the station is currently doing and aim it at the active
+//* slot again.
+//! WiFi.disconnect() alone is NOT enough, and the log proves it: the Arduino
+//? wrapper returns before it touches the driver whenever the station is not
+//* WL_CONNECTED ("STA already disconnected", STA.cpp), which is exactly the state
+//! an association stuck before DHCP is in. So every retry called begin() against
+//? an attempt that was still in flight and got ESP_ERR_WIFI_CONN (0x3007) back -
+//* forever, with no state change and no log line outside this firmware.
+//? WiFi.disconnect(true, false) is the one form that reaches esp_wifi_stop() even
+//* in that state, so the pending attempt really dies; begin() then restarts the
+//! interface. Credentials are kept (eraseap = false) - this is a retry, not a wipe.
+void wifi_station_restart()
+{
+    const uint8_t slot = wifi_credential_active();
+    const String ssid = wifi_credential_ssid(slot);
+    if (ssid.length() == 0)
+        return;
+    const String password = wifi_credential_password(slot);
+
+    WiFi.disconnect(true, false);
+    WiFi.begin(ssid.c_str(), password.c_str());
+
+    //! The clock MUST be rewound here. net_set_state() does not do it: the state
+    //? is already NET_CONNECTING, and its early return would leave the timestamp
+    //* in the past - the watchdog would then fire on every pass instead of once
+    //! per stall, which is what the first build of this did (a restart flood at
+    //* ~30 ms intervals, visible in the loop rate dropping to 293 per 10 s).
+    wifi_connecting_since = millis();
+
+    //? The ordinary retry would otherwise fire in the same pass and race this
+    //* restart with a second begin().
+    wifi_retry_at = millis();
 }
 
 //* Joined: bring up the two things that need an address.
@@ -428,9 +489,22 @@ void wifi_report_status()
                   WiFi.softAPIP().toString().c_str(),
                   WiFi.softAPgetStationNum());
     Serial.printf("[WIFI] sta_mac=%s\n", WiFi.macAddress().c_str());
+
+    //* What the driver believes it is talking to, including the security mode it
+    //? negotiated. This is what separates "the AP wants WPA3 and the board offered
+    //* WPA2" from "the password is wrong" when the disconnect reason is 202.
+    wifi_ap_record_t ap;
+    if (esp_wifi_sta_get_ap_info(&ap) == ESP_OK)
+        Serial.printf("[WIFI] ap: ssid='%s' bssid=%02X:%02X:%02X:%02X:%02X:%02X auth=%u rssi=%d ch=%u\n",
+                      (const char *)ap.ssid,
+                      ap.bssid[0], ap.bssid[1], ap.bssid[2],
+                      ap.bssid[3], ap.bssid[4], ap.bssid[5],
+                      (unsigned)ap.authmode, (int)ap.rssi, (unsigned)ap.primary);
+
     for (uint8_t slot = 0; slot < WIFI_CREDENTIAL_SLOTS; slot++)
-        Serial.printf("[WIFI] saved slot %u: '%s'%s\n", (unsigned)slot,
+        Serial.printf("[WIFI] saved slot %u: '%s' pass_len=%u%s\n", (unsigned)slot,
                       wifi_credential_ssid(slot).c_str(),
+                      (unsigned)wifi_credential_password(slot).length(),
                       (slot == wifi_credential_active()) ? "  <== active" : "");
 }
 
@@ -501,6 +575,83 @@ void wifi_report_scan()
                           (unsigned)slot, wifi_credential_ssid(slot).c_str());
     }
 }
+
+
+//* ---------------------- EVENT LOG ----------------------
+#if WIFI_DIAGNOSTICS
+//* The disconnect reasons that actually occur here, in words.
+//! Without this the log says "not connected" and nothing else. That is the whole
+//? reason this failure was undiagnosable: 202 (AUTH_FAIL) is a rejected
+//* password/auth mode, 201 (NO_AP_FOUND) is range or a 5 GHz-only SSID, and 15
+//! (4-way timeout) is a wrong WPA2 password - three faults with nothing in common
+//* that all produced the same line.
+const char *wifi_reason_name(uint8_t reason)
+{
+    switch (reason)
+    {
+    case WIFI_REASON_AUTH_EXPIRE:
+        return "auth expired";
+    case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+        return "4-way handshake timeout - wrong WPA2 password";
+    case WIFI_REASON_NO_AP_FOUND:
+        return "no AP found - off, out of range, or 5 GHz-only";
+    case WIFI_REASON_AUTH_FAIL:
+        return "authentication failed - wrong password, or an auth mode the AP refuses";
+    case WIFI_REASON_ASSOC_FAIL:
+        return "association failed";
+    case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        return "handshake timeout";
+    case WIFI_REASON_CONNECTION_FAIL:
+        return "connection failed";
+    case 210: // NO_AP_FOUND_W_COMPATIBLE_SECURITY (IDF names it from 5.2 on)
+        return "no AP with a compatible security mode (e.g. WPA3-only)";
+    case 211: // NO_AP_FOUND_IN_AUTHMODE_THRESHOLD
+        return "no AP at or above the minimum security mode";
+    default:
+        return "";
+    }
+}
+
+//* The radio's own account of what happened, one line per state change.
+//! This is the only place the DISCONNECT REASON becomes visible. The framework
+//? logs it at its own "warn" level, which this build compiles out (CORE_DEBUG_LEVEL
+//* is 0), so a wrong password, an absent AP and a rejected association all looked
+//! identical on the console: "not connected", forever, with no reason. That is
+//? what made this failure a guessing game - and it is why the reason is printed
+//* here rather than left to the library.
+void wifi_event_log(arduino_event_id_t event, arduino_event_info_t info)
+{
+    switch (event)
+    {
+    case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+        Serial.printf("[WIFI-EVT] associated: ssid='%.*s' bssid=%02X:%02X:%02X:%02X:%02X:%02X ch=%u auth=%u\n",
+                      (int)info.wifi_sta_connected.ssid_len, (const char *)info.wifi_sta_connected.ssid,
+                      info.wifi_sta_connected.bssid[0], info.wifi_sta_connected.bssid[1],
+                      info.wifi_sta_connected.bssid[2], info.wifi_sta_connected.bssid[3],
+                      info.wifi_sta_connected.bssid[4], info.wifi_sta_connected.bssid[5],
+                      (unsigned)info.wifi_sta_connected.channel,
+                      (unsigned)info.wifi_sta_connected.authmode);
+        break;
+    case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        Serial.printf("[WIFI-EVT] disconnected: reason=%u (%s) rssi=%d ssid='%.*s'\n",
+                      (unsigned)info.wifi_sta_disconnected.reason,
+                      wifi_reason_name(info.wifi_sta_disconnected.reason),
+                      (int)info.wifi_sta_disconnected.rssi,
+                      (int)info.wifi_sta_disconnected.ssid_len,
+                      (const char *)info.wifi_sta_disconnected.ssid);
+        break;
+    case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        Serial.printf("[WIFI-EVT] got address %s\n",
+                      IPAddress(info.got_ip.ip_info.ip.addr).toString().c_str());
+        break;
+    case ARDUINO_EVENT_WIFI_STA_LOST_IP:
+        Serial.println("[WIFI-EVT] lost address");
+        break;
+    default:
+        break;
+    }
+}
+#endif
 
 //* ---------------------- CREDENTIAL SLOTS ----------------------
 //? Both networks live in the "wifi" namespace, beside the pointer to the one the
@@ -678,7 +829,16 @@ bool wifi_credential_join(uint8_t slot)
     const String password = wifi_credential_password(slot);
 
     wifi_credential_set_active(slot);
-    WiFi.disconnect(false, false);
+
+    //! esp_wifi_disconnect(), not WiFi.disconnect(): the Arduino wrapper returns
+    //? without calling the driver when the station is not WL_CONNECTED, so it
+    //* cannot abandon an attempt that is still in flight - which is the only case
+    //! this call exists for. The refusal it used to leave behind was
+    //* ESP_ERR_WIFI_CONN (0x3007) from the begin() below, on every retry.
+    const esp_err_t dropped = esp_wifi_disconnect();
+    if (dropped != ESP_OK && dropped != ESP_ERR_WIFI_NOT_CONNECT)
+        Serial.printf("[WIFI] Disconnect before re-join returned 0x%x\n", (unsigned)dropped);
+
     WiFi.begin(ssid.c_str(), password.c_str());
 
     Serial.printf("[WIFI] Joining slot %u: '%s'\n", (unsigned)slot, ssid.c_str());
@@ -1047,7 +1207,14 @@ uint8_t run_config_portal(bool forced, uint16_t timeout_s, bool portal_enabled)
             Serial.println("[WIFI] Portal skipped - the button asked to leave it");
         }
 
-        wifiManager.stopConfigPortal();
+        //! Only while the portal is still up. WiFiManager's own timeout check runs
+        //? INSIDE process(), and that check calls shutdownConfigPortal() itself -
+        //* which resets its web server pointer to null. Calling stopConfigPortal()
+        //! after that dereferences the null server at WiFiManager.cpp:970 (a Load
+        //? access fault: MCAUSE 5, MTVAL 0), which is the boot loop the field log
+        //* shows. getConfigPortalActive() is false once the timeout has run.
+        if (wifiManager.getConfigPortalActive() || wifiManager.getWebPortalActive())
+            wifiManager.stopConfigPortal();
         // wifiManager goes out of scope (its internal web server on port 80 stops here)
     }
 
@@ -1068,6 +1235,21 @@ void setup_WIFI(bool portal_enabled)
     //* survives every mode change below, including coming back from offline.
     WiFi.setSleep(WIFI_MODEM_SLEEP != 0);
 
+    //* Retries are this file's job, so the framework's own automatic reconnect is
+    //? off. Left on, WIFI_REASON_AUTH_EXPIRE is "reconnectable" and the core calls
+    //! esp_wifi_connect() again immediately - measured on the failing unit, an
+    //* attempt roughly once a second, forever. That both hammers an AP that has
+    //? already refused this station and buries the one useful line (the reason) in
+    //* a flood of identical ones. The 60 s retry and the 45 s stall watchdog below
+    //* are the two paces this board is meant to try at.
+    WiFi.setAutoReconnect(false);
+
+#if WIFI_DIAGNOSTICS
+    //? Registered once per boot, before the first join attempt, so the reason for
+    //* a failed association is printed next to the attempt that failed.
+    WiFi.onEvent(wifi_event_log);
+#endif
+
     //* Before anything asks whether a network is configured at all: a board
     //? upgrading from a build without slots has its network only in the driver's
     //* config, and would otherwise look unprovisioned.
@@ -1078,7 +1260,7 @@ void setup_WIFI(bool portal_enabled)
     const bool have_credentials = wifi_has_credentials();
 
     //* Which portal, if any, this boot owes the user:
-    //?   * the 5 s press outranks everything, including the offline switch. It is
+    //?   * the 6 s hold outranks everything, including the offline switch. It is
     //?     the documented way back in when the credentials are wrong or the board
     //?     is parked offline, and a board in offline mode has no page to fix
     //!     either from - so this is the only way in, and it always opens.
@@ -1092,7 +1274,7 @@ void setup_WIFI(bool portal_enabled)
         WiFi.mode(WIFI_OFF);
         net_state = NET_OFFLINE;
         Serial.println("[NET] Offline mode - radio off, no hotspot");
-        Serial.println("[NET] Hold GPIO9 for 3 s to go back online");
+        Serial.println("[NET] Hold either switch for 3 s to go back online");
         return;
     }
 
@@ -1104,13 +1286,13 @@ void setup_WIFI(bool portal_enabled)
 
         //* Skipped: the user stood at the board, watched the hotspot come up and
         //? said no. That is a decision, so it is persisted rather than forgotten -
-        //* the radio goes off now and stays off across reboots, and the 5 s hold is
+        //* the radio goes off now and stays off across reboots, and the 6 s hold is
         //* the documented way back in.
         if (outcome == PORTAL_SKIPPED)
         {
             wifi_offline_store(true);
             Serial.println("[NET] Portal skipped - offline mode on, radio off");
-            Serial.println("[NET] Hold GPIO9 for 6 s to open the config hotspot");
+            Serial.println("[NET] Hold either switch for 6 s to open the config hotspot");
             net_enter_offline();
             return;
         }
@@ -1142,11 +1324,11 @@ void setup_WIFI(bool portal_enabled)
         //* Nothing configured and nothing stored. This is the state the user
         //? described as "not connected", but without a network name there is
         //! nothing to retry, so the radio goes off rather than beaconing forever.
-        //? A 1 s press brings the radio back, and a 5 s press reopens the portal.
+        //? A 3 s hold brings the radio back, and a 6 s hold reopens the portal.
         WiFi.mode(WIFI_OFF);
         net_state = NET_OFFLINE;
         Serial.println("[NET] No network configured - radio off until one is");
-        Serial.println("[NET] Hold GPIO9 for 5 s to open the config hotspot");
+        Serial.println("[NET] Hold either switch for 6 s to open the config hotspot");
         return;
     }
 
@@ -1163,8 +1345,8 @@ void wifi_loop()
     switch (net_state)
     {
     case NET_OFFLINE:
-        //? Nothing to do and nothing to poll. The radio is off; a press of GPIO9
-        //* is what leaves this state, and that is polled elsewhere.
+        //? Nothing to do and nothing to poll. The radio is off; a 3 s hold on
+        //* either switch is what leaves this state, and that is polled elsewhere.
         return;
 
     case NET_CONNECTING:
@@ -1173,6 +1355,18 @@ void wifi_loop()
             net_enter_connected();
             return;
         }
+
+#if WIFI_DIAGNOSTICS
+        //* While this board cannot join, say what it can see every so often. The
+        //? once-per-boot diagnostics above never ran in the field because the
+        //! station was stuck before the first retry, so the failure left no record
+        //* of the AP's security mode at all.
+        if (millis() - wifi_status_at >= 30000UL)
+        {
+            wifi_status_at = millis();
+            wifi_report_status();
+        }
+#endif
 
         //! Nothing left to aim at. The page can forget the last saved network while
         //? the board is still joined to it, so this state is reachable with both
@@ -1183,7 +1377,23 @@ void wifi_loop()
             WiFi.mode(WIFI_OFF);
             net_set_state(NET_OFFLINE);
             Serial.println("[NET] No saved network left - radio off");
-            Serial.println("[NET] Hold GPIO9 for 6 s to open the config hotspot");
+            Serial.println("[NET] Hold either switch for 6 s to open the config hotspot");
+            return;
+        }
+
+        //* Still not joined after the whole stall window. Whatever the reason -
+        //? an association that never got an address, or credentials the AP keeps
+        //* refusing - the driver can be left reporting "connecting", and the retry
+        //! below cannot clear that: WiFi.disconnect() is a no-op unless the station
+        //* is WL_CONNECTED, so begin() kept answering ESP_ERR_WIFI_CONN (0x3007).
+        //? The station is stopped and started again instead - see
+        //* wifi_station_restart().
+        if (wifi_connecting_since != 0 &&
+            (millis() - wifi_connecting_since) >= WIFI_CONNECT_STALL_MS)
+        {
+            Serial.printf("[NET] Not joined %lu ms after entering the attempt - restarting the station\n",
+                          (unsigned long)(millis() - wifi_connecting_since));
+            wifi_station_restart();
             return;
         }
 
@@ -1268,7 +1478,7 @@ void wifi_loop()
     }
 }
 
-//* The 1 s press: flip offline mode, live. Persisted, so it is the state the next
+//* The 3 s hold: flip offline mode, live. Persisted, so it is the state the next
 //* boot starts from, and applied now, so it is the state this boot ends in.
 void wifi_toggle_offline()
 {
@@ -1286,7 +1496,7 @@ void wifi_toggle_offline()
         net_enter_connecting();
         //* No portal here on purpose. A board with no saved network that comes
         //? out of offline mode lands in NET_OFFLINE off the back of
-        //! setup_WIFI()'s no-credentials rule, and the 5 s press is the way to
+        //! setup_WIFI()'s no-credentials rule, and the 6 s hold is the way to
         //* give it one - toggling the radio on should not put an AP on the air.
         if (!wifi_has_credentials())
         {

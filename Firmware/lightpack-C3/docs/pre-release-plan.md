@@ -1,21 +1,24 @@
 # lightpack-C3 pre-release plan — feature list and menu navigation
 
-> **Status note (superseded in part).** This plan builds the on-device menu on the
-> **GPIO3 touch pad**. That input is now **hardware-damaged on the bench board**: the
-> pad still measures a clean 3.3 V, but the pin reads LOW and never latches an edge
-> (measured both digitally and through the ADC, see `services/readings.h`). The
-> cause is most likely the board's own power button **BT1**, which puts `+BATT`
-> (~4.2 V) onto that 3.3 V GPIO through R12 — D6 does **not** clamp it, since its
-> other end lands on the latch-gate node, not a 3.3 V rail.
+> **Status note (superseded).** This plan builds the on-device menu on the
+> **GPIO3 touch pad**. On the first pre-release bench board that input was
+> **hardware-damaged**: the pad still measured a clean 3.3 V, but the pin read LOW
+> and never latched an edge (measured both digitally and through the ADC, see
+> `services/readings.h`). The cause is most likely the board's own power button
+> **BT1**, which puts `+BATT` (~4.2 V) onto that 3.3 V GPIO through R12 — D6 does
+> **not** clamp it, since its other end lands on the latch-gate node, not a 3.3 V
+> rail.
 >
-> The implemented input map therefore lives on **GPIO9** (the on-module BOOT switch)
-> instead, and is described in `services/readings.h` and `check_boot_button()`:
-> 1 click next mode, 2 clicks previous mode, 5 clicks power off, 3 s hold radio
-> on/off, 6 s hold config hotspot, 10 s hold recovery wipe. Sections below that
-> assume a working touch pad — especially §3's menu, the double-tap timing in §3.1
-> and the §6 test matrix — describe intent that is **not** what the firmware now
-> does. The 2.7 V zener proposed as a field fix is also too low: the C3's VIH is
-> ~2.48 V, so use 3.3 V or 3.6 V.
+> The current unit's touch module works, and the shipped map is now split between
+> the two switches. **GPIO3 (daily):** 1 click next mode, 2 clicks previous mode,
+> 5 clicks power off, 3 s hold radio on/off, 6 s hold config hotspot. **GPIO9
+> (security/recovery/fallback):** 1 click previous mode, 5 clicks power off, 3 s
+> hold radio on/off, 6 s hold config hotspot, 10 s hold recovery wipe. README §2
+> has the full map and the colour feedback. Sections below that assume a
+> single-pad menu — especially §3's menu, the double-tap timing in §3.1 and the §6
+> test matrix — describe intent that is **not** what the firmware now does. The
+> 2.7 V zener proposed as a field fix is also too low: the C3's VIH is ~2.48 V, so
+> use 3.3 V or 3.6 V.
 
 **Target hardware:** Lux et Portabilis **V2** (`Hardware/lux-et-portabilis-V2/`), ESP32-C3
 SuperMini module.

@@ -101,13 +101,13 @@ void boot_report_print()
     //* The way back in, printed with the report and therefore replayed with it.
     //? A user who has lost the page is exactly the user who cannot read this off
     //* the page, and the boot log alone is unreadable on this board's console.
-    //* The whole input map, because GPIO9 is now the board's ONLY control - the
-    //! GPIO3 touch input is hardware-damaged (see services/readings.h), so a user
-    //* who cannot work this switch cannot work the device at all.
-    Serial.println("[BOOT] GPIO9: 1 click next mode, 2 clicks previous mode, "
-                   "5 clicks power off; 3 s hold radio on/off, "
-                   "6 s hold config hotspot, 10 s hold clears the saved wifi "
-                   "and the login.");
+    //* The whole input map, because these two switches are the board's controls:
+    //? GPIO3 is the daily pad and GPIO9 is the module's own fallback/recovery key.
+    Serial.println("[BOOT] GPIO3: 1 click next mode, 2 clicks previous mode, "
+                   "5 clicks power off; 3 s hold radio on/off, 6 s hold config hotspot.");
+    Serial.println("[BOOT] GPIO9: 1 click previous mode, 5 clicks power off; "
+                   "3 s hold radio on/off, 6 s hold config hotspot, "
+                   "10 s hold clears the saved wifi and the login.");
     Serial.println("[BOOT] GPIO9 while the config hotspot is up: 3 s hold skips it.");
 }
 

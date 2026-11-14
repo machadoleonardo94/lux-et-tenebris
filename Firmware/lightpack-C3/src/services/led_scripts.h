@@ -131,6 +131,11 @@ void led_mode_next();
 //* the preset handlers.
 void webpage_config_save();
 
+//* ---------------------- UI FEEDBACK ----------------------
+//? This board has two WS2812B outputs and no screen, so an action answers twice:
+//? the single onboard pixel (always visible, even with the case fitted) and a
+//* brief flash of the strip (visible across the room, then the show resumes).
+
 //* Show one colour on the onboard pixel for a moment, over the top of the steady
 //? display. Used by the network transitions in services/wifi_settings.h to mark a
 //* state CHANGE; the blink below is what reports the state it settled into.
@@ -144,6 +149,141 @@ void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms)
     led_notice_until_ms = millis() + ms;
     onboard_led.setPixelColor(0, strip.Color(r, g, b));
     onboard_led.show();
+}
+
+//* One brief flash of the whole active strip, then back to the selected mode.
+//? The strip is the show's canvas, so this is deliberately not another renderer:
+//? it paints once, holds a deadline, and update_strip() stands down until the
+//* deadline passes. Nothing here blocks.
+//! The flash is CURRENT-LIMITED, and that is why the colour is rescaled instead
+//? of used raw. The status colours are tuned for one pixel (values up to 60), and
+//* 250 of those at full white would ask for amps - a brief brown-out, not feedback.
+//? UI_STRIP_FLASH_PEAK caps the brightest channel at 10/255, so a 250-pixel white
+//* flash is roughly 0.6 A for its 140 ms, well inside what the rail already drives.
+#define UI_STRIP_FLASH_PEAK 10
+uint32_t strip_flash_until_ms = 0;
+
+void strip_flash(uint8_t r, uint8_t g, uint8_t b, uint16_t ms)
+{
+    uint8_t peak = r;
+    if (g > peak)
+        peak = g;
+    if (b > peak)
+        peak = b;
+    if (peak == 0 || ms == 0)
+        return;
+
+    const uint8_t scale = (peak > UI_STRIP_FLASH_PEAK) ? UI_STRIP_FLASH_PEAK : peak;
+    const uint8_t sr = (uint8_t)(((uint16_t)r * scale) / peak);
+    const uint8_t sg = (uint8_t)(((uint16_t)g * scale) / peak);
+    const uint8_t sb = (uint8_t)(((uint16_t)b * scale) / peak);
+
+    strip_flash_until_ms = millis() + ms;
+    for (uint16_t i = 0; i < strip_leds(); i++)
+        strip.setPixelColor(i, strip.Color(sr, sg, sb));
+    strip.show();
+}
+
+//* The colour language for a completed action, in one place.
+//? Same hue on both channels, so the near pixel and the far strip cannot tell
+//? different stories. The values are for the status pixel; strip_flash() rescales
+//? them to its current-limited peak.
+//!
+//?   blue    one step FORWARD in the mode registry
+//?   cyan    one step BACK
+//?   red     the board is about to lose power (steady) or the radio went off
+//?   green   the radio came on
+//?   white   configuration hotspot
+//?   magenta recovery wipe
+//?   dim red a click count with no gesture (3 or 4)
+//!
+//! Red is deliberately shared by power-off and radio-off: both mean "off", and
+//? the durations separate them - a 1 s steady for power, a short pulse for radio.
+//? Amber stays reserved for the recovery countdown, so no action colour can be
+//* mistaken for "the wipe is armed".
+void ui_action_feedback(uint8_t action)
+{
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint16_t notice_ms = 0;
+    uint16_t flash_ms = 0;
+
+    switch (action)
+    {
+    case UI_ACTION_MODE_NEXT:
+        r = 0;
+        g = 25;
+        b = 50;
+        notice_ms = 600;
+        flash_ms = 140;
+        break;
+
+    case UI_ACTION_MODE_PREV:
+        r = 0;
+        g = 45;
+        b = 45;
+        notice_ms = 600;
+        flash_ms = 140;
+        break;
+
+    case UI_ACTION_POWER_OFF:
+        r = 60;
+        g = 0;
+        b = 0;
+        notice_ms = 1000;
+        flash_ms = 1000;
+        break;
+
+    case UI_ACTION_RADIO_ON:
+        r = 0;
+        g = 55;
+        b = 0;
+        notice_ms = 700;
+        flash_ms = 160;
+        break;
+
+    case UI_ACTION_RADIO_OFF:
+        r = 45;
+        g = 0;
+        b = 0;
+        notice_ms = 700;
+        flash_ms = 160;
+        break;
+
+    case UI_ACTION_CONFIG_PORTAL:
+        r = 55;
+        g = 55;
+        b = 55;
+        notice_ms = 400;
+        flash_ms = 400;
+        break;
+
+    case UI_ACTION_RECOVERY_WIPE:
+        r = 55;
+        g = 0;
+        b = 55;
+        notice_ms = 1200;
+        flash_ms = 1200;
+        break;
+
+    case UI_ACTION_IGNORED:
+        r = 18;
+        g = 0;
+        b = 0;
+        notice_ms = 250;
+        flash_ms = 80;
+        break;
+
+    default:
+        return;
+    }
+
+    led_notice(r, g, b, notice_ms);
+    strip_flash(r, g, b, flash_ms);
+    Serial.printf("[UI] action %u -> pixel %u,%u,%u / strip flash %u ms\n",
+                  (unsigned)action, (unsigned)r, (unsigned)g, (unsigned)b,
+                  (unsigned)flash_ms);
 }
 
 //* ---------------------- ONBOARD LED ----------------------
@@ -173,15 +313,26 @@ void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms)
 //! Level, not the classified press: this reads the PIN, so it lights for any touch
 //? at all - including a 20 ms tap that is too short to become a BUTTON_EVENT_SHORT
 //* and would therefore look like a dead button with nothing on screen to say why.
-//? Notices (the recovery countdown, the portal warning) still own the pixel, so
-//* this is checked AFTER them and never hides a countdown.
+//? Notices (the recovery countdown, an action confirmation) still own the pixel, so
+//* this is checked AFTER them and never hides one.
+//!
+//? The BASE colour says which switch is held (green daily / purple recovery). The
+//? threshold colours are shared, because the action is shared:
+//*   amber from 3 s  - release now toggles the radio
+//*   blue  from 6 s  - release now opens the config hotspot
 #define ONBOARD_LED_BUTTON_FEEDBACK 1
-#define BUTTON_LED_TOUCH_R 0 // green: GPIO3 is HIGH, the touch net is asserted
-#define BUTTON_LED_TOUCH_G 10
+#define BUTTON_LED_TOUCH_R 0 // green: GPIO3 is HIGH, the daily pad is asserted
+#define BUTTON_LED_TOUCH_G 20
 #define BUTTON_LED_TOUCH_B 0
-#define BUTTON_LED_BOOT_R 7 // purple: GPIO9 is held (active LOW)
+#define BUTTON_LED_BOOT_R 9 // purple: GPIO9 is held (active LOW)
 #define BUTTON_LED_BOOT_G 0
-#define BUTTON_LED_BOOT_B 7
+#define BUTTON_LED_BOOT_B 9
+#define BUTTON_LED_ARM_R 45 // amber: 3 s reached, the radio will toggle on release
+#define BUTTON_LED_ARM_G 25
+#define BUTTON_LED_ARM_B 0
+#define BUTTON_LED_PORTAL_R 0 // blue: 6 s reached, the config hotspot will open
+#define BUTTON_LED_PORTAL_G 30
+#define BUTTON_LED_PORTAL_B 45
 
 //* Colour: green joined, cyan not joined, red radio off. One blink, then dark.
 void update_onboard_LED()
@@ -202,25 +353,44 @@ void update_onboard_LED()
 
 #if ONBOARD_LED_BUTTON_FEEDBACK
     //* Switch state outranks the blink: while a switch is asserted the pixel is a
-    //? level indicator rather than a status report. The boot button is tested
+    //? level indicator rather than a status report. The recovery switch is tested
     //* second so a touch and a BOOT hold at once resolve to the touch net.
+    const uint32_t now = millis();
+
     if (button_is_down(touch_button))
     {
-        onboard_led.setPixelColor(0, strip.Color(BUTTON_LED_TOUCH_R, BUTTON_LED_TOUCH_G, BUTTON_LED_TOUCH_B));
+        const uint32_t held = touch_button.pressed ? (now - touch_button.press_start_ms) : 0;
+
+        uint8_t r = BUTTON_LED_TOUCH_R;
+        uint8_t g = BUTTON_LED_TOUCH_G;
+        uint8_t b = BUTTON_LED_TOUCH_B;
+
+        if (held >= BUTTON_PORTAL_HOLD_MS)
+        {
+            r = BUTTON_LED_PORTAL_R;
+            g = BUTTON_LED_PORTAL_G;
+            b = BUTTON_LED_PORTAL_B;
+        }
+        else if (held >= BUTTON_WIFI_HOLD_MS)
+        {
+            r = BUTTON_LED_ARM_R;
+            g = BUTTON_LED_ARM_G;
+            b = BUTTON_LED_ARM_B;
+        }
+
+        onboard_led.setPixelColor(0, strip.Color(r, g, b));
         onboard_led.show();
         return;
     }
+
     if (button_is_down(boot_button))
     {
         //* Holds act on RELEASE (a reset with GPIO9 still held lands in the ROM's
         //! download mode), so without a progress colour the user gets no feedback
-        //? at all while holding - they cannot tell 2 s from 5 s. These three
-        //* colours are that feedback: they change AT each threshold, so releasing
-        //? now would do exactly what the colour already announces.
-        //? Purple below 3 s, amber from 3 s (radio), blue from 6 s (hotspot).
-        uint32_t held = 0;
-        if (boot_button.pressed)
-            held = millis() - boot_button.press_start_ms;
+        //? at all while holding - they cannot tell 3 s from 6 s. The colour
+        //* changes AT each threshold, so releasing now does exactly what the
+        //? colour already announces.
+        const uint32_t held = boot_button.pressed ? (now - boot_button.press_start_ms) : 0;
 
         uint8_t r = BUTTON_LED_BOOT_R;
         uint8_t g = BUTTON_LED_BOOT_G;
@@ -228,15 +398,15 @@ void update_onboard_LED()
 
         if (held >= BUTTON_PORTAL_HOLD_MS)
         {
-            r = 0;
-            g = 16;
-            b = 25;
+            r = BUTTON_LED_PORTAL_R;
+            g = BUTTON_LED_PORTAL_G;
+            b = BUTTON_LED_PORTAL_B;
         }
         else if (held >= BUTTON_WIFI_HOLD_MS)
         {
-            r = 25;
-            g = 15;
-            b = 0;
+            r = BUTTON_LED_ARM_R;
+            g = BUTTON_LED_ARM_G;
+            b = BUTTON_LED_ARM_B;
         }
 
         onboard_led.setPixelColor(0, strip.Color(r, g, b));
@@ -1031,6 +1201,16 @@ void led_mode_prev()
 
 void update_strip(int mode)
 {
+    //* A UI flash owns the strip for its short life. strip_flash() already painted
+    //? every active pixel and called show(), so standing down here is all that is
+    //* needed; the selected mode repaints on the first frame after the deadline.
+    if (strip_flash_until_ms != 0)
+    {
+        if ((int32_t)(millis() - strip_flash_until_ms) < 0)
+            return;
+        strip_flash_until_ms = 0;
+    }
+
     if (millis() - led_strip.update_time < LED_SCRIPT_FRAME_MS)
         return;
     led_strip.update_time = millis();

@@ -14,15 +14,16 @@ void setup_button_interrupt();
 //* service includes - the same reason services/webpage.h forward-declares the
 //* helpers of services/presets.h.
 void led_mode_next();
-//* Its inverse, for the double-click. Declared for the same reason as the walk
-//* above: the registry lives in a header that is included after this one.
+//* Its inverse, for the touch pad's double-click and the BOOT switch's single
+//* click. Declared for the same reason as the walk above: the registry lives in a
+//* header that is included after this one.
 void led_mode_prev();
 
-//* Same ordering problem for the WiFi service: both boot-button actions are
-//* implemented in services/wifi_settings.h, which is included after this header.
-//? The portal is requested by leaving a flag in NVS and restarting, so that is
-//? all the button side needs; the offline toggle is a live transition the WiFi
-//* service owns, so the name is all it needs either.
+//* Same ordering problem for the WiFi service: the radio toggle and the config
+//? portal are implemented in services/wifi_settings.h, which is included after
+//* this header. The portal is requested by leaving a flag in NVS and restarting,
+//? so that is all the button side needs; the offline toggle is a live transition
+//* the WiFi service owns, so the name is all it needs either.
 void wifi_request_portal_on_boot();
 void wifi_toggle_offline();
 
@@ -35,6 +36,16 @@ void webpage_auth_clear();
 //* The onboard pixel, for the recovery countdown. services/led_scripts.h is
 //* included after this header too - see the note above about led_mode_next().
 void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms);
+
+//* What a completed gesture means. The vocabulary is in shared/variables.h and
+//? the colours live in services/led_scripts.h, so the input layer only names the
+//* action and every switch draws the same confirmation for the same action.
+void ui_action_feedback(uint8_t action);
+
+//* Each switch owns its click map. Declared before setup_button_interrupt() stores
+//* them in the wiring table; defined with the rest of the gesture code below.
+void touch_click_resolve(uint8_t clicks);
+void boot_click_resolve(uint8_t clicks);
 
 /*
 ADC_ATTEN_DB_2_5
@@ -136,25 +147,32 @@ void boot_rail_note_step(const char *step)
 }
 
 //* ---------------------- USER INPUTS ----------------------
-//? Two switches on this board, both reported live on the configuration page (the
-//? table below is what webpage_handle_buttons() walks):
+//? Two switches, both reported live on the configuration page (the table below is
+//? what webpage_handle_buttons() walks). They are deliberately not two copies of
+//? the same interface:
 //?
-//?   touch_button  GPIO3  The touch module. It drives the pin HIGH while it is
-//!                        touched. HARDWARE DAMAGED on this board: the pad still
-//?                        measures a clean 3.3 V but the pin reads LOW and never
-//!                        latches an edge, so nothing here fires any more. Kept
-//*                        for the repair that clamps BT1 below 3.3 V.
-//?                          1 s hold - switch to the next LED mode (on release)
-//?                          5 s hold - cut the battery latch and power down
-//?   boot_button   GPIO9  The C3 Supermini's BOOT switch, HIGH while idle and
-//?                        pulled LOW while it is held. This is now the whole user
-//!                        interface, because it is on the module itself and so is
-//*                        unaffected by anything done to the carrier board:
+//?   touch_button  GPIO3  The touch module on the carrier board. It drives the pin
+//?                        HIGH while it is touched. This is the DAILY button, and
+//?                        on the current unit the module works as intended:
 //?                          1 click   - next LED mode
 //?                          2 clicks  - previous LED mode
 //?                          5 clicks  - cut the battery latch and power down
 //?                          3 s hold  - toggle offline mode (on release)
-//?                          6 s hold  - reopen the WiFi config hotspot (on release)
+//?                          6 s hold  - reboot into the WiFi config hotspot (on release)
+//?                        Its 1 s hold no longer changes the mode and its 5 s hold no
+//?                        longer powers down: those gestures moved to the click
+//?                        ladder, which is what the 1/2/5-click window is for.
+//?                        A repaired board that still cannot see this pad loses
+//?                        nothing - GPIO9 below carries a complete fallback.
+//?   boot_button   GPIO9  The C3 Supermini's BOOT switch, HIGH while idle and
+//?                        pulled LOW while it is held. It is the SECURITY and
+//?                        RECOVERY button: it lives on the module itself, so it
+//?                        survives anything done to the carrier board, and it is
+//?                        the one switch that can wipe the saved networks.
+//?                          1 click   - previous LED mode (fallback navigation)
+//?                          5 clicks  - cut the battery latch and power down
+//?                          3 s hold  - toggle offline mode (on release)
+//?                          6 s hold  - reboot into the WiFi config hotspot (on release)
 //?                          10 s hold - wipe the saved networks and the page login
 //?                        Holding it through a reset is still the ROM's
 //?                        download-mode request, which no sketch can see or use.
@@ -166,8 +184,8 @@ void boot_rail_note_step(const char *step)
 //!
 //! Clicks are a different problem, and they are NOT solved here: whether a short
 //! press is the start of a 1-, 2- or 5-click gesture cannot be known until the
-//! user stops clicking, so button_finalize() only reports SHORT and
-//* check_boot_button() groups them across BUTTON_CLICK_GAP_MS.
+//! user stops clicking, so button_finalize() only reports SHORT and the two
+//* check functions group clicks across BUTTON_CLICK_GAP_MS.
 //!
 //! An ISR only latches an edge. The classification, the actions and every number
 //! the page draws are polled from loop(), so a press never sits inside a wait
@@ -176,6 +194,10 @@ void boot_rail_note_step(const char *step)
 //! the page could only be answered after the finger came off, a 1 s press froze
 //! the strip and the HTTP service alike, and a held switch was invisible to
 //! /api/buttons however fast the page polled.
+//!
+//! Both switches pay the click window on every tap, because both now carry a
+//* 5-click gesture. A mode change therefore lands BUTTON_CLICK_GAP_MS after the
+//? finger lifts - the same 400 ms tax the single-button firmware already paid.
 
 //* ---------------------- TOUCH MODULE POLARITY ----------------------
 //! The pad is an EXTERNAL module plugged into TOUCH1, not the chip's own sensing.
@@ -201,27 +223,19 @@ void boot_rail_note_step(const char *step)
 //? and the ISR edge follows that same flag in setup_button_interrupt().
 //* tools/button_probe/ (environment C3-PROBE) measures which one this module is.
 
-#define BUTTON_LONG_PRESS_MS 1000  // Touch held past this: next LED mode
-#define BUTTON_POWER_HOLD_MS 5000  // Touch held past this: latch off, power down
-
-//* ---------------------- BOOT BUTTON GESTURES ----------------------
-//? Every user-facing gesture now lives on ONE switch, GPIO9, because GPIO3 is
-//! hardware-damaged on this board (the input buffer stopped responding while the
-//? pad still measured a clean 3.3 V). GPIO9 is on the SuperMini module itself, so
-//* it survives any repair done to the carrier board.
+//* ---------------------- SHARED HOLD THRESHOLDS ----------------------
+//? Both switches now carry the same two holds, so the threshold is a property of
+//? the gesture rather than of the switch:
 //?
-//?   1 click    -> next LED mode      (fires BUTTON_CLICK_GAP_MS after the release)
-//?   2 clicks   -> previous LED mode
-//?   5 clicks   -> cut the power latch
-//?   >= 3 s     -> toggle the radio: offline mode on/off
-//?   >= 6 s     -> reboot into the WiFi config hotspot
-//?   >= 10 s    -> recovery wipe: saved networks and page login
+//?   >= 3 s, then release -> toggle the radio: offline mode on/off
+//?   >= 6 s, then release -> reboot into the WiFi config hotspot
+//?   >= 10 s, then release -> recovery wipe, BOOT SWITCH ONLY
 //?
 //? Clicks and holds are told apart by HOW LONG THE PRESS WAS, not by two separate
 //* counters racing each other: a press that outlasts BUTTON_CLICK_MAX_MS is a hold
 //* candidate and can never be counted as a click.
-#define BUTTON_WIFI_HOLD_MS 3000   // Boot: released past this -> radio on/off
-#define BUTTON_PORTAL_HOLD_MS 6000 // Boot: released past this -> the config portal
+#define BUTTON_WIFI_HOLD_MS 3000   // Released past this -> radio on/off
+#define BUTTON_PORTAL_HOLD_MS 6000 // Released past this -> the config portal
 
 //* The gesture window for the click counts.
 //? Telling one click from two - and two from five - cannot be done on a release,
@@ -235,6 +249,9 @@ void boot_rail_note_step(const char *step)
 //* (say 1.5 s) is classified SHORT and silently counted as one click of a gesture
 //? the user never intended.
 #define BUTTON_CLICK_MAX_MS 600
+//* Five clicks is the most any switch recognises, and the count that fires the
+//* power latch. A sixth tap in the same burst is simply the next gesture.
+#define BUTTON_CLICK_MAX_COUNT 5
 
 #define BUTTON_RECOVERY_WARN_MS 3000 // Countdown blink before the recovery hold is reached
 #define BUTTON_RECOVERY_BLINK_MS 400 // One pulse of that countdown
@@ -243,17 +260,19 @@ void boot_rail_note_step(const char *step)
 //* the login has been forgotten or the saved networks are all gone, without a
 //? cable and without a reflash, and it is deliberately the only thing in this
 //* firmware that erases settings.
+//! Touch deliberately has no recovery hold (0 in its wiring entry). The wipe is a
+//* security action and stays on the switch that is part of the module itself.
 #define BUTTON_BOOT_RECOVERY_MS 10000
 
-//! The boot button's actions fire on RELEASE, not at the threshold, and two of
-//! them restart the board: a C3 reset with GPIO9 still held enters the ROM's
-//? download mode instead of running the firmware, so the board would look bricked
-//! until the button was let go. That is why this give-up sits ABOVE every
-//? threshold that acts, and why a hold long enough to be beyond doubt is not a
-//* press at all - it is classified and dropped instead of firing anything.
+//! Both switches' actions fire on RELEASE, not at the threshold, and two of them
+//! restart the board: a C3 reset with GPIO9 still held enters the ROM's download
+//? mode instead of running the firmware, so the board would look bricked until the
+//! button was let go. That is why this give-up sits ABOVE every threshold that
+//? acts, and why a hold long enough to be beyond doubt is not a press at all - it
+//* is classified and dropped instead of firing anything.
 //? It is also what makes the wipe safe to hang off a long hold: a switch shorted
 //* to ground never releases, so a jammed GPIO9 can never confirm one.
-#define BUTTON_BOOT_GIVE_UP_MS 15000
+#define BUTTON_GIVE_UP_MS 15000
 #define BUTTON_IRQ_DEBOUNCE_MS 50      // ISR-level: ignore edges closer together than this
 #define BUTTON_RELEASE_DEBOUNCE_MS 30  // The pin must read released this long to count as released
 #define BUTTON_MULTI_PRESS_GAP_MS 5000 // Gap that restarts the running press counter shown on the page
@@ -273,8 +292,8 @@ void boot_rail_note_step(const char *step)
 
 //* Event codes, reported to the page as last_event. They describe what the
 //? SWITCH did; what the firmware DOES about it is the button's `action`/`role`
-//* text, because the same "held to its threshold" means power-off on one switch
-//* and a config portal on the other.
+//* text, because the same "held to its threshold" means the radio on the 3 s
+//* threshold and the config portal on the 6 s one.
 enum : uint8_t
 {
     BUTTON_EVENT_NONE = 0,
@@ -283,12 +302,18 @@ enum : uint8_t
     BUTTON_EVENT_STUCK,  // Still down at monitor_timeout_ms: classified and let go
     BUTTON_EVENT_ACTION, // Held past action_hold_ms: this switch's action ran
     BUTTON_EVENT_TRIPLE, // Legacy: no longer produced. Clicks are grouped by the
-                         // caller now (check_boot_button), so three presses are just
-                         // three SHORT events and the gesture layer decides.
+                         // caller now (check_button / check_boot_button), so three
+                         // presses are just three SHORT events and the gesture
+                         // layer decides.
     //! Appended, never inserted: the page maps these numbers to names of its own,
     //* and a reordering would relabel every press already on its way out.
     BUTTON_EVENT_RECOVERY // Held to recovery_hold_ms and released: the wipe ran
 };
+
+//* What a completed group of clicks means on one switch. Each switch supplies its
+//? own resolver, so the same 1-click event can be "next" on the touch pad and
+//* "previous" on the BOOT switch without either caller knowing about the other.
+typedef void (*button_click_handler)(uint8_t clicks);
 
 typedef struct buttonInput
 {
@@ -298,10 +323,12 @@ typedef struct buttonInput
     const char *label;    // Human readable name shown in the UI
     const char *role;     // What the firmware does with it, shown in the UI
     const char *action;   // Short name of the action_hold_ms action, shown in the UI
+    const char *long_action; // Short name of the long_press_ms action, shown in the UI
     uint32_t long_press_ms;    // 0 = a long hold means nothing here
     uint32_t action_hold_ms;   // 0 = this switch has no held action
     uint32_t recovery_hold_ms; // 0 = this switch has no recovery hold
     uint32_t monitor_timeout_ms;
+    button_click_handler click_resolve; // Called when a click burst is complete
 
     //* ISR-owned. Nothing else touches these two.
     volatile bool irq_pending;
@@ -317,6 +344,8 @@ typedef struct buttonInput
     uint32_t event_count;        // Completed presses since boot
     uint8_t last_event;
     uint8_t counter;             // Multi-press count in the current window
+    uint8_t click_count;         // Clicks accumulated toward the 1/2/5 gesture
+    uint32_t click_last_ms;      // When the last click of that burst landed
 } struct_buttonInput;
 
 struct_buttonInput touch_button;
@@ -354,7 +383,7 @@ const char *button_event_name(const struct_buttonInput &b)
     case BUTTON_EVENT_SHORT:
         return "short press";
     case BUTTON_EVENT_LONG:
-        return "long press";
+        return (b.long_action != nullptr) ? b.long_action : "long press";
     case BUTTON_EVENT_STUCK:
         return "held past the timeout";
     case BUTTON_EVENT_ACTION:
@@ -389,9 +418,10 @@ void IRAM_ATTR boot_button_isr() { button_latch(&boot_button); }
 //? so idle is HIGH and the pullup defines it.
 void button_input_configure(struct_buttonInput &b, uint8_t pin, bool active_high,
                             const char *key, const char *label, const char *role,
-                            const char *action, uint32_t long_press_ms,
-                            uint32_t action_hold_ms, uint32_t recovery_hold_ms,
-                            uint32_t monitor_timeout_ms)
+                            const char *action, const char *long_action,
+                            uint32_t long_press_ms, uint32_t action_hold_ms,
+                            uint32_t recovery_hold_ms, uint32_t monitor_timeout_ms,
+                            button_click_handler click_resolve)
 {
     b.pin = pin;
     b.active_high = active_high;
@@ -399,10 +429,12 @@ void button_input_configure(struct_buttonInput &b, uint8_t pin, bool active_high
     b.label = label;
     b.role = role;
     b.action = action;
+    b.long_action = long_action;
     b.long_press_ms = long_press_ms;
     b.action_hold_ms = action_hold_ms;
     b.recovery_hold_ms = recovery_hold_ms;
     b.monitor_timeout_ms = monitor_timeout_ms;
+    b.click_resolve = click_resolve;
     b.irq_pending = false;
     b.irq_time = 0;
     b.pressed = false;
@@ -413,6 +445,8 @@ void button_input_configure(struct_buttonInput &b, uint8_t pin, bool active_high
     b.event_count = 0;
     b.last_event = BUTTON_EVENT_NONE;
     b.counter = 0;
+    b.click_count = 0;
+    b.click_last_ms = 0;
 
     pinMode(b.pin, b.active_high ? INPUT_PULLDOWN : INPUT_PULLUP);
 }
@@ -426,20 +460,21 @@ void setup_button_interrupt()
     //? above). A push-pull active-HIGH module, which is what this call declares,
     //* produces a rising edge on touch.
     //! A module that holds its output active after a tap (the latching, toggle-wired
-    //! kind) would read as one endless press here and power the board down at
-    //! BUTTON_POWER_HOLD_MS - this firmware assumes the momentary behaviour, where
-    //! the active level lasts exactly as long as the touch does.
-    //? Its monitor timeout IS its power-off threshold: the power-off fires while
-    //? the pad is still held, because a finger resting on it after the latch drops
-    //? is not a press anyone needs to see the end of.
-    //? The touch button has no recovery hold: the 0 below says so, and the pair
-    //* that follows is its action threshold and its monitor timeout, which are the
-    //* same number by design.
+    //! kind) would read as one endless press here and reach the give-up timeout.
+    //* This firmware assumes the momentary behaviour, where the active level lasts
+    //? exactly as long as the touch does.
+    //? Its monitor timeout is the give-up, not an action: a hold that outlasts it is
+    //* classified and dropped. The 0 in the recovery slot says this switch has no
+    //? recovery wipe - that security action stays on GPIO9, which is part of the
+    //* module itself.
     button_input_configure(touch_button, button_pin, true, "touch", "Touch button (GPIO3)",
-                           "1 s press: next LED mode. 5 s press: power off at the latch.",
-                           "power off",
-                           BUTTON_LONG_PRESS_MS, BUTTON_POWER_HOLD_MS, 0,
-                           BUTTON_POWER_HOLD_MS);
+                           "1 click: next mode. 2 clicks: previous mode. "
+                           "5 clicks: power off. "
+                           "3 s hold, then release: toggle the radio (offline mode). "
+                           "6 s hold, then release: reboot into the WiFi config hotspot.",
+                           "config portal", "radio on/off",
+                           BUTTON_WIFI_HOLD_MS, BUTTON_PORTAL_HOLD_MS, 0,
+                           BUTTON_GIVE_UP_MS, touch_click_resolve);
     attachInterrupt(digitalPinToInterrupt(touch_button.pin), touch_button_isr,
                     touch_button.active_high ? RISING : FALLING);
 
@@ -448,20 +483,22 @@ void setup_button_interrupt()
     //! Supermini pulls it up, so the switch reads HIGH when idle and LOW while it
     //! is held - which is what the pressed/released test and the flag-derived
     //* falling edge below both assume.
-    //? Four holds, and their thresholds are what separate them: 1 s..5 s is the
-    //? offline toggle (BUTTON_EVENT_LONG), 5 s..10 s is the portal
-    //? (BUTTON_EVENT_ACTION), 10 s and over, once released, is the recovery wipe
-    //? (BUTTON_EVENT_RECOVERY). Anything under a second is only counted, and a
-    //! hold that outlasts the give-up is dropped rather than fired.
+    //? This is the security and recovery switch, and its gestures are the fallback
+    //? navigation when the touch pad is unavailable: 1 click goes BACK one mode
+    //? (repeated clicks can walk the whole registry), 5 clicks power off, 3 s
+    //? toggles the radio, 6 s opens the portal, 10 s wipes the saved networks and
+    //? the page login. A tap under BUTTON_CLICK_MAX_MS is counted toward the 1/2/5
+    //* ladder; a press between that and 3 s is dropped, and a hold past the
+    //* give-up is dropped too.
     button_input_configure(boot_button, (uint8_t)prog_switch, false, "boot", "Boot button (GPIO9)",
-                           "1 click: next mode. 2 clicks: previous mode. "
+                           "1 click: previous mode (fallback navigation). "
                            "5 clicks: power off. "
                            "3 s hold, then release: toggle the radio (offline mode). "
                            "6 s hold, then release: reboot into the WiFi config hotspot. "
                            "10 s hold, then release: wipe the saved networks and the page login.",
-                           "config portal",
+                           "config portal", "radio on/off",
                            BUTTON_WIFI_HOLD_MS, BUTTON_PORTAL_HOLD_MS, BUTTON_BOOT_RECOVERY_MS,
-                           BUTTON_BOOT_GIVE_UP_MS);
+                           BUTTON_GIVE_UP_MS, boot_click_resolve);
     //? The edge follows the flag here too, for the same reason as the touch button:
     //* active_high = false is what makes this FALLING, so the two cannot disagree.
     attachInterrupt(digitalPinToInterrupt(boot_button.pin), boot_button_isr,
@@ -470,10 +507,9 @@ void setup_button_interrupt()
 
 //* Cut the battery latch and restart. The latch holds the board's own supply, so
 //* this is the only power switch the device has.
-//? Moved here from loop() in main.cpp, where it fired on any press of this same
-//! switch once five seconds had passed since boot - which would have collided
-//! with the press the mode switch now uses. The hold is what tells the two apart,
-//! and only the state machine below measures it.
+//? Fired by five clicks on either switch. It used to be a five-second hold on the
+//! touch pad; moving it to the click ladder freed the holds for the radio and the
+//* portal, which are the two things a user standing at the board actually needs.
 //!
 //! Refused for the first POWER_OFF_ARM_MS of wall clock. The check lives here,
 //? at the single choke point, rather than at the caller, so a future second
@@ -490,12 +526,19 @@ void power_off_sequence()
         return;
     }
 
-    Serial.printf("[POWER] Off at %lu ms\n", (unsigned long)millis());
-    onboard_led.setPixelColor(0, strip.Color(55, 0, 30));
-    onboard_led.show();
+    Serial.printf("[POWER] Latch cut at %lu ms\n", (unsigned long)millis());
+    //* Red, steady, on both WS2812B channels. This is the last thing the board
+    //? shows, so it has to be readable in one glance and it has to be red: the
+    //* user is about to lose the device and has one second to change their mind.
+    ui_action_feedback(UI_ACTION_POWER_OFF);
     delay(1000);                     // Long enough to see it, short enough not to be a wait
     digitalWrite(latch_enable, LOW); // Deactivate latch to shutdown
     delay(100);                      // Wait for the latch to settle
+    //! A board on USB power stays alive after the latch opens, so what follows is
+    //? a restart, not a shutdown. Say so: the serial log would otherwise look like
+    //* a power-off that failed. On battery the rail collapses before this prints.
+    Serial.println("[POWER] Still powered after the latch cut - USB supply, restarting");
+    Serial.flush();
     ESP.restart();
 }
 
@@ -521,15 +564,45 @@ void recovery_boot()
     wifi_recovery_wipe();
     webpage_auth_clear();
 
-    //* Magenta, and held long enough to read: this is the last thing the board
-    //? shows before it comes back with no network and no login, and a user who
-    //* did not mean it has exactly this moment to pull the power.
-    onboard_led.setPixelColor(0, strip.Color(45, 0, 45));
-    onboard_led.show();
+    //* Magenta, held long enough to read: this is the last thing the board shows
+    //? before it comes back with no network and no login, and a user who did not
+    //* mean it has exactly this moment to pull the power.
+    ui_action_feedback(UI_ACTION_RECOVERY_WIPE);
     delay(1200);
 
     Serial.println("[REC] Rebooting - the config hotspot opens on the way up");
     Serial.flush();
+    ESP.restart();
+}
+
+//* ---------------------- HELD ACTIONS ----------------------
+//? Two holds are shared by both switches, so their feedback is shared too. The
+//? colour for each one lives in services/led_scripts.h; these functions only say
+//* which action happened.
+
+//* The 3 s hold: flip the radio, live and persistently.
+//? The colour follows where the radio ENDED UP, not which direction the switch
+//? was flipped: a board with no credentials falls straight back to offline even
+//? when the user asked for radio on, and painting that green would be a lie.
+void radio_toggle_action(const char *source)
+{
+    Serial.printf("[BUTTON] %s: held to the wifi threshold - toggling the radio\n", source);
+    wifi_toggle_offline();
+    ui_action_feedback(net_state == NET_OFFLINE ? UI_ACTION_RADIO_OFF : UI_ACTION_RADIO_ON);
+}
+
+//* The 6 s hold: leave a portal request in NVS and restart into it.
+//? This is a restart rather than a live portal because port 80 belongs to the
+//! configuration page once the board has joined a network, and WiFiManager's
+//? portal needs that port for its own server. setup_WIFI() consumes the request
+//? on the way up; the reboot also means the feedback below is the last frame the
+//* user sees, so it is allowed to block for 400 ms.
+void config_portal_action(const char *source)
+{
+    Serial.printf("[BUTTON] %s: held to the hotspot threshold - rebooting into the config hotspot\n", source);
+    wifi_request_portal_on_boot();
+    ui_action_feedback(UI_ACTION_CONFIG_PORTAL);
+    delay(400); // Long enough to see it; loop() is about to end anyway
     ESP.restart();
 }
 
@@ -556,13 +629,12 @@ void button_finalize(struct_buttonInput &b, uint32_t held_ms, bool stuck)
         b.counter = 0;
     }
     //* This switch's action threshold next: it is the longest hold that fires
-    //? while still held, and on the touch button it takes the board away, so no
-    //* later branch could matter.
-    //? A press that was given up on still resolves to the action only when the
-    //? action threshold IS the monitor timeout - the touch button's power-off,
-    //! which is meant to fire with the pad still under a finger. The boot
-    //* button's thresholds are not the same number, so a jammed GPIO9 now stops
-    //? at STUCK instead of requesting a config portal on every single boot.
+    //? while still held, and on both switches that is the config portal (which
+    //* restarts the board).
+    //? A press that was given up on resolves to the action only when the action
+    //? threshold IS the monitor timeout. Neither switch has that arrangement any
+    //! more, so a jammed switch now stops at STUCK instead of requesting a config
+    //* portal on every single boot.
     else if (b.action_hold_ms != 0 && held_ms >= b.action_hold_ms &&
              (!stuck || b.action_hold_ms == b.monitor_timeout_ms))
     {
@@ -583,9 +655,9 @@ void button_finalize(struct_buttonInput &b, uint32_t held_ms, bool stuck)
     {
         //* A short press is a CLICK CANDIDATE and nothing more.
         //? Grouping clicks into the 1/2/5 gestures belongs to the caller
-        //! (check_boot_button), because only the caller knows the click window and
-        //? can tell whether another press is still coming. This function classifies
-        //* ONE press and has no idea what follows it.
+        //! (check_button / check_boot_button), because only the caller knows the
+        //? click window and can tell whether another press is still coming. This
+        //* function classifies ONE press and has no idea what follows it.
         b.last_event = BUTTON_EVENT_SHORT;
         b.counter++;
     }
@@ -634,7 +706,7 @@ void button_poll(struct_buttonInput &b)
     const uint32_t held = now - b.press_start_ms;
 
     //* Held past the point where waiting can teach us anything: classify and drop
-    //* the press. For the touch button this is where the power-off fires.
+    //* the press. Neither switch acts at this point; it is the jammed-switch guard.
     if (held >= b.monitor_timeout_ms)
     {
         button_finalize(b, held, true);
@@ -662,7 +734,108 @@ void button_poll(struct_buttonInput &b)
     button_finalize(b, held, false);
 }
 
-//* The touch button: mode switching and the power latch.
+//* ---------------------- CLICK GESTURES ----------------------
+//? button_poll() only says "a short press ended". Whether that press is tap 1 of
+//? a 5-click shutdown or a completed single click is decided here, once the click
+//* window has closed - or immediately when the count can no longer grow.
+
+//* Count one completed tap and fire a gesture if the burst is already complete.
+void button_clicks_add(struct_buttonInput &b)
+{
+    b.click_count++;
+    b.click_last_ms = millis();
+
+    //* Fire the five-click power-off the instant the count arrives instead of
+    //? waiting the window out: the count cannot grow past it and the user has
+    //* already said everything there is to say.
+    if (b.click_count >= BUTTON_CLICK_MAX_COUNT)
+    {
+        const uint8_t clicks = b.click_count;
+        b.click_count = 0;
+        b.click_resolve(clicks);
+    }
+}
+
+//* Resolve a burst once the click window closes.
+//! `!b.pressed` matters. Without it a click followed straight away by a hold
+//? would resolve during the hold - switching the mode at 400 ms and then doing
+//* the hold action on release, two actions from one intention. While a press is
+//? in flight the count is left pending; a hold branch clears it, so the hold wins.
+void button_clicks_poll(struct_buttonInput &b)
+{
+    if (b.click_count == 0 || b.pressed)
+        return;
+    if ((millis() - b.click_last_ms) < BUTTON_CLICK_GAP_MS)
+        return;
+
+    const uint8_t clicks = b.click_count;
+    b.click_count = 0;
+    b.click_resolve(clicks);
+}
+
+//* The touch pad's click map: the daily direction, plus the shared power-off.
+//? 3 and 4 clicks have no gesture of their own. They are answered with the dim
+//! red "nothing here" flash rather than mapped onto a neighbour: a half-finished
+//? 5-click shutdown must not switch the mode on its way past.
+void touch_click_resolve(uint8_t clicks)
+{
+    switch (clicks)
+    {
+    case 1:
+        Serial.println("[BUTTON] touch: 1 click - next mode");
+        led_mode_next();
+        ui_action_feedback(UI_ACTION_MODE_NEXT);
+        break;
+    case 2:
+        Serial.println("[BUTTON] touch: 2 clicks - previous mode");
+        led_mode_prev();
+        ui_action_feedback(UI_ACTION_MODE_PREV);
+        break;
+    case 5:
+        //* Five deliberate clicks is hard to do by accident, which is why the
+        //! power latch is allowed to hang off it at all. power_off_sequence()
+        //* still refuses for the first POWER_OFF_ARM_MS of wall clock.
+        Serial.println("[BUTTON] touch: 5 clicks - power off");
+        power_off_sequence();
+        break;
+    default:
+        Serial.printf("[BUTTON] touch: %u clicks - no gesture, ignored\n", (unsigned)clicks);
+        ui_action_feedback(UI_ACTION_IGNORED);
+        break;
+    }
+}
+
+//* The BOOT switch's click map: one step BACK, plus the shared power-off.
+//? One click is the whole mode fallback. It only walks backwards, but repeated
+//? clicks reach every entry in the registry, which is exactly what a board with a
+//* dead touch pad needs. A second click does not add a forward step: the fallback
+//? should be one unambiguous gesture, not a second ladder to learn.
+void boot_click_resolve(uint8_t clicks)
+{
+    switch (clicks)
+    {
+    case 1:
+        Serial.println("[BUTTON] boot: 1 click - previous mode");
+        led_mode_prev();
+        ui_action_feedback(UI_ACTION_MODE_PREV);
+        break;
+    case 5:
+        Serial.println("[BUTTON] boot: 5 clicks - power off");
+        power_off_sequence();
+        break;
+    default:
+        Serial.printf("[BUTTON] boot: %u clicks - no gesture, ignored\n", (unsigned)clicks);
+        ui_action_feedback(UI_ACTION_IGNORED);
+        break;
+    }
+}
+
+//* The touch pad: the daily interface.
+//?   1 click  next mode, 2 clicks previous mode, 5 clicks power off,
+//*   >= 3 s   radio on/off, >= 6 s config hotspot.
+//! Every hold resolves on RELEASE. Two of them restart the board, and a C3 reset
+//? with GPIO9 still held lands in the ROM's download mode instead of the
+//* firmware - the board would look bricked until the button was let go.
 void check_button()
 {
     const uint32_t before = touch_button.event_count;
@@ -671,73 +844,54 @@ void check_button()
     //? event_count is the "a press completed on this pass" signal: last_event
     //! describes the previous press too, so acting on it directly would repeat the
     //! action on every pass of loop() until the next press.
-    if (touch_button.event_count == before)
-        return;
-
-    if (touch_button.last_event == BUTTON_EVENT_ACTION)
+    if (touch_button.event_count != before)
     {
-        power_off_sequence();
-        return; // Not reached: the board restarts
+        switch (touch_button.last_event)
+        {
+        case BUTTON_EVENT_ACTION: // >= 6 s
+            touch_button.click_count = 0;
+            config_portal_action("touch");
+            return; // Not reached: the board restarts
+
+        case BUTTON_EVENT_LONG: // >= 3 s
+            touch_button.click_count = 0;
+            radio_toggle_action("touch");
+            return;
+
+        case BUTTON_EVENT_SHORT:
+            //! A press that outlasted BUTTON_CLICK_MAX_MS is not a tap, even
+            //? though it is far too short to reach any hold threshold. Counting it
+            //* as a click would let a slow, hesitant press switch the mode.
+            if (touch_button.hold_ms <= BUTTON_CLICK_MAX_MS)
+            {
+                button_clicks_add(touch_button);
+                return;
+            }
+
+            //* Too long to be a click: it cancels whatever clicks were pending,
+            //* because the user has visibly moved on to a different intention.
+            touch_button.click_count = 0;
+            Serial.printf("[BUTTON] touch: released after %u ms - too long for a click, "
+                          "too short for a hold\n",
+                          (unsigned)touch_button.hold_ms);
+            return;
+
+        default: // STUCK: given up on, never a gesture
+            touch_button.click_count = 0;
+            return;
+        }
     }
 
-    if (touch_button.last_event == BUTTON_EVENT_LONG)
-    {
-        //* Switch to next mode
-        //? The registry walk, the wrap-around and the NVS save all live in
-        //? led_mode_next() (services/led_scripts.h), so the button path and the
-        //? webpage's POST /api/mode change the mode the same way.
-        led_mode_next();
-    }
-
-    //* BUTTON_EVENT_SHORT needs no action on this switch: it is only counted and
-    //* reported. The touch button has no click gestures - the boot button owns
-    //* them, and grouping a click into a gesture needs the click window that
-    //* check_boot_button() keeps.
+    button_clicks_poll(touch_button);
 }
 
-//* Clicks waiting to be resolved into a gesture, and when the last one landed.
-//? loop()-owned, like the rest of the button state. The count is only ever
-//* reported ONCE, when the window closes, so a gesture cannot fire twice.
-uint8_t boot_click_count = 0;
-uint32_t boot_click_last_ms = 0;
-
-//* Act on a group of clicks that is now known to be complete.
-//? 3 and 4 clicks have no gesture of their own. They are dropped rather than
-//! mapped onto a neighbour: a half-finished 5-click shutdown must not switch the
-//? mode on its way past, and the user's intent there is simply unknown.
-void boot_gesture_resolve(uint8_t clicks)
-{
-    switch (clicks)
-    {
-    case 1:
-        //* Same path as the page's POST /api/mode, so the registry walk, the
-        //* wrap-around and the NVS save all stay in one place.
-        Serial.println("[BUTTON] boot: 1 click - next mode");
-        led_mode_next();
-        break;
-    case 2:
-        Serial.println("[BUTTON] boot: 2 clicks - previous mode");
-        led_mode_prev();
-        break;
-    case 5:
-        //* Five deliberate clicks is hard to do by accident, which is why the
-        //! power latch is allowed to hang off it at all. power_off_sequence()
-        //* still refuses for the first POWER_OFF_ARM_MS of wall clock.
-        Serial.println("[BUTTON] boot: 5 clicks - power off");
-        power_off_sequence();
-        break;
-    default:
-        Serial.printf("[BUTTON] boot: %u clicks - no gesture, ignored\n", (unsigned)clicks);
-        break;
-    }
-}
-
-//* The boot button, and now the ONLY user input this board still has.
-//?   1 click  next mode, 2 clicks previous mode, 5 clicks power off,
+//* The BOOT switch: the security and recovery interface, with mode navigation as
+//? the fallback when the touch pad cannot be used.
+//?   1 click  previous mode, 5 clicks power off,
 //*   >= 3 s   radio on/off, >= 6 s config hotspot, >= 10 s recovery wipe.
-//! Every hold resolves on RELEASE. Two of them restart the board, and a C3 reset
-//? with GPIO9 still held lands in the ROM's download mode instead of the
-//* firmware - the board would look bricked until the button was let go.
+//! Every hold resolves on RELEASE, and the two rebooting holds are why: a C3
+//? reset with GPIO9 still held lands in the ROM's download mode instead of the
+//* firmware, so the board would look bricked until the button was let go.
 void check_boot_button()
 {
     const uint32_t before = boot_button.event_count;
@@ -785,33 +939,20 @@ void check_boot_button()
         switch (boot_button.last_event)
         {
         case BUTTON_EVENT_RECOVERY:
-            boot_click_count = 0;
+            boot_button.click_count = 0;
             recovery_boot();
             return; // Not reached: the board restarts
 
         case BUTTON_EVENT_ACTION: // >= 6 s
-            //* Reopen the config portal by restarting into it. See the note over
-            //? wifi_request_portal_on_boot() in services/wifi_settings.h for why
-            //? this is not a call to WiFiManager from here: port 80 belongs to the
-            //! configuration page once the board has joined a network, and
-            //! startConfigPortal() would block loop() for the whole window on top
-            //* of that.
-            boot_click_count = 0;
-            wifi_request_portal_on_boot();
-
-            Serial.println("[BUTTON] boot: held to the hotspot threshold - rebooting into the config hotspot");
-            onboard_led.setPixelColor(0, strip.Color(0, 40, 60)); // Blue: portal, not power
-            onboard_led.show();
-            delay(400); // Long enough to see it; loop() is about to end anyway
-            ESP.restart();
-            return;
+            boot_button.click_count = 0;
+            config_portal_action("boot");
+            return; // Not reached: the board restarts
 
         case BUTTON_EVENT_LONG: // >= 3 s
-            boot_click_count = 0;
-            //! This is the only switch that changes the radio, so it is also the
-            //* only way out of offline mode without a reflash - it always acts.
-            Serial.println("[BUTTON] boot: held to the wifi threshold - toggling the radio");
-            wifi_toggle_offline();
+            boot_button.click_count = 0;
+            //! This is the only switch that changes the radio from a board whose
+            //* touch pad has failed, so it always acts.
+            radio_toggle_action("boot");
             return;
 
         case BUTTON_EVENT_SHORT:
@@ -820,47 +961,24 @@ void check_boot_button()
             //* as a click would let a slow, hesitant press switch the mode.
             if (boot_button.hold_ms <= BUTTON_CLICK_MAX_MS)
             {
-                boot_click_count++;
-                boot_click_last_ms = millis();
-
-                //* Fire the shutdown the instant the count arrives instead of
-                //? waiting the window out: the count cannot grow past it and the
-                //* user has already said everything there is to say.
-                if (boot_click_count >= 5)
-                {
-                    const uint8_t clicks = boot_click_count;
-                    boot_click_count = 0;
-                    boot_gesture_resolve(clicks);
-                }
+                button_clicks_add(boot_button);
                 return;
             }
 
             //* Too long to be a click: it cancels whatever clicks were pending,
             //* because the user has visibly moved on to a different intention.
-            boot_click_count = 0;
+            boot_button.click_count = 0;
             Serial.printf("[BUTTON] boot: released after %u ms - too long for a click, "
                           "too short for a hold\n",
                           (unsigned)boot_button.hold_ms);
             return;
 
         default: // STUCK: given up on, never a gesture
-            boot_click_count = 0;
+            boot_button.click_count = 0;
             return;
         }
     }
 
-    //* The window closed with clicks still pending: the gesture is complete.
-    //! `!boot_button.pressed` matters. Without it a click followed straight away
-    //? by a hold would resolve its count DURING the hold - switching the mode at
-    //* 400 ms and then toggling the radio on release, two actions from one
-    //? intention. While a press is in flight the count is simply left pending; if
-    //! that press turns into a hold, the branches above clear it, so the hold wins.
-    if (boot_click_count > 0 && !boot_button.pressed &&
-        (millis() - boot_click_last_ms) >= BUTTON_CLICK_GAP_MS)
-    {
-        const uint8_t clicks = boot_click_count;
-        boot_click_count = 0;
-        boot_gesture_resolve(clicks);
-    }
+    button_clicks_poll(boot_button);
 }
 #endif // SERVICE_READINGS

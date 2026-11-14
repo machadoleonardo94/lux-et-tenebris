@@ -458,11 +458,12 @@ void webpage_handle_buttons()
   const uint32_t now = millis();
 
   String json;
-  //? Two switches, so roughly twice the old single-button document.
-  json.reserve(768);
-  //* The mode the firmware is actually on. A 1 s press on the touch button
-  //! changes it on the device, and the page's mode buttons have to notice that
-  //! without waiting for its own slower /api/state poll.
+  //? Two switches, plus the click and hold vocabulary the page explains around
+  //* them.
+  json.reserve(1024);
+  //* The mode the firmware is actually on. A click on the touch pad changes it on
+  //! the device, and the page's mode buttons have to notice that without waiting
+  //* for its own slower /api/state poll.
   json += F("{\"mode\":");
   json += String(mode);
   //* The thresholds that are not per-switch, sent once instead of in each row.
@@ -470,7 +471,7 @@ void webpage_handle_buttons()
   //* each panel. The gesture window that actually drives behaviour is click_gap_ms:
   //? the wait after the last click before the firmware decides which gesture the
   //! user made. triple_count is gone - clicks are grouped by the caller now, so
-  //* three presses are just three SHORT events (see check_boot_button()).
+  //* three presses are just three SHORT events (see check_button/check_boot_button).
   json += F(",\"multi_gap_ms\":");
   json += String(BUTTON_MULTI_PRESS_GAP_MS);
   json += F(",\"click_gap_ms\":");
@@ -495,6 +496,8 @@ void webpage_handle_buttons()
     json += webpage_json_escape(b->role);
     json += F("\",\"action\":\"");
     json += webpage_json_escape(b->action);
+    json += F("\",\"long_action\":\"");
+    json += webpage_json_escape(b->long_action);
     json += F("\",\"pin\":");
     json += String(b->pin);
     json += F(",\"pressed\":");
@@ -1755,8 +1758,8 @@ function netRender(w) {
   } else if (w.offline) {
     netInfo('Offline mode: the radio is off. Saving a network here switches it back on.');
   } else if (!w.slots.some(function (s) { return s.saved; })) {
-    netInfo('No network is saved, so the board is running on its own. A 5 s press of ' +
-            'GPIO9 opens the config hotspot instead.');
+    netInfo('No network is saved, so the board is running on its own. A 6 s hold on ' +
+            'either switch opens the config hotspot instead.');
   } else {
     netInfo('Radio: ' + w.state + '.');
   }
@@ -2523,19 +2526,22 @@ function renderInput(b) {
   //* While a press is in flight the interesting number is how far it has got
   //* toward this switch's thresholds; between presses it is the last hold. The
   //* thresholds come from the device, and a zero means this switch has no action
-  //* at that point at all - which is what long_press_ms is on the boot switch.
-  //? The action is named by the device too, because "held to its threshold" means
-  //? power-off on one switch and a config portal on the other.
+  //* at that point at all.
+  //? The actions are named by the device too, because "held to its threshold"
+  //? means the radio on one threshold and the config portal on the next, and the
+  //* two switches can carry different sets.
   var pastLong = b.long_press_ms > 0 && b.held_now_ms > b.long_press_ms;
   var pastAction = b.action_hold_ms > 0 && b.held_now_ms >= b.action_hold_ms;
   el.hold.textContent = b.pressed
-    ? (pastAction ? b.action : (pastLong ? (b.action_hold_ms ? 'mode on release' : 'no action') : 'holding'))
+    ? (pastAction ? b.action : (pastLong ? b.long_action : 'holding'))
     : (b.hold_ms > 0 ? b.hold_ms + ' ms' : '-');
 
   var rows = {
     'Last press': b.last_event === 4
                   ? INPUT_EVENTS[4] + ': ' + b.action
-                  : (INPUT_EVENTS[b.last_event] || ('event ' + b.last_event)),
+                  : b.last_event === 2
+                    ? INPUT_EVENTS[2] + ': ' + b.long_action
+                    : (INPUT_EVENTS[b.last_event] || ('event ' + b.last_event)),
     'When': b.last_event === 0 ? '-' : agoText(b.last_event_age_ms),
     'Presses': b.events + ' since boot',
     'Recent presses': b.counter > 0

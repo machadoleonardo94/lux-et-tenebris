@@ -27,7 +27,7 @@
 //?
 //?   NET_OFFLINE     The radio is off. No join attempts, no hotspot, no page and
 //?                   no OTA listener. This is the persisted "offline mode" switch
-//?                   and it survives a reboot; a 1 s press of GPIO9 flips it.
+//?                   and it survives a reboot; a 3 s hold of either switch flips it.
 //?   NET_CONNECTING  The radio is up, the saved network is not joined. The join is
 //?                   retried every WIFI_RETRY_INTERVAL_MS, forever. There is no
 //?                   address to serve on, so there is still no page and no OTA.
@@ -43,6 +43,27 @@ enum : uint8_t
 };
 
 uint8_t net_state = NET_OFFLINE;
+
+//* ---------------------- UI ACTION FEEDBACK ----------------------
+//? What a completed gesture asks the board to confirm. The input layer names the
+//? action; the LED service (services/led_scripts.h) owns the colour, the notice
+//? time and the strip flash for it, so one gesture cannot be drawn two ways.
+//! Append to this enum. The numbers are never persisted or sent over the wire -
+//? unlike net_state above - so this is a convenience, not a wire format.
+//? It lives here because services/readings.h is included before
+//* services/led_scripts.h and both sides need the vocabulary.
+enum : uint8_t
+{
+    UI_ACTION_NONE = 0,
+    UI_ACTION_MODE_NEXT,     // Touch 1 click
+    UI_ACTION_MODE_PREV,     // Touch 2 clicks / boot 1 click
+    UI_ACTION_POWER_OFF,     // Either switch, 5 clicks
+    UI_ACTION_RADIO_ON,      // Either switch, 3 s hold (release)
+    UI_ACTION_RADIO_OFF,     // Either switch, 3 s hold (release)
+    UI_ACTION_CONFIG_PORTAL, // Either switch, 6 s hold (release)
+    UI_ACTION_RECOVERY_WIPE, // Boot only, 10 s hold (release)
+    UI_ACTION_IGNORED        // A click count with no gesture (3 or 4)
+};
 
 //* ---------------------- GLOBAL COMPONENT VARIABLES ----------------------
 

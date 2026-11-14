@@ -11,7 +11,7 @@
 #define servo_pin 2
 #define button_pin 3
 #define latch_enable 4
-#define status_led_pin 10
+#define status_led_pin 10 // 0 on red board
 
 //* PORT3 (free GPIOs):
 #define freeGPIOA 5
