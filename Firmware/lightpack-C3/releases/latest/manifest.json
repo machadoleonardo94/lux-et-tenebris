@@ -1,7 +1,7 @@
 {
   "name": "lightpack-C3",
   "version": "0.4-pre+usb",
-  "new_install_prompt_erase": false,
+  "new_install_prompt_erase": true,
   "built": "2026-11-14T00:07:35-03:00",
   "source": "934a3fa",
   "size": 1281168,

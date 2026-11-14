@@ -1327,16 +1327,17 @@ function validateUpdateManifest(manifest) {
 
 async function mountLatestInstaller() {
   const box = $('#updateInstall');
+  // The version in the query busts the component's own manifest cache when a
+  // new build is published under the same path. Relative part paths still
+  // resolve against releases/latest/.
+  const version = encodeURIComponent(app.updateManifest?.source || app.updateManifest?.version || Date.now());
+  const manifestUrl = `${UPDATE_MANIFEST_URL}?v=${version}`;
 
   if (!app.updateElement) {
     await loadEspWebTools();
 
     const element = document.createElement('esp-web-install-button');
-    // The version in the query busts the component's own manifest cache when a
-    // new build is published under the same path. Relative part paths still
-    // resolve against releases/latest/.
-    const version = encodeURIComponent(app.updateManifest?.source || app.updateManifest?.version || Date.now());
-    element.setAttribute('manifest', `${UPDATE_MANIFEST_URL}?v=${version}`);
+    element.setAttribute('manifest', manifestUrl);
 
     const button = document.createElement('button');
     button.type = 'button';
@@ -1362,6 +1363,8 @@ async function mountLatestInstaller() {
 
     box.append(element);
     app.updateElement = element;
+  } else {
+    app.updateElement.setAttribute('manifest', manifestUrl);
   }
 
   box.hidden = false;

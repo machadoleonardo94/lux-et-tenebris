@@ -156,13 +156,16 @@ Diagnostics → **Firmware update** turns the console into a USB updater:
    serial port. The installer cannot share it.
 3. **Install latest** (ESP Web Tools) asks for the port, resets the board into
    the ROM bootloader, writes `boot_app0.bin` at `0xE000` and `firmware.bin` at
-   `0x10000`, and reboots.
+   `0x10000`, and reboots. In the installer's **Erase device** step, leave the
+   checkbox **unchecked** — that is the default. Unchecked writes only the two
+   parts; checked erases the whole flash, including the saved configuration.
 4. Click **Connect** again. The console reconnects to the new build.
 
-The update deliberately writes **parts, not a factory image**: NVS
-(`0x9000`–`0xE000`) is not in the list, so mode, palette, every tunable, the
-preset slots, the saved networks and the page login survive. `boot_app0` makes
-the bootloader start `app0`; the next WiFi/OTA update uses `app1` as usual.
+The update writes **parts, not a factory image**: NVS (`0x9000`–`0xE000`) is not
+in the list, so mode, palette, every tunable, the preset slots, the saved
+networks and the page login survive — provided the erase checkbox is left
+unchecked. `boot_app0` makes the bootloader start `app0`; the next WiFi/OTA
+update uses `app1` as usual.
 
 Do not unplug during the write. If it is interrupted, the board may have no
 valid app; recover with the [browser installer](../../../install/) or a full

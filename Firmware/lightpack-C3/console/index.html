@@ -228,8 +228,10 @@
             <span id="updateCurrent" class="muted mono"></span>
           </div>
           <p class="hint">Checks the repository's <code>releases/latest</code> channel and installs the app
-             over USB. The saved configuration lives in NVS and is kept. Disconnect the console first: the
-             installer needs the port and resets the board into the ROM bootloader.</p>
+             over USB. The app slot and OTA selector are written, not NVS — in the installer dialog,
+             <strong>leave Erase device unchecked</strong> (the default) to keep mode, palette, presets,
+             networks and login. Checking it wipes them. Disconnect the console first: the installer
+             needs the port and resets the board into the ROM bootloader.</p>
           <div class="row">
             <button id="btnCheckUpdate" class="btn" type="button">Check for latest build</button>
             <button id="btnUpdateDisconnect" class="btn ghost" type="button" disabled>Disconnect console</button>

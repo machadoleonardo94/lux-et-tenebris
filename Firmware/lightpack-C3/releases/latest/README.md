@@ -17,8 +17,13 @@ or a versioned folder under `releases/`.
 
 The update writes only the app slot and the OTA selector. The NVS partition
 (`0x9000`–`0xE000`) is not touched, so mode, palette, every tunable, the five
-preset slots, the saved networks and the page login all survive. The board is
-forced to boot `app0`; the next web/OTA update will use `app1` as usual.
+preset slots, the saved networks and the page login all survive — **provided the
+installer's Erase device checkbox is left unchecked**, which is its default. The
+board is forced to boot `app0`; the next web/OTA update will use `app1` as usual.
+
+The installer shows that erase step because this firmware does not implement
+Improv Serial, so ESP Web Tools treats every install as a new one. Leaving the
+box unchecked is what turns it into an in-place app update.
 
 ## Updating it
 
