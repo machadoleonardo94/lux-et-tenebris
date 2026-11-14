@@ -1,10 +1,10 @@
 {
   "name": "lightpack-C3",
   "version": "0.5.0-dev",
-  "built": "2026-11-14T01:18:53-03:00",
-  "source": "usb-ota",
-  "size": 1282704,
-  "sha256": "3B5B3FE957FC5576CF3202440B316360FC9831EA89C855BD018819FF4EEA4DE7",
+  "built": "2026-11-14T01:35:57-03:00",
+  "source": "usb-ota2",
+  "size": 1282864,
+  "sha256": "0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6",
   "notes": "App-only USB OTA image. NVS is preserved; the inactive slot is written.",
   "builds": [
     {
@@ -18,7 +18,7 @@
         {
           "path": "firmware.bin",
           "offset": 65536,
-          "sha256": "3B5B3FE957FC5576CF3202440B316360FC9831EA89C855BD018819FF4EEA4DE7"
+          "sha256": "0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6"
         }
       ]
     }

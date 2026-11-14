@@ -22,6 +22,11 @@ image and the NVS partition (`0x9000`–`0xE000`) are untouched until `UPDATE EN
 marks the new slot bootable, so mode, palette, every tunable, the five preset
 slots, the saved networks and the page login all survive.
 
+Before the first erase the firmware blanks the strip and repairs a stale OTA
+selector so it can never write the running slot. A flash write can make the USB
+CDC pause briefly; the upload state is kept and the host retries the same byte
+offset.
+
 `boot_app0.bin` is kept because an ESP Web Tools manifest can carry it, but the
 console's USB path never writes it. The board chooses the boot slot through the
 OTA selector that `Update.end()` updates.

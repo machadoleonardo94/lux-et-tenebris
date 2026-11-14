@@ -71,7 +71,9 @@ No release images yet.
   chunk; progress is the board's own received count. The running image and NVS — mode, palette,
   tunables, presets, networks and login — are untouched until `END`. No ROM bootloader,
   esptool-js, port close or reload. The first build with `UPDATE` is `0.5.0-dev`, which has to
-  be flashed once with PlatformIO or the installer.
+  be flashed once with PlatformIO or the installer. Before the first erase it blanks the strip,
+  repairs a stale OTA selector so it cannot target the running slot, and keeps the upload state
+  across a momentary USB CDC drop while flash is written.
 - **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
   DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
   one request into the reset. The saved configuration is restored; unsaved edits do not

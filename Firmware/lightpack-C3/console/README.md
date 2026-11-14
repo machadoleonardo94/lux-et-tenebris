@@ -167,6 +167,11 @@ or recover with the [browser installer](../../../install/). The update does not
 need the ROM bootloader, does not change the port, and has no runtime
 dependency.
 
+Writing flash can make the USB CDC pause for a moment. The board keeps the
+upload state and the host retries the same byte offset, so the progress bar may
+stall briefly but the update continues. A full image takes roughly two to four
+minutes at 2048 bytes per acknowledged chunk.
+
 **First install:** this protocol lives in `0.5.0-dev`. A board still running an
 older build has no `UPDATE` command, so flash `0.5.0-dev` once with
 `pio run -e C3-USB -t upload` (or the browser installer); after that the console

@@ -2,17 +2,19 @@ lightpack-C3 USB update channel
 ===============================
 
 firmware:      0.5.0-dev
-source:        usb-ota (first build with the USB UPDATE protocol)
-built:         2026-11-14T01:18:53-03:00
-firmware.bin:  1,282,704 bytes
-sha256:        3B5B3FE957FC5576CF3202440B316360FC9831EA89C855BD018819FF4EEA4DE7
-base:          boot_app0.bin (for ESP Web Tools compatibility; the console sends
-               only firmware.bin to the inactive OTA slot)
+source:        usb-ota2
+built:         2026-11-14T01:35:57-03:00
+firmware.bin:  1,282,864 bytes
+sha256:        0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6
 
 The console verifies firmware.bin against the manifest SHA-256, sends it as
 base64 chunks with UPDATE BEGIN/DATA/END, and the board writes it through
 Update.h. NVS is untouched; the running image stays valid until END.
 
-The first firmware with this protocol must be installed over USB once with
-`pio run -e C3-USB -t upload` (or the browser installer). After that the console
-can update itself.
+usb-ota2 includes the slot-selection repair (never write the running slot), the
+strip blank before the first flash erase, and keeping the OTA state across a
+transient USB CDC drop during a flash write.
+
+The first firmware with this protocol had to be installed over USB once with
+`pio run -e C3-USB -t upload` (or the browser installer). Boards on 0.5.0-dev
+can now update from the console.

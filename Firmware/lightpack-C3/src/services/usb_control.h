@@ -3,6 +3,7 @@
 
 #include "shared/dependencies.h"
 #include <mbedtls/base64.h>
+#include <esp_ota_ops.h>
 
 //? ---------------------- USB CONTROL SERVICE ----------------------
 //? A line protocol on the C3's USB Serial/JTAG, which is the same CDC port the
@@ -756,11 +757,45 @@ void usb_handle_update(char *args)
 
         usb_update_total = (size_t)size;
         usb_update_received = 0;
+
+        //! A CLI upload writes app0 but does not necessarily update otadata.
+        //! In that state esp_ota_get_next_update_partition() can return the
+        //! RUNNING slot, and Update.write would overwrite the code executing
+        //* this function. Make the running slot the boot slot first, then
+        //* re-query so the inactive one is chosen.
+        const esp_partition_t *running = esp_ota_get_running_partition();
+        const esp_partition_t *target = esp_ota_get_next_update_partition(nullptr);
+        if (target == running)
+        {
+            if (esp_ota_set_boot_partition(running) != ESP_OK)
+            {
+                usb_send_error("update", -1, "could not select the inactive OTA slot");
+                return;
+            }
+            target = esp_ota_get_next_update_partition(nullptr);
+        }
+        if (target == nullptr || target == running)
+        {
+            usb_send_error("update", -1, "no inactive OTA slot");
+            return;
+        }
+        if (usb_update_total > target->size)
+        {
+            usb_send_error("update", -1, "image does not fit the OTA slot");
+            return;
+        }
+
         if (!Update.begin(usb_update_total, U_FLASH))
         {
             usb_send_error("update", -1, Update.errorString());
             return;
         }
+
+        //! Flash writes draw current. With 250 LEDs lit the rail sits near
+        //! 4.2 V and the C3 can brown out; blank the strip before the first
+        //* sector erase. The normal loop repaints it if the update aborts.
+        strip.clear();
+        strip.show();
 
         usb_update_active = true;
         usb_update_reboot_at = 0;
@@ -1173,11 +1208,10 @@ void usb_control_loop()
     {
         //? A reset or an unplug ends the session mid-line. Drop the partial
         //* line and stop the stream; the host re-handshakes when it comes back.
-        if (usb_update_active)
-        {
-            Update.abort();
-            usb_update_active = false;
-        }
+        //! Do NOT abort an in-flight Update here: writing flash can make the
+        //! USB CDC drop for a moment, and the host resumes the same byte
+        //* offset when it comes back. BEGIN rejects a second update, so a
+        //* genuinely abandoned image is cleared by ABORT or a reboot.
         usb_rx_len = 0;
         usb_rx_overflow = false;
         usb_stream_hz = 0;
