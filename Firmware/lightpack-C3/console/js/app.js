@@ -1351,6 +1351,15 @@ async function mountLatestInstaller() {
     unsupported.textContent = 'This browser cannot install ESP devices. Use Chrome or Edge on a desktop.';
     element.append(unsupported);
 
+    // Backstop for the disabled state: if the component ever re-enables the
+    // slotted button, a click must still not steal a port the console owns.
+    element.addEventListener('click', (event) => {
+      if (!app.connected) return;
+      event.preventDefault();
+      event.stopPropagation();
+      showError('Disconnect the console before installing an update.');
+    }, true);
+
     box.append(element);
     app.updateElement = element;
   }
