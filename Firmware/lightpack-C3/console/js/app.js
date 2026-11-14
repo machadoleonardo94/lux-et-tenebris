@@ -41,8 +41,6 @@ const MODE_NOTES = {
 const EDIT_DEBOUNCE_MS = 90;
 const COMMIT_DEBOUNCE_MS = 900;
 const UPDATE_MANIFEST_URL = '../releases/latest/manifest.json';
-const ESPTOOL_URL = 'https://cdn.jsdelivr.net/npm/esptool-js@0.6.0/+esm';
-const UPDATE_ARMED_KEY = 'lightpack-update-armed';
 
 const app = {
   link: null,
@@ -77,7 +75,6 @@ const app = {
   diagAt: 0,
 
   updateManifest: null,
-  esptoolPromise: null,
   updateBusy: false,
 };
 
@@ -127,25 +124,9 @@ function boot() {
       .catch(() => {});
   }
 
-  // If Install had to unload the page to release a wedged SerialPort, resume
-  // once from the fresh page. The flag is cleared before anything else runs so
-  // a failed update can never cause a reload loop.
-  let resumeUpdate = false;
-  try {
-    resumeUpdate = sessionStorage.getItem(UPDATE_ARMED_KEY) === '1';
-    if (resumeUpdate) sessionStorage.removeItem(UPDATE_ARMED_KEY);
-  } catch {}
-
-  if (resumeUpdate) {
-    setTimeout(async () => {
-      await checkLatestBuild();
-      if (!app.updateManifest) return;
-      setUpdateProgress('Port released by reload. Starting update…', 0);
-      await installLatest();
-    }, 400);
-  } else if (params.has('check')) {
-    // A small test hook: ?check runs the update check on load. It is used to
-    // verify the manifest path and the installer component without a board.
+  // A small test hook: ?check runs the update check on load. It is used to
+  // verify the manifest path without a board.
+  if (params.has('check')) {
     setTimeout(() => checkLatestBuild(), 250);
   }
 }
@@ -1282,15 +1263,13 @@ function renderConnectionUI() {
 }
 
 //* ---------------------- FIRMWARE UPDATE ----------------------
-//? The update is esptool-js over the same USB port. It is not part of the `@`
-//? protocol: esptool-js puts the C3 into its ROM bootloader and writes two
-//? parts, so the console must let go of the port first.
+//? The update rides the same `@` link: BEGIN <size>, DATA <offset> <base64>,
+//? END. The firmware writes the app to the inactive OTA slot through Update.h;
+//? the running image and NVS are untouched until END marks the new slot
+//? bootable. No ROM bootloader, no port close/reset, no esptool-js dependency.
 //!
-//? Parts, not a factory image:
-//?   boot_app0.bin at 0xE000 makes the bootloader start app0.
-//?   firmware.bin  at 0x10000 is the app.
-//? NVS (0x9000-0xE000) is deliberately not in the list, so mode, palette,
-//* presets, networks and the page login survive the update.
+//? The host verifies the manifest's per-part SHA-256 before the first chunk, so
+//* a bad download is rejected before the board writes anything.
 
 async function checkLatestBuild() {
   setText('updateInfo', 'Checking…');
@@ -1359,136 +1338,96 @@ async function installLatest() {
     showError('Check for a latest build first.');
     return;
   }
-  if (app.updateBusy) return;
-
-  // Chrome can keep a SerialPort wedged after the C3 resets on close: the old
-  // link is gone, port.close() has failed, and open() keeps saying "already
-  // open". A page unload is the one close Chrome always completes, so when the
-  // port is held, reload, then resume from boot with a genuinely closed port.
-  const portHeld = app.connected || Boolean(app.link) ||
-    Boolean(app.port && (app.port.readable || app.port.writable));
-  if (portHeld) {
-    if (app.connected && app.state?.dirty) {
-      try {
-        await commit();
-      } catch {}
-    }
-    let armed = false;
-    try {
-      sessionStorage.setItem(UPDATE_ARMED_KEY, '1');
-      armed = true;
-    } catch {}
-    if (armed) {
-      location.reload();
-      return;
-    }
+  if (!app.connected || !app.link) {
+    showError('Connect to the board first; the update uses the USB control link.');
+    return;
   }
-
-  // From here until the write finishes, the update owns the port. Stop the
-  // console's reconnect timer now: a stale link's disconnect event used to
-  // reopen the port underneath the updater and reset the board mid-open.
-  app.manualDisconnect = true;
-  app.expectReboot = false;
-  app.reconnectAttempts = 0;
-  clearTimeout(app.reconnectTimer);
+  if (app.updateBusy) return;
 
   app.updateBusy = true;
   renderUpdatePanel();
   setUpdateProgress('Preparing…', 0);
 
-  let port = app.port;
-  let transport = null;
-  let loader = null;
-
   try {
-    if (app.connected || app.link) await disconnect();
-
-    if (!port) {
-      const ports = await navigator.serial.getPorts().catch(() => []);
-      port = ports.find((candidate) => candidate.getInfo?.().usbVendorId === 0x303a) ||
-        (ports.length === 1 ? ports[0] : null);
-      if (!port) port = await navigator.serial.requestPort();
-    }
-    app.port = port;
-
     const manifest = app.updateManifest;
     const build = manifest.builds[0];
+    // USB OTA writes the app to the inactive OTA slot; boot_app0 belongs to
+    // the ROM-bootloader path and is not sent over this link.
+    const appPart = build.parts.find((part) => Number(part.offset) === 65536) ||
+      build.parts[build.parts.length - 1];
     const source = manifest.source || manifest.version || String(Date.now());
     const base = new URL(UPDATE_MANIFEST_URL, window.location.href);
+    const url = new URL(appPart.path, base);
+    url.searchParams.set('v', source);
 
     setUpdateProgress('Downloading firmware…', 0);
-    const parts = [];
-    let totalBytes = 0;
-    for (const part of build.parts) {
-      const url = new URL(part.path, base);
-      url.searchParams.set('v', source);
-      const response = await fetch(url, { cache: 'no-store' });
-      if (!response.ok) throw new Error(`download ${part.path} -> HTTP ${response.status}`);
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      if (part.sha256 && (await sha256Hex(bytes)) !== String(part.sha256).toLowerCase()) {
-        throw new Error(`checksum mismatch for ${part.path}`);
-      }
-      parts.push({ data: bytes, address: Number(part.offset) });
-      totalBytes += bytes.length;
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`download ${appPart.path} -> HTTP ${response.status}`);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (appPart.sha256 && (await sha256Hex(bytes)) !== String(appPart.sha256).toLowerCase()) {
+      throw new Error(`checksum mismatch for ${appPart.path}`);
+    }
+    const total = bytes.length;
+
+    const ready = await request(commands.updateBegin(total), isUpdateAck, 5000);
+    if (!ready.ok || ready.state !== 'ready') {
+      throw new Error(ready.err || 'the board refused the update');
     }
 
-    setUpdateProgress('Opening port…', 0);
-    port = await openUpdatePort(port);
-    // Opening the CDC port resets the C3 once. Let it finish booting before
-    // esptool asks the ROM bootloader to reset it again.
-    await sleep(1000);
+    const CHUNK = 2048;
+    let sent = 0;
+    while (sent < total) {
+      const end = Math.min(sent + CHUNK, total);
+      const base64 = base64Bytes(bytes.subarray(sent, end));
+      let ack = null;
 
-    setUpdateProgress('Loading esptool-js…', 0);
-    const { ESPLoader, Transport } = await loadEsptool();
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          ack = await request(commands.updateData(sent, base64), isUpdateAck, 8000);
+          if (!ack.ok) throw new Error(ack.err || 'the board rejected a chunk');
+          break;
+        } catch (error) {
+          if (attempt === 2) throw error;
+          await sleep(250);
+        }
+      }
 
-    transport = new Transport(port);
-    loader = new ESPLoader({ transport, baudrate: 115200, enableTracing: false });
+      const received = Number(ack?.received);
+      if (!Number.isFinite(received) || received <= sent) {
+        throw new Error('the board did not confirm the chunk');
+      }
+      sent = Math.min(received, total);
+      setUpdateProgress('Writing application…', (sent / total) * 100);
+    }
 
-    setUpdateProgress('Connecting to ROM bootloader…', 0);
-    await loader.main();
-
-    setUpdateProgress('Writing firmware…', 0);
-    await loader.writeFlash({
-      fileArray: parts,
-      flashSize: 'keep',
-      flashMode: 'keep',
-      flashFreq: 'keep',
-      eraseAll: false,
-      compress: true,
-      reportProgress: (fileIndex, written, total) => {
-        const part = parts[fileIndex];
-        const prior = parts.slice(0, fileIndex).reduce((sum, item) => sum + item.data.length, 0);
-        const partial = total ? (written / total) * part.data.length : 0;
-        const percent = totalBytes ? ((prior + partial) / totalBytes) * 100 : 0;
-        setUpdateProgress(`Writing ${fileIndex === 0 ? 'OTA selector' : 'application'}…`, percent);
-      },
-    });
-
-    setUpdateProgress('Resetting board…', 100);
-    await transport.setRTS(true);
-    await sleep(100);
-    await loader.after();
-    await transport.disconnect().catch(() => {});
+    let done;
+    app.expectReboot = true;
     try {
-      await port.close();
-    } catch {}
-    transport = null;
+      done = await request(commands.updateEnd(), isUpdateAck, 10000);
+    } catch (error) {
+      // The C3 can restart before the final ack reaches the host. Only a lost
+      // answer is success-ish; a board rejection must still fail.
+      if (!/did not answer/i.test(String(error?.message || error))) {
+        app.expectReboot = false;
+        throw error;
+      }
+      done = null;
+    }
+    if (done && (!done.ok || done.state !== 'complete')) {
+      app.expectReboot = false;
+      throw new Error(done.err || 'the board rejected the image');
+    }
 
-    setUpdateProgress('Update complete — reconnecting…', 100);
+    setUpdateProgress('Update complete — board restarting…', 100);
     app.manualDisconnect = false;
     app.reconnectAttempts = 0;
-    setTimeout(() => tryReconnect(), 1800);
+    setStatus('connecting', 'restarting');
+    setSync('restarting');
   } catch (error) {
     setUpdateProgress(`Update failed: ${error.message}`, null);
     showError(`Firmware update failed: ${error.message}`);
     try {
-      if (loader) await loader.after();
-    } catch {}
-    try {
-      if (transport) await transport.disconnect();
-    } catch {}
-    try {
-      if (port) await port.close();
+      if (app.link) app.link.send(commands.updateAbort());
     } catch {}
   } finally {
     app.updateBusy = false;
@@ -1496,105 +1435,14 @@ async function installLatest() {
   }
 }
 
-async function closePortQuietly(port) {
-  if (!port) return;
-  try {
-    await port.close();
-  } catch {
-    // Not open, locked by a stream that is still unwinding, or owned by
-    // another tab. The retry below decides whether that is recoverable.
-  }
+function isUpdateAck(frame) {
+  return frame.t === 'ack' && frame.cmd === 'update';
 }
 
-async function waitPortReleased(port, timeout = 1200) {
-  const deadline = Date.now() + timeout;
-  while (Date.now() < deadline) {
-    if (!port.readable && !port.writable) return;
-    await sleep(50);
-  }
-}
-
-async function openPortWithRetries(port, options, attempts = 5) {
-  let lastError = null;
-
-  for (let attempt = 0; attempt < attempts; attempt++) {
-    try {
-      await port.open(options);
-      return;
-    } catch (error) {
-      lastError = error;
-      const text = String(error?.message || error);
-
-      if (/already open/i.test(text)) {
-        await closePortQuietly(port);
-        await waitPortReleased(port);
-      } else if (!/failed to open|access denied|busy|network|not found|no such/i.test(text)) {
-        throw error;
-      }
-
-      // The C3 re-enumerates after a reset. Opening too soon gives
-      // "Failed to open serial port"; give it a longer window each time.
-      await sleep(250 * (attempt + 1));
-    }
-  }
-
-  throw lastError || new Error('Could not open the serial port.');
-}
-
-async function openUpdatePort(initial) {
-  const options = { baudRate: 115200, bufferSize: 8192 };
-  const candidates = [initial];
-  let lastError = null;
-
-  // getPorts() can hand back a fresh object after a reset even when app.port
-  // still points at the old one; try those too before giving up. Keep the
-  // fallback to Espressif devices so an update cannot wander onto another
-  // serial peripheral.
-  try {
-    for (const candidate of await navigator.serial.getPorts()) {
-      if (candidate !== initial && candidate.getInfo?.().usbVendorId === 0x303a) {
-        candidates.push(candidate);
-      }
-    }
-  } catch {}
-
-  for (const candidate of candidates) {
-    // A console link or an earlier failed attempt can leave the SerialPort open
-    // even though this page no longer has a link to it. Close it first, then
-    // let Chrome settle the reader/writer locks and the board re-enumerate
-    // before opening it for esptool-js.
-    await closePortQuietly(candidate);
-    await waitPortReleased(candidate);
-    await sleep(350);
-
-    try {
-      await openPortWithRetries(candidate, options);
-      app.port = candidate;
-      await sleep(200);
-      return candidate;
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw new Error(
-    'Could not open the serial port. If another console tab or program owns COM9, ' +
-    'close it; then unplug/replug the board and try Install latest again.' +
-    (lastError ? ` (${lastError.message})` : '')
-  );
-}
-
-function loadEsptool() {
-  if (!app.esptoolPromise) {
-    // Pinned: a moving upstream must not change what an update writes. Loaded
-    // lazily so checking for a build does not pay for it.
-    app.esptoolPromise = import(ESPTOOL_URL).catch((error) => {
-      app.esptoolPromise = null;
-      throw new Error(`esptool-js failed to load (${error.message})`);
-    });
-  }
-
-  return app.esptoolPromise;
+function base64Bytes(bytes) {
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
 }
 
 async function sha256Hex(bytes) {
@@ -1633,14 +1481,16 @@ function renderUpdatePanel() {
 
   const install = $('#btnInstallUpdate');
   if (install) {
-    install.disabled = !app.updateManifest || app.demo || busy || app.connecting;
+    install.disabled = !app.updateManifest || app.demo || busy || app.connecting || !app.connected;
     install.title = app.demo
       ? 'Demo mode: there is no board to update'
-      : !app.updateManifest
-        ? 'Check for a build first'
-        : busy
-          ? 'An update is already running'
-          : 'Disconnects the console, then writes the latest build over USB';
+      : !app.connected
+        ? 'Connect to the board first'
+        : !app.updateManifest
+          ? 'Check for a build first'
+          : busy
+            ? 'An update is already running'
+            : 'Writes the latest build to the inactive OTA slot over the USB link';
   }
 
   const hint = $('#updateHint');
@@ -1648,8 +1498,8 @@ function renderUpdatePanel() {
     if (busy) hint.textContent = 'Updating — keep the board plugged in.';
     else if (app.demo) hint.textContent = 'Demo mode: no board to update.';
     else if (!app.updateManifest) hint.textContent = 'Check for a build first.';
-    else if (app.connected) hint.textContent = 'Install disconnects the console first, then writes over USB.';
-    else hint.textContent = 'Ready. The board will reset and reconnect.';
+    else if (!app.connected) hint.textContent = 'Connect to the board first.';
+    else hint.textContent = 'Ready. The board keeps running; NVS is preserved.';
   }
 }
 

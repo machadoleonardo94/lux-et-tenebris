@@ -10,20 +10,28 @@ or a versioned folder under `releases/`.
 | File | Purpose |
 |---|---|
 | `manifest.json` | Update manifest (ESP Web Tools-compatible) plus the version/date/size/SHA fields the console displays |
-| `firmware.bin` | App-only image, written at `0x10000` |
-| `boot_app0.bin` | OTA selector, written at `0xE000`; makes the bootloader start app0 |
+| `firmware.bin` | App-only image; the console sends it to the inactive OTA slot |
+| `boot_app0.bin` | OTA selector at `0xE000` for ESP Web Tools-compatible manifests; the console does **not** send it |
 | `SHA256SUMS.txt` | Hashes of both images |
-| `BUILD.txt` | Source commit and build time |
+| `BUILD.txt` | Version, build time and source channel |
 
-The console writes only the app slot and the OTA selector, with
-`eraseAll: false`. The NVS partition (`0x9000`–`0xE000`) is not touched, so mode,
-palette, every tunable, the five preset slots, the saved networks and the page
-login all survive. The board is forced to boot `app0`; the next web/OTA update
-will use `app1` as usual.
+The console picks the part at offset `0x10000`, verifies its SHA-256 with Web
+Crypto, and streams it over the existing `@` link (`UPDATE BEGIN/DATA/END`).
+The firmware writes it through `Update.h` to the inactive OTA slot. The running
+image and the NVS partition (`0x9000`–`0xE000`) are untouched until `UPDATE END`
+marks the new slot bootable, so mode, palette, every tunable, the five preset
+slots, the saved networks and the page login all survive.
 
-Each manifest part carries its own `sha256`; the console downloads both, verifies
-them with Web Crypto, and only then opens the port. A mismatch stops the update
-before anything is written.
+`boot_app0.bin` is kept because an ESP Web Tools manifest can carry it, but the
+console's USB path never writes it. The board chooses the boot slot through the
+OTA selector that `Update.end()` updates.
+
+## First install of this protocol
+
+`UPDATE` exists from **0.5.0-dev**. A board running an older build has no such
+command; flash `0.5.0-dev` once with `pio run -e C3-USB -t upload` or the browser
+installer. After that the console can update it over USB without the ROM
+bootloader.
 
 ## Updating it
 
@@ -38,12 +46,12 @@ sha256sum releases/latest/firmware.bin releases/latest/boot_app0.bin > releases/
 
 Then update `manifest.json` (`version`, `built`, `source`, `size`, `sha256`, and
 both part `sha256` values) and `BUILD.txt`, and commit both. The console fetches
-`manifest.json` with `cache: no-store` and the images with a source-version
-query, so a refresh sees the new build without a code change.
+`manifest.json` with `cache: no-store` and the image with a source-version query,
+so a refresh sees the new build without a code change.
 
-## Why app-only and not the factory image
+## Why app-only
 
 The factory image spans `0x0`–end and contains `0xFF` padding across the NVS
 region when merged with `esptool merge_bin`. Writing it at `0x0` would wipe the
-saved configuration. This channel writes exactly two parts — the OTA selector
-and the app — so an update is an update, not a factory reset.
+saved configuration. This channel carries the app only; the console's USB path
+writes it to the inactive OTA slot and lets the bootloader switch slots.

@@ -150,38 +150,27 @@ the whole reason the firmware services USB from the portal loop.
 
 Diagnostics → **Firmware update** turns the console into a USB updater:
 
-1. **Check for latest build** fetches `releases/latest/manifest.json` from this
+1. **Connect to the board first.** The update rides the existing `@` control
+   link; it does not close the port, reset into a bootloader or load esptool-js.
+2. **Check for latest build** fetches `releases/latest/manifest.json` from this
    repository and shows the version, build date, size and source commit.
-2. **Install latest** disconnects the console if it is still connected, commits
-   any unsaved configuration, downloads both parts, verifies each part's
-   SHA-256, resets the board into the ROM bootloader, writes `boot_app0.bin` at
-   `0xE000` and `firmware.bin` at `0x10000`, and reboots.
+3. **Install latest** downloads the app part, verifies its SHA-256, sends
+   `UPDATE BEGIN`, then 2048-byte base64 chunks (`UPDATE DATA <offset> <base64>`)
+   and waits for the board to acknowledge each one. Progress comes from the
+   board's own received count, not a browser-side estimate.
+4. `UPDATE END` marks the inactive OTA slot bootable and the board reboots into
+   it. The console reconnects automatically; **Connect** is there if it does not.
 
-   If the console is connected, the page **reloads once** before installing.
-   The unload is the only port close Chrome always completes; trying to close
-   it from script after the C3 resets can leave the `SerialPort` wedged. The
-   page reads `sessionStorage`, reloads, re-checks the manifest and resumes the
-   update automatically. The reload is expected, not an error.
+The running image and NVS are untouched until `Update.end()`. An interrupted or
+rejected transfer leaves the board running exactly what it booted with; retry,
+or recover with the [browser installer](../../../install/). The update does not
+need the ROM bootloader, does not change the port, and has no runtime
+dependency.
 
-   The most reliable path is still to reload the page and go straight to
-   **Check → Install without connecting first**: the updater can take a closed
-   port and resets the board itself.
-3. The progress area in the panel reports **Downloading firmware → Opening port
-   → Connecting to ROM bootloader → Writing OTA selector/application (%) →
-   Resetting board → Update complete — reconnecting**. There is no separate
-   installer modal and no erase prompt.
-4. The console reconnects automatically; **Connect** is there if it does not.
-
-The update writes **parts, not a factory image**, with `eraseAll: false`: NVS
-(`0x9000`–`0xE000`) is not in the list, so mode, palette, every tunable, the
-preset slots, the saved networks and the page login always survive. `boot_app0`
-makes the bootloader start `app0`; the next WiFi/OTA update uses `app1` as
-usual.
-
-Do not unplug during the write. If it is interrupted, the board may have no
-valid app; recover with the [browser installer](../../../install/) or a full
-release image. esptool-js is pinned to 0.6.0 and fetched from jsDelivr on first
-use; if that is blocked, the fallback links are in the panel.
+**First install:** this protocol lives in `0.5.0-dev`. A board still running an
+older build has no `UPDATE` command, so flash `0.5.0-dev` once with
+`pio run -e C3-USB -t upload` (or the browser installer); after that the console
+can update it.
 
 `releases/latest/` is a development channel replaced in place — not a tagged
 release. For a blank board or a full recovery, use a versioned release folder.
@@ -209,11 +198,10 @@ reconnects by itself.
 | The board is in its config hotspot | The console still works; the page shows *config hotspot open*. Radio switching is refused until the portal closes. |
 | Board resets when the page connects | **Expected on this board.** The C3's USB Serial/JTAG resets when the host asserts DTR/RTS, so opening the port reboots it once. The page waits for the boot and retries `PING`; the saved configuration is restored. Closing the port can reset it again. Unsaved edits do not survive a reconnect. |
 | "Check for latest build" says 404 | The page is being served without the firmware folder's `releases/latest/` next to it. Serve the repository root or `Firmware/lightpack-C3`; see *Locally* above. |
-| Install latest is disabled | No build has been checked yet, the page is in `?demo` mode, an update is already running, or the console is reconnecting. Check for a build first; Install can disconnect the console itself. |
-| Install starts but stops at "Connecting to ROM bootloader" | The board did not enter the ROM bootloader. Hold **BOOT** while clicking Install latest, or use the browser installer. |
-| Update fails with "The port is already open" | Another console tab or program owns COM9. Close every other console/terminal tab (or click Disconnect there), then hard-refresh this page and try Install latest again. The page force-closes its own stale port and retries once; Chrome will not let it close a port owned by another tab. |
-| Update fails with "Failed to open serial port" | The C3 was still re-enumerating from the previous open/reset. The updater retries with a growing delay; if it still fails, **reload the page and install without clicking Connect first**, close other tabs/terminals, or unplug/replug the board. |
-| No progress appears after Install | The progress line starts with **Downloading firmware**; if it does not, esptool-js could not load from jsDelivr or the manifest fetch failed. Check the device log and the error banner. |
+| Install latest is disabled | Connect to the board first; the updater uses the open control link. It is also disabled in `?demo`, while a check is running, or when no build has been checked. |
+| Update fails at a chunk or at END | The board keeps running the image it booted with. Retry; the chunk offset makes a resent chunk idempotent. If the board itself rejects the image, check the manifest hash and the firmware log. |
+| Update fails with "unknown command" or no UPDATE ack | The board is running a build older than `0.5.0-dev`. Flash that once with `pio run -e C3-USB -t upload` or the browser installer; the USB updater is in the new image. |
+| No progress appears after Install | The progress line starts with **Downloading firmware**; if it does not, the manifest fetch failed. Check the device log and the error banner. |
 | The update finishes but the board still runs the old build | The update writes app0 and forces the OTA selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
 | The update was interrupted | Do not keep retrying from the console. The application may be incomplete; recover with the [browser installer](../../../install/) or a full release image. |
 | The values snap back | The firmware clamps every write, and `changed` reports what it actually stored. The UI follows the device. |
@@ -228,8 +216,8 @@ successful **Check for latest build**. For recovery, use the
 
 ## 5. How it is built
 
-Static files, no bundler. esptool-js is the one runtime dependency and is
-imported only when you install an update:
+Static files, no bundler, no runtime dependency: esptool-js is gone from the
+update path.
 
 ```
 console/

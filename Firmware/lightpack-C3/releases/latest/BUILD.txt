@@ -1,16 +1,18 @@
 lightpack-C3 USB update channel
 ===============================
 
-source commit: 934a3fa
-built:         2026-11-14T00:07:35-03:00
-firmware:      firmware.bin
-base:          boot_app0.bin
+firmware:      0.5.0-dev
+source:        usb-ota (first build with the USB UPDATE protocol)
+built:         2026-11-14T01:18:53-03:00
+firmware.bin:  1,282,704 bytes
+sha256:        3B5B3FE957FC5576CF3202440B316360FC9831EA89C855BD018819FF4EEA4DE7
+base:          boot_app0.bin (for ESP Web Tools compatibility; the console sends
+               only firmware.bin to the inactive OTA slot)
 
-This folder is the "latest build" channel used by the USB console's firmware
-update button. It is replaced in place; it is not a tagged release. The app-only
-firmware is written at 0x10000 and boot_app0.bin at 0xE000, which selects app0.
-NVS (0x9000-0xE000) is not touched, so mode, palette, presets, networks and the
-page login survive an update.
+The console verifies firmware.bin against the manifest SHA-256, sends it as
+base64 chunks with UPDATE BEGIN/DATA/END, and the board writes it through
+Update.h. NVS is untouched; the running image stays valid until END.
 
-For a blank board or a full recovery, use the browser installer or a release
-folder instead.
+The first firmware with this protocol must be installed over USB once with
+`pio run -e C3-USB -t upload` (or the browser installer). After that the console
+can update itself.

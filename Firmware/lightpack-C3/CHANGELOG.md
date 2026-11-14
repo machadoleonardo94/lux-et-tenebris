@@ -62,19 +62,16 @@ No release images yet.
   cannot hold the LED loop up for a tenth of a second.
 - **New `console/` page: zero-install, Chrome/Edge, Web Serial.** Mode bar, parameter pages,
   live telemetry, presets import/export (the same JSON the device page writes), a device log
-  pane and a radio toggle. `?demo` renders it with no board. No build step; the update button
-  loads esptool-js on demand.
-- **The console can update the firmware over the same USB cable.** Diagnostics → Firmware
-  update checks `releases/latest/manifest.json`, disconnects the control port, and writes the
-  build with esptool-js (pinned 0.6.0, loaded on demand), showing download, write and reset
-  progress in the panel. It writes `boot_app0.bin` at `0xE000` and the app at `0x10000` with
-  `eraseAll: false`, so NVS — mode, palette, tunables, presets, networks and login — is
-  preserved and `app0` is selected. `releases/latest/` is a development channel, replaced in
-  place, with its own manifest, per-part SHA-256 sums and a pinned tool. The update owns the
-  port end to end: console reconnect is suspended, a stale `SerialPort` is closed, and opens
-  retry while the C3 re-enumerates; if the console was connected, the page reloads once so the
-  unload closes the port and then resumes the update. A port held by another tab or program now
-  says so instead of surfacing a bare browser error.
+  pane and a radio toggle. `?demo` renders it with no board. No build step, no runtime
+  dependency.
+- **The console can update the firmware over the same USB control link.** Diagnostics →
+  Firmware update checks `releases/latest/manifest.json`, verifies the app part's SHA-256, and
+  streams it as 2048-byte base64 chunks (`UPDATE BEGIN` / `UPDATE DATA <offset>` / `UPDATE
+  END`). The firmware writes the inactive OTA slot through `Update.h` and acknowledges every
+  chunk; progress is the board's own received count. The running image and NVS — mode, palette,
+  tunables, presets, networks and login — are untouched until `END`. No ROM bootloader,
+  esptool-js, port close or reload. The first build with `UPDATE` is `0.5.0-dev`, which has to
+  be flashed once with PlatformIO or the installer.
 - **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
   DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
   one request into the reset. The saved configuration is restored; unsaved edits do not

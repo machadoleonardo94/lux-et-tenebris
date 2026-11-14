@@ -292,11 +292,13 @@ board whose antenna cannot hold a link, and for a board parked in offline mode. 
   refused there; everything else works.
 - **One owner:** close `pio device monitor`, the Arduino IDE or any other terminal before
   clicking Connect. The page reports a busy port rather than hanging.
-- **Firmware update:** Diagnostics → **Firmware update** checks the `releases/latest` channel,
-  disconnects, and writes the app over USB with esptool-js, with download, write and reset
-  progress in the panel. It writes the app slot and the OTA selector only (`eraseAll: false`),
-  so NVS and every saved setting survive. The library is pinned to 0.6.0 and fetched from
-  jsDelivr on first use; the offline fallback is the browser installer.
+- **Firmware update:** Diagnostics → **Firmware update** checks the `releases/latest` channel and
+  writes the app to the inactive OTA slot over the existing USB control link, with chunk and
+  percentage progress. Connect first; the running image and NVS are untouched until the final
+  `UPDATE END`, so mode, palette, presets, networks and login survive. No ROM bootloader,
+  esptool-js or port reset. A board older than `0.5.0-dev` has no `UPDATE` command, so flash
+  `0.5.0-dev` once with `pio run -e C3-USB -t upload` or the browser installer; after that the
+  console updates it.
 - **Connecting resets the board once.** The C3's USB Serial/JTAG resets when the host asserts
   DTR/RTS, so opening the port reboots it; the console waits for the boot and retries the
   handshake. The saved configuration is restored. Unsaved edits do not survive a reconnect.

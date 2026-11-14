@@ -46,7 +46,7 @@ so allow up to ten seconds for the first answer and send `@PING` again if the
 first one is lost.
 
 ```json
-@{"t":"pong","v":1,"proto":1,"fw":"0.4-pre","build":"Nov 13 2026 22:00:00",
+@{"t":"pong","v":1,"proto":1,"fw":"0.5.0-dev","build":"Nov 14 2026 01:18:00",
   "chip":"ESP32-C3","cpu_mhz":160,"mac":"AA:BB:CC:DD:EE:FF","uptime_ms":123456}
 ```
 
@@ -87,6 +87,10 @@ and do not use it.
 | `@PRESET CLEAR n` | `presets` | Empty a slot |
 | `@IMPACT mag` | `ack` | Inject a preview impact (0–255) for flame tuning |
 | `@RADIO on\|off\|toggle` | `ack` | Switch the WiFi radio; USB is unaffected |
+| `@UPDATE BEGIN <size>` | `ack` (`state:"ready"`) | Start an app-only OTA into the inactive slot |
+| `@UPDATE DATA <offset> <base64>` | `ack` (`state:"data"`) | One 2 KiB chunk; offset must equal the board's received count or be a retry |
+| `@UPDATE END` | `ack` (`state:"complete"`) | Mark the new slot bootable and reboot |
+| `@UPDATE ABORT` | `ack` (`state:"aborted"`) | Drop the partial image; the running image is unchanged |
 | `@REBOOT` | `ack`, then reset | Restart the board |
 
 `n` is 0-based (slots 0–4), matching `/api/preset` and the JSON files.
@@ -257,6 +261,35 @@ example, turning the radio on with no saved network leaves it off):
 impact would. The flame mode consumes it on its next frame. The detector's
 counters are untouched. In a mode other than Step flame the value waits in the
 latch, so select the mode first if you want to see it immediately.
+
+### 3.8 Firmware update
+
+The console sends the app image to the **inactive OTA slot** over the same
+line. It does not enter the ROM bootloader and does not touch NVS.
+
+```
+@UPDATE BEGIN 1282704
+@UPDATE DATA 0 <base64 of 2048 bytes>
+@UPDATE DATA 2048 <base64>
+…
+@UPDATE END
+```
+
+`BEGIN` replies with `state:"ready"` and `size`; each `DATA` replies with
+`state:"data"`, `received` and `total`; `END` replies `state:"complete"` and
+the board restarts after a short delay. Errors are normal `ack` frames with
+`ok:false` and `err`.
+
+The firmware writes through `Update.h` to `esp_ota_get_next_update_partition()`;
+the running image stays valid until `END`. The base64 line is capped at the
+protocol's 4 KiB line length, hence 2048-byte chunks. `offset` is the count of
+bytes already received: a retried chunk whose ack was lost is acknowledged
+without being written twice. `ABORT` (or a disconnect) aborts the partial
+image.
+
+This command exists from **0.5.0-dev**; older builds answer `unknown command`.
+A board that predates it must be flashed once with PlatformIO or the browser
+installer.
 
 ---
 

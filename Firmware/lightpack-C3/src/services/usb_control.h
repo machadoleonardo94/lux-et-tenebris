@@ -2,6 +2,7 @@
 #define SERVICE_USB_CONTROL
 
 #include "shared/dependencies.h"
+#include <mbedtls/base64.h>
 
 //? ---------------------- USB CONTROL SERVICE ----------------------
 //? A line protocol on the C3's USB Serial/JTAG, which is the same CDC port the
@@ -32,11 +33,12 @@
 //! main.cpp must size the CDC buffers BEFORE Serial.begin(); see usb_control_begin().
 
 #define USB_CONTROL_PROTO_VERSION 1
-#define USB_CONTROL_MAX_LINE 1024
+#define USB_CONTROL_MAX_LINE 4096
 #define USB_CONTROL_MAX_FIELDS 32
 #define USB_CONTROL_STREAM_MAX_HZ 50
-#define USB_CONTROL_RX_BYTES_PER_LOOP 256
+#define USB_CONTROL_RX_BYTES_PER_LOOP 4096
 #define USB_CONTROL_LINES_PER_LOOP 8
+#define USB_UPDATE_CHUNK 2048
 
 //* ---------------------- STATE ----------------------
 
@@ -59,6 +61,15 @@ uint8_t usb_last_mode = 0;
 uint32_t usb_last_impact_count = 0;
 uint32_t usb_last_button_events[BUTTON_INPUT_COUNT] = {0};
 bool usb_was_connected = false;
+
+//* USB firmware update. The image goes into the inactive OTA slot through
+//* Update.h, exactly like the web upload, so NVS and the running image are
+//* never touched until Update.end() marks the new slot bootable.
+bool usb_update_active = false;
+size_t usb_update_total = 0;
+size_t usb_update_received = 0;
+uint32_t usb_update_reboot_at = 0;
+uint8_t usb_update_buf[USB_UPDATE_CHUNK];
 
 //* ---------------------- OUTPUT HELPERS ----------------------
 
@@ -682,6 +693,191 @@ void usb_handle_reboot()
     ESP.restart();
 }
 
+//* ---------------------- USB FIRMWARE UPDATE ----------------------
+//? The image is written to the inactive OTA slot, exactly like the web page's
+//? upload. The host sends BEGIN <size>, then DATA <offset> <base64> chunks and
+//? END; each DATA is acknowledged so the host can keep a window of one and
+//? update its progress from the board's own received count.
+//!
+//? Offset, not sequence: a retried chunk whose ack was lost is recognized as
+//? already received and acknowledged without being written twice.
+
+void usb_send_update_state(const char *state)
+{
+    String json;
+    json.reserve(180);
+    usb_begin_ack(json, "update", -1);
+    json += F(",\"state\":\"");
+    json += state;
+    json += F("\",\"received\":");
+    json += String((unsigned long)usb_update_received);
+    json += F(",\"total\":");
+    json += String((unsigned long)usb_update_total);
+    json += F("}\n");
+    usb_write_line(json);
+}
+
+void usb_handle_update(char *args)
+{
+    if (args == nullptr || *args == '\0')
+    {
+        usb_send_error("update", -1, "expected BEGIN, DATA, END or ABORT");
+        return;
+    }
+
+    char *rest = strchr(args, ' ');
+    if (rest != nullptr)
+    {
+        *rest = '\0';
+        rest++;
+        while (*rest == ' ')
+            rest++;
+    }
+    else
+    {
+        rest = args + strlen(args);
+    }
+
+    if (usb_ieq(args, "BEGIN"))
+    {
+        if (usb_update_active || Update.isRunning())
+        {
+            usb_send_error("update", -1, "an update is already running");
+            return;
+        }
+
+        char *end = nullptr;
+        const unsigned long size = strtoul(rest, &end, 10);
+        if (size == 0 || end == rest || *end != '\0')
+        {
+            usb_send_error("update", -1, "expected BEGIN <image bytes>");
+            return;
+        }
+
+        usb_update_total = (size_t)size;
+        usb_update_received = 0;
+        if (!Update.begin(usb_update_total, U_FLASH))
+        {
+            usb_send_error("update", -1, Update.errorString());
+            return;
+        }
+
+        usb_update_active = true;
+        usb_update_reboot_at = 0;
+        usb_send_update_state("ready");
+        return;
+    }
+
+    if (usb_ieq(args, "DATA"))
+    {
+        if (!usb_update_active)
+        {
+            usb_send_error("update", -1, "no update in progress");
+            return;
+        }
+
+        char *b64 = strchr(rest, ' ');
+        if (b64 == nullptr)
+        {
+            usb_send_error("update", -1, "expected DATA <offset> <base64>");
+            return;
+        }
+        *b64 = '\0';
+        b64++;
+        while (*b64 == ' ')
+            b64++;
+
+        char *end = nullptr;
+        const unsigned long offset = strtoul(rest, &end, 10);
+        if (end == rest || *end != '\0')
+        {
+            usb_send_error("update", -1, "bad chunk offset");
+            return;
+        }
+
+        size_t decoded = 0;
+        const int rc = mbedtls_base64_decode(usb_update_buf, sizeof(usb_update_buf),
+                                             &decoded, (const unsigned char *)b64,
+                                             strlen(b64));
+        if (rc != 0 || decoded == 0)
+        {
+            usb_send_error("update", -1, "bad base64 chunk");
+            return;
+        }
+
+        // A lost ack makes the host resend the same offset. The bytes already
+        // landed; acknowledge them again instead of writing a second copy.
+        if (offset < usb_update_received)
+        {
+            usb_send_update_state("data");
+            return;
+        }
+        if (offset > usb_update_received)
+        {
+            usb_send_error("update", -1, "chunk gap");
+            return;
+        }
+        if (offset + decoded > usb_update_total)
+        {
+            usb_send_error("update", -1, "chunk exceeds image size");
+            return;
+        }
+
+        const size_t written = Update.write(usb_update_buf, decoded);
+        if (written != decoded)
+        {
+            const char *message = Update.errorString();
+            Update.abort();
+            usb_update_active = false;
+            usb_send_error("update", -1, message);
+            return;
+        }
+
+        usb_update_received += decoded;
+        usb_send_update_state("data");
+        return;
+    }
+
+    if (usb_ieq(args, "END"))
+    {
+        if (!usb_update_active)
+        {
+            usb_send_error("update", -1, "no update in progress");
+            return;
+        }
+        if (usb_update_received != usb_update_total)
+        {
+            usb_send_error("update", -1, "image incomplete");
+            return;
+        }
+        if (!Update.end(true))
+        {
+            const char *message = Update.errorString();
+            Update.abort();
+            usb_update_active = false;
+            usb_send_error("update", -1, message);
+            return;
+        }
+
+        usb_update_active = false;
+        usb_update_reboot_at = millis() + 700;
+        usb_send_update_state("complete");
+        return;
+    }
+
+    if (usb_ieq(args, "ABORT"))
+    {
+        if (usb_update_active)
+            Update.abort();
+        usb_update_active = false;
+        usb_update_reboot_at = 0;
+        usb_send_update_state("aborted");
+        return;
+    }
+
+    usb_send_error("update", -1, "expected BEGIN, DATA, END or ABORT");
+}
+
 void usb_handle_line(char *line)
 {
     if (*line == '\0')
@@ -759,6 +955,11 @@ void usb_handle_line(char *line)
     if (usb_ieq(line, "REBOOT"))
     {
         usb_handle_reboot();
+        return;
+    }
+    if (usb_ieq(line, "UPDATE"))
+    {
+        usb_handle_update(args);
         return;
     }
 
@@ -972,11 +1173,25 @@ void usb_control_loop()
     {
         //? A reset or an unplug ends the session mid-line. Drop the partial
         //* line and stop the stream; the host re-handshakes when it comes back.
+        if (usb_update_active)
+        {
+            Update.abort();
+            usb_update_active = false;
+        }
         usb_rx_len = 0;
         usb_rx_overflow = false;
         usb_stream_hz = 0;
     }
     usb_was_connected = connected;
+
+    if (usb_update_reboot_at != 0 &&
+        (int32_t)(millis() - usb_update_reboot_at) >= 0)
+    {
+        usb_update_reboot_at = 0;
+        Serial.flush();
+        delay(100);
+        ESP.restart();
+    }
 
     if (!connected)
         return;

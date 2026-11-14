@@ -71,11 +71,15 @@ sha256sum releases/latest/firmware.bin releases/latest/boot_app0.bin > releases/
 ```
 
 Update `latest/manifest.json` (`version`, `built`, `source`, `size`, `sha256`,
-and both part `sha256` values) and `latest/BUILD.txt`. The console verifies each
-part's hash before it opens the port. The manifest lists **two parts** —
-`boot_app0.bin` at `0xE000` and `firmware.bin` at `0x10000` — and deliberately no
-factory image: a merged factory image spans the NVS region with `0xFF` padding and
-would wipe the saved configuration. `latest/README.md` has the full reasoning.
+and both part `sha256` values) and `latest/BUILD.txt`. The console selects the
+part at `0x10000`, verifies its hash, and streams it to the inactive OTA slot
+over the USB control link; it does not send `boot_app0.bin`. The manifest still
+lists **two parts** — `boot_app0.bin` at `0xE000` and `firmware.bin` at
+`0x10000` — so an ESP Web Tools manifest can use it, and deliberately no
+factory image: a merged factory image spans the NVS region with `0xFF` padding
+and would wipe the saved configuration. `latest/README.md` has the full
+reasoning.
 
 The console fetches the manifest with `cache: no-store`; no front-end change is
-needed for a new build.
+needed for a new build. The **first** build carrying the `UPDATE` command is
+`0.5.0-dev`, which must be flashed once with PlatformIO or the installer.

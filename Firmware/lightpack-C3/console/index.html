@@ -227,10 +227,10 @@
             <h2>Firmware update</h2>
             <span id="updateCurrent" class="muted mono"></span>
           </div>
-          <p class="hint">Checks the repository's <code>releases/latest</code> channel and installs the app
-             over USB. The app slot and the OTA selector are written; NVS is left alone, so mode, palette,
-             presets, networks and login survive. If the console is connected when you click Install, the
-             page reloads once to release the port cleanly and resumes the update; this is normal.</p>
+          <p class="hint">Checks the repository's <code>releases/latest</code> channel and writes the app
+             to the board's inactive OTA slot over the existing USB control link. Connect to the board
+             first. The running image keeps running and NVS is untouched until the new slot is complete,
+             so mode, palette, presets, networks and login survive.</p>
           <div class="row">
             <button id="btnCheckUpdate" class="btn" type="button">Check for latest build</button>
             <button id="btnUpdateDisconnect" class="btn ghost" type="button" disabled>Disconnect console</button>
@@ -247,10 +247,10 @@
               <span id="updatePercent" class="mono"></span>
             </div>
           </div>
-          <p class="hint">The update runs in this panel with esptool-js (pinned 0.6.0, fetched from jsDelivr
-             on first use) and shows byte progress below. If that is blocked, use the
-             <a href="../../../install/">browser installer</a> or the <code>firmware.bin</code> in
-             <a href="../releases/latest/README.md">releases/latest</a>.</p>
+          <p class="hint">No bootloader hand-off and no extra browser dependency: the image is sent as
+             base64 chunks on the same <code>@</code> link, acknowledged by the board and written through
+             <code>Update.h</code>. If it is interrupted, the board keeps running the image it booted
+             with; retry, or use the <a href="../../../install/">browser installer</a>.</p>
         </div>
 
         <dl id="diag" class="diag"></dl>
