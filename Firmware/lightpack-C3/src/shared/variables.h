@@ -19,6 +19,12 @@
 //! that three advertisements have to agree.
 #define NETWORK_HOSTNAME "lightpack"
 
+//* ---------------------- FIRMWARE IDENTITY ----------------------
+//? Reported by the USB console's PING, and shown in its title bar. Bump it with
+//? the release, not with every build: the build date travels beside it and is
+//* what tells two images of the same version apart.
+#define LIGHTPACK_FW_VERSION "0.4-pre"
+
 //* ---------------------- NETWORK STATE ----------------------
 //? The board is in exactly one of these three states. It lives here rather than in
 //? services/wifi_settings.h, which owns the transitions, because the onboard
@@ -175,6 +181,21 @@ typedef struct colorRGB
 } struct_colorRGB;
 
 struct_colorRGB palette;
+
+//* ---------------------- UNSAVED CONFIGURATION ----------------------
+//? True while RAM holds something NVS does not. The USB path sets it when a
+//? transient SET actually moves a field; webpage_config_save() and
+//? webpage_config_load() clear it. The web page ignores it - every write it makes
+//* is saved - and the USB console draws its "unsaved" dot from it.
+bool config_dirty = false;
+
+//* ---------------------- CONFIG PORTAL WINDOW ----------------------
+//? True while setup_WIFI() is pumping the provisioning hotspot in setup(). The
+//? USB console is serviced from that loop - otherwise a board that booted into
+//? the 60 s portal would ignore the cable for a minute, which is exactly the
+//? situation this link exists for. RADIO is refused while it is set: tearing the
+//* radio down underneath WiFiManager is not a transition this firmware supports.
+bool usb_portal_window = false;
 
 //* ---------------------- PULSE WHIP TUNABLES (mode 5) ----------------------
 //? Exposed on the device configuration webpage. The dynamics that consume these

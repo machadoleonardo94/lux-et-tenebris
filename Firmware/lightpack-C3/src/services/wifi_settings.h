@@ -39,6 +39,11 @@ bool wifi_offline_saved();
 void wifi_toggle_offline();
 const char *wifi_state_name();
 
+//* Defined in services/usb_control.h, which is included after this header. The
+//? config portal is the one blocking window of the boot, and it services the
+//* console from its own loop so the cable still answers while the hotspot is up.
+void usb_control_loop();
+
 //* How long the portal a board with NO SAVED CREDENTIALS opens stays up.
 //? This is a fixed window measured from the portal opening, not from your first
 //? connection attempt, so a board that boots and sits idle will have closed its AP
@@ -1107,6 +1112,11 @@ uint8_t run_config_portal(bool forced, uint16_t timeout_s, bool portal_enabled)
         const uint8_t last_event_before = boot_button.last_event;
         const uint8_t counter_before = boot_button.counter;
 
+        //* The console is live for the whole window, not just after setup()
+        //? returns. Cleared before the portal is torn down, so a RADIO request
+        //* that raced the close cannot act on a half-dismantled radio.
+        usb_portal_window = true;
+
         while (true)
         {
             //* The portal's entire server, serviced once per pass.
@@ -1114,6 +1124,17 @@ uint8_t run_config_portal(bool forced, uint16_t timeout_s, bool portal_enabled)
             //? alive - it answers false on every idle pass - so it is not a liveness
             //* test. See getConfigPortalActive() below.
             wifiManager.process();
+
+            //* The USB console, serviced from this loop on purpose. setup() has
+            //? not returned, so without this the cable is dead for the whole
+            //? portal window - the exact situation (bad WiFi, board stuck asking
+            //* for credentials) the console is meant to fix.
+            usb_control_loop();
+
+            //* And let a SET be seen while it is set. The mode renderer is
+            //? normally loop()'s job, but loop() is not running here; without
+            //* this the lamp would not react until the portal closed.
+            update_strip(mode);
 
             //* Polled rather than waited for. setup_button_interrupt() ran before
             //? setup_WIFI(), so the edge is already latched and the press clock has
@@ -1185,6 +1206,8 @@ uint8_t run_config_portal(bool forced, uint16_t timeout_s, bool portal_enabled)
         }
 
         //* Hand the switch back exactly as it was found - see the snapshot above.
+        usb_portal_window = false;
+
         boot_button.event_count = events_before;
         boot_button.last_event_ms = last_event_ms_before;
         boot_button.hold_ms = hold_ms_before;

@@ -178,6 +178,10 @@ void webpage_config_load()
                 flame.power_slope, flame.power_max, flame.power_idle);
   Serial.printf("[WEB] Rainbow: speed=%.2f gap=%u..%ums\n",
                 rainbow.speed, rainbow.min_ms, rainbow.max_ms);
+
+  //* NVS and RAM agree again, whatever they held before. The USB console reads
+  //? this through /api/state to draw its unsaved dot; the page ignores it.
+  config_dirty = false;
 }
 
 void webpage_config_save()
@@ -230,12 +234,20 @@ void webpage_config_save()
   //? The old cadence key is dropped rather than left behind: it described a gate
   //! that never did anything (see the note in services/gyros.h), so re-saving it
   //! would advertise a setting the firmware no longer has.
-  preferences.remove("stmaxg");
+  //! Guarded: remove() logs "[E] nvs_erase_key fail: stmaxg NOT_FOUND" when the
+  //* key was never present, which is the ordinary case on every mode change.
+  if (preferences.isKey("stmaxg"))
+    preferences.remove("stmaxg");
   preferences.putFloat("stimin", step.impact_min);
   preferences.putFloat("stimax", step.impact_max);
   preferences.putUChar("stmagmin", step.magnitude_min);
   preferences.putUChar("stmagmax", step.magnitude_max);
   preferences.end();
+
+  //? Every caller of this function means "the live configuration is now the
+  //? stored one": the web POST, the button's mode change, a preset apply and the
+  //* USB COMMIT. Clearing the flag here is what keeps that true for all of them.
+  config_dirty = false;
 }
 
 //* ---------------------- HELPERS ----------------------
@@ -269,13 +281,14 @@ String webpage_url()
 
 //* ---------------------- HANDLERS ----------------------
 
-void webpage_handle_state()
+//* The whole live configuration as the JSON object /api/state serves, without a
+//? wrapper and without a trailing newline. Split out of webpage_handle_state()
+//? so the USB console can nest the same document in its own frame: one builder,
+//* so a field added here cannot exist on one transport and be missing on the other.
+void webpage_state_json(String &json)
 {
   const struct_ledMode *entry = find_led_mode((uint8_t)mode);
 
-  String json;
-  //? Grown for the strip-size, step-flame and step-detection blocks.
-  json.reserve(2600); // The state document outgrew the old 320-byte reserve long ago
   json += F("{\"mode\":");
   json += String(mode);
   json += F(",\"mode_key\":\"");
@@ -308,6 +321,19 @@ void webpage_handle_state()
   json += String(whip_in_flight());
   json += F(",\"whip_max_heads\":");
   json += String(WHIP_MAX_HEADS);
+  //* Range constants for the host tools. The device clamps every write anyway;
+  //? exporting them is what stops a second copy of these numbers from drifting
+  //* away from the firmware's own.
+  json += F(",\"whip_speed_min\":");
+  json += String(WHIP_SPEED_MIN, 1);
+  json += F(",\"whip_speed_max\":");
+  json += String(WHIP_SPEED_MAX, 1);
+  json += F(",\"whip_length_min\":");
+  json += String(WHIP_LENGTH_MIN);
+  json += F(",\"whip_period_min\":");
+  json += String(WHIP_PERIOD_MIN);
+  json += F(",\"whip_period_max\":");
+  json += String(WHIP_PERIOD_MAX);
   json += F(",\"rainbow_speed\":");
   json += String(rainbow.speed, 2);
   json += F(",\"rainbow_min_ms\":");
@@ -348,6 +374,15 @@ void webpage_handle_state()
   json += wifi_state_name();
   json += F("\",\"offline_mode\":");
   json += (net_state == NET_OFFLINE) ? F("true") : F("false");
+  //* The provisioning hotspot is pumped inside setup(), where loop() is not
+  //? running. Saying so here is what lets the console explain a board that is
+  //* otherwise reporting "offline" while its radio is very much on.
+  json += F(",\"portal\":");
+  json += usb_portal_window ? F("true") : F("false");
+  //? RAM differs from NVS: set by a transient USB SET, cleared by any save or a
+  //* reload. The browser page ignores it; the USB console draws its unsaved dot.
+  json += F(",\"dirty\":");
+  json += config_dirty ? F("true") : F("false");
 
   //* Step flame tunables.
   json += F(",\"flame_decay\":");
@@ -367,6 +402,10 @@ void webpage_handle_state()
   json += String(FLAME_DECAY_MAX, 3);
   json += F(",\"flame_spatial_max\":");
   json += String(FLAME_SPATIAL_MAX, 1);
+  json += F(",\"flame_decay_min\":");
+  json += String(FLAME_DECAY_MIN, 3);
+  json += F(",\"flame_spatial_min\":");
+  json += String(FLAME_SPATIAL_MIN, 1);
   json += F(",\"flame_power_slope_max\":");
   json += String(FLAME_POWER_SLOPE_MAX, 1);
 
@@ -397,6 +436,8 @@ void webpage_handle_state()
   json += String(STEP_BASELINE_TAU_MAX_MS);
   json += F(",\"step_jerk_max\":");
   json += String(STEP_JERK_MAX, 1);
+  json += F(",\"step_jerk_floor\":");
+  json += String(STEP_JERK_MIN, 1);
   json += F(",\"step_threshold_min\":");
   json += String(STEP_THRESHOLD_MIN, 2);
   json += F(",\"step_threshold_max\":");
@@ -439,8 +480,15 @@ void webpage_handle_state()
   //? The network the board is aiming at, not necessarily the one it is on: in
   //* NET_CONNECTING those differ, and that is exactly the state worth seeing.
   json += webpage_json_escape(wifi_saved_ssid().c_str());
-  json += F("\"}\n");
+  json += F("\"}");
+}
 
+void webpage_handle_state()
+{
+  String json;
+  //? Grown for the strip-size, step-flame, step-detection and USB blocks.
+  json.reserve(3000); // The state document outgrew the old 320-byte reserve long ago
+  webpage_state_json(json);
   web_server.send(200, "application/json", json);
 }
 
@@ -587,8 +635,24 @@ void webpage_handle_set_mode()
   webpage_handle_state(); // Reply with the resulting state
 }
 
-void webpage_handle_set_config()
+//* Apply one /api/config field, exactly as the HTTP handler always has.
+//? The 28 clamp blocks below are the handler's original body, unchanged. They
+//? address their input as web_server.hasArg(name) / web_server.arg(name), so a
+//? small local adapter answers those two calls from the single name/value pair
+//? this function was handed. That is why the limits exist once and not twice -
+//? the browser and the USB console cannot drift apart on a clamp.
+//! The local `web_server` shadows the global server on purpose and only inside
+//* this scope; the body below never sends a response.
+bool webpage_config_apply_arg(const char *name, const String &value)
 {
+  struct single_arg_request
+  {
+    const char *name;
+    const String &value;
+    bool hasArg(const char *key) const { return strcmp(name, key) == 0; }
+    String arg(const char *) const { return value; }
+  } web_server{name, value};
+
   bool changed = false;
 
   if (web_server.hasArg("red"))
@@ -867,6 +931,20 @@ void webpage_handle_set_config()
     step.magnitude_max = (uint8_t)magnitude;
     changed = true;
   }
+
+  return changed;
+}
+
+void webpage_handle_set_config()
+{
+  //? Walk the request's own argument list, in the order the browser sent it,
+  //? and feed the same per-field function the USB parser uses. The sanitisers
+  //? run once after the whole batch, exactly as they did when this was a wall
+  //! of hasArg() blocks: a request that moves both sides of a pair must be
+  //* sanitised on the final values, not on each intermediate one.
+  bool changed = false;
+  for (int i = 0; i < web_server.args(); i++)
+    changed |= webpage_config_apply_arg(web_server.argName(i).c_str(), web_server.arg(i));
 
   if (!changed)
   {

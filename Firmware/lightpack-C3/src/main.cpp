@@ -44,7 +44,19 @@ void setup()
   onboard_led.setPixelColor(0, 50, 0, 0);
   onboard_led.show();
   Serial.println("Status LED initialized");
+  //* Size the CDC buffers BEFORE begin(). HWCDC::begin() only installs its
+  //? 256-byte defaults when no queue exists yet, and the USB console's batch
+  //! lines are several hundred bytes: a 256-byte RX queue would drop them. The
+  //? tx ring is raised for the same reason - a 3 KB state frame is written in
+  //* one call and must not have to wait for a tiny ring to drain in pieces.
+  Serial.setRxBufferSize(4096);
+  Serial.setTxBufferSize(4096);
   Serial.begin(115200);
+  //! Default is 100 ms. If the host stops reading, a full tx ring would then
+  //* hold up loop() - and therefore the LEDs - for a tenth of a second per
+  //? frame. Ten milliseconds is enough for USB to drain a normal reply and
+  //* short enough that a stalled browser cannot be felt on the strip.
+  Serial.setTxTimeoutMs(10);
   delay(100);
 
   Serial.println("\n\nESP32-C3 Lightpack Let it Go ");
@@ -114,6 +126,11 @@ void setup()
   webpage_config_load();
   strip_report_config();
 
+  //* The USB console's baseline is taken after the stored configuration has
+  //? been restored, so its first "mode changed" event is a real change rather
+  //* than the difference between compile-time defaults and NVS.
+  usb_control_begin();
+
   //* Network bring-up, then the device configuration webpage - except that the
   //? page is no longer started from here. setup_WIFI() reads the stored offline
   //? switch and the stored credentials and leaves the board in one of three
@@ -159,26 +176,29 @@ void loop()
   //* User inputs, both polled here rather than from an ISR body: the interrupts
   //* only latch an edge, and the debounce, the classification, the mode change and
   //* the power-off are all loop-level work (services/readings.h).
-  //! Touch button (GPIO3): 1 s press next LED mode, 5 s press cuts the latch.
-  //! The GPIO3 input is HARDWARE DAMAGED on this board - the pad still measures a
-  //? clean 3.3 V but the pin reads LOW and never latches an edge (see the polarity
-  //! notes in services/readings.h). This path is kept for a repaired board only;
-  //* every gesture below is what the device is actually driven with now.
+  //! Touch button (GPIO3): the daily interface - 1 click next mode, 2 clicks
+  //? previous mode, 5 clicks power off, 3 s hold toggles the radio, 6 s hold opens
+  //! the config hotspot. It is working on the current unit; GPIO9 below is the
+  //* fallback if it ever fails again.
   check_button();
-  //? Boot button (GPIO9): 1 click next mode, 2 clicks previous mode, 5 clicks
-  //? power off, 3 s hold toggles the radio, 6 s hold opens the config hotspot,
-  //* 10 s hold wipes the saved networks and the page login. It is the only input
-  //? this board still responds to, which is why it now carries the lot.
+  //? Boot button (GPIO9): the security and recovery interface - 1 click previous
+  //? mode, 5 clicks power off, 3 s hold toggles the radio, 6 s hold opens the
+  //* config hotspot, 10 s hold wipes the saved networks and the page login.
   check_boot_button();
 
-  //* The network, after the inputs: a 1 s press that flips offline mode is acted
-  //? on in the same pass rather than the next one, and check_boot_button() itself
-  //* performs the transition, so this only carries the join and the retry.
+  //* The network, after the inputs: a hold that flips offline mode is acted on in
+  //? the same pass rather than the next one, and the check functions themselves
+  //* perform the transition, so this only carries the join and the retry.
   wifi_loop();
 
   update_strip(mode);
 
   webpage_loop();
+
+  //* The USB console is serviced after the page and before the periodic log:
+  //? a SET is applied in the same pass it arrived, and a reply is written
+  //* before the 10 s telemetry block can add its own lines around it.
+  usb_control_loop();
 
   serial_outputs();
 }

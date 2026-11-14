@@ -62,5 +62,9 @@
 //* Presets come after the page: their handlers are registered by setup_webpage()
 //* and they reuse its JSON helper and configuration writer.
 #include "services/presets.h"
+//* The USB console comes last: it uses the preset field table and store, the
+//? webpage's state builder and configuration writer, the input table and the
+//* network state - all of which are defined above.
+#include "services/usb_control.h"
 
 #endif

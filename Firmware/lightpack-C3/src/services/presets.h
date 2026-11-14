@@ -235,6 +235,24 @@ uint8_t preset_slot_state(uint8_t slot)
     return preset_read_checked(slot, scratch);
 }
 
+//* Copy the live configuration into a slot struct.
+//? `p` is NOT zeroed here: the name and the padding belong to the caller, and
+//? preset_write() zeroes the struct before calling this so a CRC-free blob never
+//? carries stack noise. The USB service uses the same function twice - once
+//? before a SET and once after - to diff what the request actually changed.
+void preset_capture(struct_preset &p)
+{
+    p.version = PRESET_FORMAT_VERSION;
+    p.mode = (uint8_t)mode;
+    p.brightness = led_strip.brightness;
+    p.active_leds = strip_settings.active_leds;
+    p.palette = palette;
+    p.whip = whip;
+    p.rainbow = rainbow;
+    p.flame = flame;
+    p.step = step;
+}
+
 //* Copy the live configuration into a slot.
 bool preset_write(uint8_t slot, const char *name)
 {
@@ -245,15 +263,7 @@ bool preset_write(uint8_t slot, const char *name)
     //? they are part of the blob, and a CRC-free format should not carry stack
     //? noise into flash.
     struct_preset p = {};
-    p.version = PRESET_FORMAT_VERSION;
-    p.mode = (uint8_t)mode;
-    p.brightness = led_strip.brightness;
-    p.active_leds = strip_settings.active_leds;
-    p.palette = palette;
-    p.whip = whip;
-    p.rainbow = rainbow;
-    p.flame = flame;
-    p.step = step;
+    preset_capture(p);
 
     //* Name resolution, in order: what the caller asked for, then the name the
     //* slot already had (so re-saving over a named slot keeps its label), and
@@ -368,16 +378,12 @@ void preset_json_config(String &json, const struct_preset &p)
 
 //* ---------------------- HANDLERS ----------------------
 
-//* GET /api/presets - what the page needs to draw the slot bar: which slots hold
-//? something, what they are called, and whether this firmware can read them.
-//? `used` deliberately means USABLE rather than "something is stored here", so
-//? every existing caller keeps its meaning: only an OK slot can be applied or
-//* exported. `state` is what separates the two ways a slot can be unusable, and it
-//* is why a slot written by another build no longer looks like an empty one.
-void webpage_handle_presets()
+//* The slot list as a JSON array, without a wrapper and without a trailing
+//? newline. Split out of webpage_handle_presets() so the USB console can frame
+//* the same document in its own envelope instead of duplicating this loop.
+void preset_slots_json(String &json)
 {
-    String json;
-    json.reserve(480);
+    json.reserve(json.length() + 480);
     json += '[';
     for (uint8_t i = 0; i < PRESET_SLOTS; i++)
     {
@@ -397,25 +403,32 @@ void webpage_handle_presets()
             json += webpage_json_escape(p.name);
         json += F("\"}");
     }
-    json += F("]\n");
+    json += ']';
+}
 
+//* GET /api/presets - what the page needs to draw the slot bar: which slots hold
+//? something, what they are called, and whether this firmware can read them.
+//? `used` deliberately means USABLE rather than "something is stored here", so
+//? every existing caller keeps its meaning: only an OK slot can be applied or
+//* exported. `state` is what separates the two ways a slot can be unusable, and it
+//* is why a slot written by another build no longer looks like an empty one.
+void webpage_handle_presets()
+{
+    String json;
+    preset_slots_json(json);
     web_server.send(200, "application/json", json);
 }
 
-//* GET /api/preset?slot=N - one slot, values included: the export payload.
-void webpage_handle_preset()
+//* One usable slot as the export payload, or false when the slot is empty or
+//? unreadable. The caller decides the status code; the USB console only needs
+//* the object and its `slot`/`name` envelope.
+bool preset_slot_json(String &json, int slot)
 {
-    int slot = web_server.hasArg("slot") ? web_server.arg("slot").toInt() : -1;
     struct_preset p;
-
     if (slot < 0 || slot >= PRESET_SLOTS || !preset_read((uint8_t)slot, p))
-    {
-        web_server.send(404, "application/json", "{\"ok\":false,\"error\":\"empty slot\"}\n");
-        return;
-    }
+        return false;
 
-    String json;
-    json.reserve(700);
+    json.reserve(json.length() + 700);
     json += F("{\"slot\":");
     json += String(slot);
     json += F(",\"name\":\"");
@@ -426,7 +439,21 @@ void webpage_handle_preset()
     json += String(PRESET_FIELD_COUNT);
     json += F(",\"config\":");
     preset_json_config(json, p);
-    json += F("}\n");
+    json += '}';
+    return true;
+}
+
+//* GET /api/preset?slot=N - one slot, values included: the export payload.
+void webpage_handle_preset()
+{
+    int slot = web_server.hasArg("slot") ? web_server.arg("slot").toInt() : -1;
+
+    String json;
+    if (!preset_slot_json(json, slot))
+    {
+        web_server.send(404, "application/json", "{\"ok\":false,\"error\":\"empty slot\"}\n");
+        return;
+    }
 
     web_server.send(200, "application/json", json);
 }
