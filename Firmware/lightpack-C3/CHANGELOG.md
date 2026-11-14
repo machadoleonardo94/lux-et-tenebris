@@ -70,9 +70,10 @@ No release images yet.
   progress in the panel. It writes `boot_app0.bin` at `0xE000` and the app at `0x10000` with
   `eraseAll: false`, so NVS — mode, palette, tunables, presets, networks and login — is
   preserved and `app0` is selected. `releases/latest/` is a development channel, replaced in
-  place, with its own manifest, per-part SHA-256 sums and a pinned tool. Before opening the
-  port the update closes a stale `SerialPort` and retries; a port held by another console tab
-  or program now reports that instead of a bare browser error.
+  place, with its own manifest, per-part SHA-256 sums and a pinned tool. The update owns the
+  port end to end: console reconnect is suspended, a stale `SerialPort` is closed, and opens
+  retry while the C3 re-enumerates; a port held by another tab or program now says so instead
+  of surfacing a bare browser error.
 - **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
   DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
   one request into the reset. The saved configuration is restored; unsaved edits do not

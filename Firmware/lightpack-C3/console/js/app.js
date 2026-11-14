@@ -1229,14 +1229,14 @@ function renderConnectionUI() {
   connectButton.textContent = app.connected ? 'Disconnect' : 'Connect';
   connectButton.classList.toggle('solid', !app.connected);
   connectButton.classList.toggle('ghost', app.connected);
-  connectButton.disabled = app.connecting;
+  connectButton.disabled = app.connecting || app.updateBusy;
 
   if (app.demo) {
     connectButton.textContent = 'Demo';
     connectButton.disabled = true;
   }
 
-  $('#btnReconnect').hidden = app.connected || app.connecting || !app.port || app.demo;
+  $('#btnReconnect').hidden = app.connected || app.connecting || !app.port || app.demo || app.updateBusy;
 
   $('#btnSave').disabled = !ready;
   $('#btnRevert').disabled = !ready;
@@ -1258,7 +1258,7 @@ function renderConnectionUI() {
   if (fileButton) fileButton.classList.toggle('disabled', !ready);
 
   if (!app.connected) {
-    $('#btnConnect').disabled = app.connecting;
+    $('#btnConnect').disabled = app.connecting || app.updateBusy;
   }
 
   renderUpdatePanel();
@@ -1344,6 +1344,14 @@ async function installLatest() {
   }
   if (app.updateBusy) return;
 
+  // From here until the write finishes, the update owns the port. Stop the
+  // console's reconnect timer now: a stale link's disconnect event used to
+  // reopen the port underneath the updater and reset the board mid-open.
+  app.manualDisconnect = true;
+  app.expectReboot = false;
+  app.reconnectAttempts = 0;
+  clearTimeout(app.reconnectTimer);
+
   app.updateBusy = true;
   renderUpdatePanel();
   setUpdateProgress('Preparing…', 0);
@@ -1386,6 +1394,9 @@ async function installLatest() {
 
     setUpdateProgress('Opening port…', 0);
     port = await openUpdatePort(port);
+    // Opening the CDC port resets the C3 once. Let it finish booting before
+    // esptool asks the ROM bootloader to reset it again.
+    await sleep(1000);
 
     setUpdateProgress('Loading esptool-js…', 0);
     const { ESPLoader, Transport } = await loadEsptool();
@@ -1463,9 +1474,37 @@ async function waitPortReleased(port, timeout = 1200) {
   }
 }
 
+async function openPortWithRetries(port, options, attempts = 5) {
+  let lastError = null;
+
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      await port.open(options);
+      return;
+    } catch (error) {
+      lastError = error;
+      const text = String(error?.message || error);
+
+      if (/already open/i.test(text)) {
+        await closePortQuietly(port);
+        await waitPortReleased(port);
+      } else if (!/failed to open|access denied|busy|network|not found|no such/i.test(text)) {
+        throw error;
+      }
+
+      // The C3 re-enumerates after a reset. Opening too soon gives
+      // "Failed to open serial port"; give it a longer window each time.
+      await sleep(250 * (attempt + 1));
+    }
+  }
+
+  throw lastError || new Error('Could not open the serial port.');
+}
+
 async function openUpdatePort(initial) {
   const options = { baudRate: 115200, bufferSize: 8192 };
   const candidates = [initial];
+  let lastError = null;
 
   // getPorts() can hand back a fresh object after a reset even when app.port
   // still points at the old one; try those too before giving up. Keep the
@@ -1482,34 +1521,26 @@ async function openUpdatePort(initial) {
   for (const candidate of candidates) {
     // A console link or an earlier failed attempt can leave the SerialPort open
     // even though this page no longer has a link to it. Close it first, then
-    // let Chrome settle the reader/writer locks before opening it for esptool.
+    // let Chrome settle the reader/writer locks and the board re-enumerate
+    // before opening it for esptool-js.
     await closePortQuietly(candidate);
     await waitPortReleased(candidate);
-    await sleep(180);
+    await sleep(350);
 
     try {
-      await candidate.open(options);
+      await openPortWithRetries(candidate, options);
       app.port = candidate;
+      await sleep(200);
       return candidate;
     } catch (error) {
-      if (!/already open/i.test(String(error?.message || error))) throw error;
-    }
-
-    await closePortQuietly(candidate);
-    await waitPortReleased(candidate);
-    await sleep(400);
-    try {
-      await candidate.open(options);
-      app.port = candidate;
-      return candidate;
-    } catch (error) {
-      if (!/already open/i.test(String(error?.message || error))) throw error;
+      lastError = error;
     }
   }
 
   throw new Error(
-    'The serial port is already open in another tab or program. ' +
-    'Close that tab/program, then try Install latest again.'
+    'Could not open the serial port. If another console tab or program owns COM9, ' +
+    'close it; then unplug/replug the board and try Install latest again.' +
+    (lastError ? ` (${lastError.message})` : '')
   );
 }
 

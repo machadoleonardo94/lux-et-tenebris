@@ -156,6 +156,12 @@ Diagnostics → **Firmware update** turns the console into a USB updater:
    any unsaved configuration, downloads both parts, verifies each part's
    SHA-256, resets the board into the ROM bootloader, writes `boot_app0.bin` at
    `0xE000` and `firmware.bin` at `0x10000`, and reboots.
+
+   The most reliable path is to reload the page and go straight to
+   **Check → Install without connecting first**: the updater can take a closed
+   port and resets the board itself. If you do connect first, Install releases
+   the console and the updater waits for the C3 to re-enumerate before opening.
+   Connecting first is not required to install.
 3. The progress area in the panel reports **Downloading firmware → Opening port
    → Connecting to ROM bootloader → Writing OTA selector/application (%) →
    Resetting board → Update complete — reconnecting**. There is no separate
@@ -202,6 +208,7 @@ reconnects by itself.
 | Install latest is disabled | No build has been checked yet, the page is in `?demo` mode, an update is already running, or the console is reconnecting. Check for a build first; Install can disconnect the console itself. |
 | Install starts but stops at "Connecting to ROM bootloader" | The board did not enter the ROM bootloader. Hold **BOOT** while clicking Install latest, or use the browser installer. |
 | Update fails with "The port is already open" | Another console tab or program owns COM9. Close every other console/terminal tab (or click Disconnect there), then hard-refresh this page and try Install latest again. The page force-closes its own stale port and retries once; Chrome will not let it close a port owned by another tab. |
+| Update fails with "Failed to open serial port" | The C3 was still re-enumerating from the previous open/reset. The updater retries with a growing delay; if it still fails, **reload the page and install without clicking Connect first**, close other tabs/terminals, or unplug/replug the board. |
 | No progress appears after Install | The progress line starts with **Downloading firmware**; if it does not, esptool-js could not load from jsDelivr or the manifest fetch failed. Check the device log and the error banner. |
 | The update finishes but the board still runs the old build | The update writes app0 and forces the OTA selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
 | The update was interrupted | Do not keep retrying from the console. The application may be incomplete; recover with the [browser installer](../../../install/) or a full release image. |
