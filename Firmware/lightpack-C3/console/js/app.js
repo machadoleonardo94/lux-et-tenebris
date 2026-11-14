@@ -1351,7 +1351,6 @@ async function installLatest() {
   let port = app.port;
   let transport = null;
   let loader = null;
-  let opened = false;
 
   try {
     if (app.connected || app.link) await disconnect();
@@ -1386,8 +1385,7 @@ async function installLatest() {
     }
 
     setUpdateProgress('Opening port…', 0);
-    await port.open({ baudRate: 115200, bufferSize: 8192 });
-    opened = true;
+    port = await openUpdatePort(port);
 
     setUpdateProgress('Loading esptool-js…', 0);
     const { ESPLoader, Transport } = await loadEsptool();
@@ -1423,7 +1421,6 @@ async function installLatest() {
     try {
       await port.close();
     } catch {}
-    opened = false;
     transport = null;
 
     setUpdateProgress('Update complete — reconnecting…', 100);
@@ -1440,12 +1437,80 @@ async function installLatest() {
       if (transport) await transport.disconnect();
     } catch {}
     try {
-      if (opened && port) await port.close();
+      if (port) await port.close();
     } catch {}
   } finally {
     app.updateBusy = false;
     renderUpdatePanel();
   }
+}
+
+async function closePortQuietly(port) {
+  if (!port) return;
+  try {
+    await port.close();
+  } catch {
+    // Not open, locked by a stream that is still unwinding, or owned by
+    // another tab. The retry below decides whether that is recoverable.
+  }
+}
+
+async function waitPortReleased(port, timeout = 1200) {
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    if (!port.readable && !port.writable) return;
+    await sleep(50);
+  }
+}
+
+async function openUpdatePort(initial) {
+  const options = { baudRate: 115200, bufferSize: 8192 };
+  const candidates = [initial];
+
+  // getPorts() can hand back a fresh object after a reset even when app.port
+  // still points at the old one; try those too before giving up. Keep the
+  // fallback to Espressif devices so an update cannot wander onto another
+  // serial peripheral.
+  try {
+    for (const candidate of await navigator.serial.getPorts()) {
+      if (candidate !== initial && candidate.getInfo?.().usbVendorId === 0x303a) {
+        candidates.push(candidate);
+      }
+    }
+  } catch {}
+
+  for (const candidate of candidates) {
+    // A console link or an earlier failed attempt can leave the SerialPort open
+    // even though this page no longer has a link to it. Close it first, then
+    // let Chrome settle the reader/writer locks before opening it for esptool.
+    await closePortQuietly(candidate);
+    await waitPortReleased(candidate);
+    await sleep(180);
+
+    try {
+      await candidate.open(options);
+      app.port = candidate;
+      return candidate;
+    } catch (error) {
+      if (!/already open/i.test(String(error?.message || error))) throw error;
+    }
+
+    await closePortQuietly(candidate);
+    await waitPortReleased(candidate);
+    await sleep(400);
+    try {
+      await candidate.open(options);
+      app.port = candidate;
+      return candidate;
+    } catch (error) {
+      if (!/already open/i.test(String(error?.message || error))) throw error;
+    }
+  }
+
+  throw new Error(
+    'The serial port is already open in another tab or program. ' +
+    'Close that tab/program, then try Install latest again.'
+  );
 }
 
 function loadEsptool() {
