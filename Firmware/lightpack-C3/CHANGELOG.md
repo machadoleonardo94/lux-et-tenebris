@@ -4,6 +4,135 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [Unreleased]
+
+Two-button control surface, colour-coded action feedback, and a zero-install USB console.
+No release images yet.
+
+### Wi-Fi
+
+- **The configuration portal no longer panics when it times out.** WiFiManager's
+  own timeout check runs inside `process()`, and it shuts the portal down itself,
+  resetting its web server to null. `run_config_portal()` then called
+  `stopConfigPortal()` unconditionally on the way out, dereferencing that null
+  server (`WiFiManager.cpp:970`) - a Load access fault (`MCAUSE 5`, `MTVAL 0`) and
+  a boot loop at exactly the moment the portal was being used to fix credentials.
+  The shutdown is now guarded by `getConfigPortalActive()`.
+- **A join retry can finally cancel the attempt it is retrying.** The retry used
+  `WiFi.disconnect(false, false)`, which returns without touching the driver
+  unless the station is already `WL_CONNECTED` - so a station stuck mid-connect
+  was never released and every `WiFi.begin()` was refused with
+  `ESP_ERR_WIFI_CONN` (0x3007), forever. The join path now calls
+  `esp_wifi_disconnect()`, and a 45 s stall watchdog stops and restarts the
+  station when an attempt neither joins nor fails.
+- **The disconnect reason and the AP's security mode are logged.**
+  `[WIFI-EVT] disconnected: reason=...` names the reason in words, and the
+  periodic status block reports the AP's `auth` mode, BSSID and the stored
+  password length. The framework's automatic reconnect is off: on a refusing AP
+  it retried about once a second, hammering the AP and burying the one useful line.
+
+### USB console
+
+- **The whole configuration surface is now available over the USB cable, with no network at
+  all.** `src/services/usb_control.h` speaks a line protocol on the same CDC port the console
+  uses. It works with the radio switched off and while the board is inside its 60-second
+  config hotspot, which is exactly the situation a bad antenna creates.
+- **`@PING`, `@GET`, `@SET`, `@COMMIT`, `@RELOAD`, `@STREAM`, `@PRESET`, `@IMPACT`, `@RADIO`
+  and `@REBOOT`.** Device frames are `@`-prefixed JSON, host batches are `key=value&…`; every
+  other line on the port stays a human log. The full reference is
+  [`docs/usb-control.md`](docs/usb-control.md).
+- **A `SET` is strict, atomic and transient.** Every key is validated against the 28-field
+  table and every value must be numeric before any field is applied; an unknown key rejects
+  the whole batch. The ack returns only the fields that moved (including cross-field
+  sanitiser changes), so a slider drag does not build the ~3 KB state document or touch NVS.
+- **`@COMMIT` is the only USB write to flash.** `@RELOAD` discards RAM edits. A mode change
+  made with the physical switches still saves the whole live configuration, as it always did.
+- **The HTTP page and the USB console share one writer and one state builder.**
+  `webpage_config_apply_arg()` now holds the 28 clamp blocks and both transports call it;
+  `webpage_state_json()` is shared the same way. `/api/state` gained `dirty`, `portal` and
+  the remaining range constants (`whip_speed_min/max`, `whip_period_min/max`,
+  `flame_decay_min`, `flame_spatial_min`, `step_jerk_floor`) so a host does not have to keep
+  a second copy of the limits.
+- **The console is serviced from the config-portal loop.** `run_config_portal()` calls
+  `usb_control_loop()` and `update_strip(mode)` every pass, so the cable answers and the lamp
+  reacts while `setup()` is still inside the hotspot. `RADIO` is refused there; tearing the
+  radio down underneath WiFiManager is not a supported transition.
+- **CDC buffers are sized for batch lines.** The HWCDC RX/TX rings are 4 KB instead of the
+  256-byte defaults, and the write timeout drops from 100 ms to 10 ms so a stalled host
+  cannot hold the LED loop up for a tenth of a second.
+- **New `console/` page: zero-install, Chrome/Edge, Web Serial.** Mode bar, parameter pages,
+  live telemetry, presets import/export (the same JSON the device page writes), a device log
+  pane and a radio toggle. `?demo` renders it with no board. No build step, no dependency.
+- **Opening the CDC port resets the C3.** The USB Serial/JTAG resets when the host asserts
+  DTR/RTS, so the page waits for the boot and retries `PING` for up to 12 s instead of sending
+  one request into the reset. The saved configuration is restored; unsaved edits do not
+  survive a reconnect. Measured on the bench board with pyserial: DTR high at open resets,
+  a later low/low transition resets again, and low/high enters download mode.
+- **Read-only protocol detail:** `@STREAM` ticks report the detector's diagnostic counters,
+  never `impact_take()`, so telemetry cannot steal an impact from Step flame.
+
+### Firmware
+
+- **GPIO3 (touch pad) is the daily interface again.** It now carries the click ladder:
+  1 click next mode, 2 clicks previous mode, 5 clicks power off, 3 s hold radio on/off,
+  6 s hold reboots into the WiFi config hotspot. Its old 1 s-hold next-mode and 5 s-hold
+  power-off gestures are gone; the click ladder replaces them on both switches.
+- **GPIO9 (BOOT) becomes the security / recovery / fallback switch.** 1 click previous
+  mode (repeated clicks walk the whole registry), 5 clicks power off, 3 s hold radio
+  on/off, 6 s hold config hotspot, 10 s hold recovery wipe. The 10 s wipe stays exclusive
+  to GPIO9.
+- **Both switches pay the 400 ms click window** because both can now produce a 5-click
+  power-off. A mode change therefore resolves 400 ms after the finger lifts.
+- **Colour-coded action feedback on both WS2812B channels.** The status pixel (GPIO10)
+  shows the action colour; the strip (GPIO1) gives a brief flash of the same colour and
+  then the selected mode resumes. The strip flash is current-limited to a peak of 10/255
+  per channel (~0.6 A for a 250-pixel white flash).
+  - next mode: blue; previous mode: cyan; power off: red (1 s); radio on: green;
+    radio off: red; config hotspot: white; recovery wipe: magenta; unrecognised 3/4
+    clicks: dim red.
+  - while held: green (GPIO3) or purple (GPIO9) below 3 s, amber from 3 s (radio will
+    toggle on release), blue from 6 s (hotspot will open). The recovery countdown on
+    GPIO9 stays amber.
+- **`strip_flash()` is a first-class overlay.** `update_strip()` stands down while a
+  feedback flash owns the strip, so the mode cannot repaint over it; the flash itself is
+  non-blocking except immediately before a reboot or the latch cut.
+- **The page reports the long-press action separately** (`long_action` in `/api/buttons`),
+  so a hold no longer claims to be a mode change in the live input panel.
+- **The boot report and the live page now describe the two-button map.** The old banner
+  still advertised GPIO9 as the whole interface; it now lists GPIO3 daily and GPIO9
+  security/recovery separately.
+- **The legacy `stmaxg` NVS key is removed only when it exists.** Unconditional
+  `preferences.remove()` logged `nvs_erase_key fail: stmaxg NOT_FOUND` on every mode
+  change.
+- **Power-off says what happened on USB power.** The latch cut is still the shutdown; a
+  USB-powered board stays alive afterwards and restarts, so the log now says so instead of
+  looking like a failed power-off.
+
+### Tooling
+
+- **The build chain no longer stops on the Device Guard-blocked archiver.** `tools/build_plain_ar.py`
+  is loaded as a `pre:` extra script and makes the archive step use the RISC-V toolchain's
+  plain `ar`/`ranlib` instead of `riscv32-esp-elf-gcc-ar.exe`. The firmware is built without
+  LTO, so the archives are equivalent. This restores the normal PlatformIO
+  `pio run -e C3-USB -t upload` task; no manual workaround is needed.
+
+### Verification
+
+`pio run -e C3-USB`:
+
+```
+RAM:   12.8% (42,084 / 327,680 bytes)
+Flash: 62.5% (1,269,098 / 2,031,616 bytes)
+```
+
+Image: `firmware.bin` 1,281,168 bytes. The USB protocol was exercised on the bench board
+(`PING`, `GET`, `SET` clamping, strict errors, presets, `STREAM`, `RADIO` off/on, `RELOAD`);
+the browser page itself has only been UI-tested with `?demo` so far. The two-button map has
+also not been hardware-tested since the rework; the touch module on the current unit is
+reported working.
+
+---
+
 ## [V0.4-pre] — 2026-10-26
 
 First pre-release of the **renamed** firmware, after the board was identified as the

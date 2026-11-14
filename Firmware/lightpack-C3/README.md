@@ -7,8 +7,8 @@
 Firmware for the **Lux et Portabilis V2** board (`Hardware/lux-et-portabilis-V2/`): an
 ESP32-C3 SuperMini driving one addressable LED strip, a status pixel, an MPU6050
 accelerometer, a battery latch and a servo/analog breakout — with a browser UI on the
-LAN, two independent OTA paths, and a complete no-phone control surface on the module's
-BOOT switch.
+LAN, two independent OTA paths, and a complete no-phone control surface on the touch pad
+and the module's BOOT switch.
 
 - **Board:** Lux et Portabilis V2 (ESP32-C3 SuperMini, 4 MB flash)
 - **Image:** `C3-USB` / `C3-OTA` in `platformio.ini`
@@ -19,8 +19,9 @@ BOOT switch.
 
 > **Pre-release status.** This is a bench-verified pre-release, not a 1.0. The
 > outstanding hardware unknowns are listed under [Known limitations](#known-limitations),
-> and the most load-bearing one — the touch pad input — is **not usable on the current
-> bench board at all**. Everything user-facing runs off the BOOT switch instead.
+> and the most load-bearing one — the touch pad input — **was dead on the first bench
+> board**. The current unit's touch module works and is now the daily control; the BOOT
+> switch remains the fallback and the recovery input.
 
 ---
 
@@ -89,17 +90,34 @@ Checksums for every file are in [`releases/V0.4-pre/FLASHING.md`](releases/V0.4-
 
 ## 2. On-device controls
 
-The whole user interface is the **BOOT switch on the SuperMini module (GPIO9)**. It is on the
-module itself, so it keeps working no matter what happens to the carrier board.
+Two switches, with deliberately different jobs. **GPIO3 is the touch pad and the daily
+interface.** **GPIO9 is the SuperMini's BOOT switch and the security/recovery interface** —
+it lives on the module, so it keeps working no matter what happens to the carrier board,
+and it is the fallback if the touch pad fails again.
+
+### Touch pad — GPIO3 (daily)
 
 | Gesture | Action |
 |---|---|
 | 1 click | next LED mode |
 | 2 clicks | previous LED mode |
 | 5 clicks | cut the battery latch — power down |
-| 3 s hold | toggle the radio: offline mode on / off |
-| 6 s hold | reboot into the WiFi configuration hotspot |
-| 10 s hold | recovery wipe: erase saved networks and the page login |
+| 3 s hold, release | toggle the radio: offline mode on / off |
+| 6 s hold, release | reboot into the WiFi configuration hotspot |
+
+### BOOT switch — GPIO9 (security / recovery / fallback)
+
+| Gesture | Action |
+|---|---|
+| 1 click | previous LED mode — fallback navigation when the pad is unavailable |
+| 5 clicks | cut the battery latch — power down |
+| 3 s hold, release | toggle the radio: offline mode on / off |
+| 6 s hold, release | reboot into the WiFi configuration hotspot |
+| 10 s hold, release | recovery wipe: erase saved networks and the page login |
+
+Repeated BOOT clicks walk the whole registry backwards, so a board with a dead pad still
+reaches every mode. The 10 s wipe is deliberately **BOOT-only**: it erases settings, and
+it should not sit under the pad a sleeve can brush.
 
 How the timing behaves, because it is the part users notice:
 
@@ -110,23 +128,59 @@ How the timing behaves, because it is the part users notice:
   mode changes 400 ms late. A double-tap that is still inside 400 ms behaves as one gesture.
 - **Holds act on release, and only one fires.** The 6 s portal and the 3 s radio toggle are
   exclusive by construction: the longest applicable threshold wins, so a portal hold never
-  also toggles the radio. The 10 s recovery hold shows an amber countdown from 3 s.
+  also toggles the radio. The 10 s recovery hold shows an amber countdown from 7 s.
+- **Power-off is armed 10 s after boot.** The latch cut is refused during the boot and
+  self-test window, so five clicks in the first 10 s do nothing (the refusal is logged).
+  This guard is what keeps a boot-time spurious press from cutting power.
+- **Power-off only cuts battery power.** With USB connected the latch opens but the board
+  stays alive and restarts after the red indication; unplug USB to see it actually shut
+  down. The serial log says which happened.
 - **Holding BOOT through a reset is still the ROM's download mode**, which no sketch can
   see or use.
 
-### The touch pad (GPIO3) — hardware damaged on the bench board
+### Feedback — the status pixel and the strip
+
+The onboard WS2812B pixel (GPIO10) is the always-visible channel. The strip (GPIO1) gives a
+short flash of the same colour so the action can be seen across the room; then the selected
+mode resumes. The strip flash is current-limited to a peak of 10/255 per channel, so a
+250-pixel white flash is a brief ~0.6 A, not the several amps a full-brightness white would
+ask for.
+
+| Action | Status pixel | Strip |
+|---|---|---|
+| next mode | blue, 600 ms | one blue flash, 140 ms |
+| previous mode | cyan, 600 ms | one cyan flash, 140 ms |
+| power off | red, held 1 s | red, held 1 s |
+| radio on | green, 700 ms | one green flash, 160 ms |
+| radio off | red, 700 ms | one red flash, 160 ms |
+| config hotspot | white, 400 ms | white, 400 ms |
+| recovery wipe | magenta, 1.2 s | magenta, 1.2 s |
+| 3 or 4 clicks (no gesture) | dim red, 250 ms | dim red, 80 ms |
+
+While a switch is held, the pixel is a level indicator: **green** on the touch pad or
+**purple** on BOOT below 3 s, **amber** from 3 s (release now toggles the radio), **blue**
+from 6 s (release now opens the hotspot). On BOOT, the last 3 s before the 10 s wipe pulse
+**amber**. When nothing is happening the pixel returns to its network blink: green joined,
+cyan not joined, red radio off.
+
+Red is shared by power-off and radio-off because both mean "off"; the durations separate
+them. Amber never confirms an action — it stays reserved for the wipe countdown.
+
+### The touch pad (GPIO3)
 
 `TOUCH1` takes an external momentary touch module (pin 1 = `+BATT`, pin 2 = signal,
-pin 3 = GND). The firmware still classifies it and still reports it on the page — 1 s hold =
-next mode, 5 s hold = power down — but **on the current bench board it never fires**: the pad
-measures a clean 3.3 V while the pin reads LOW and latches no edge. Board power button `BT1`
-puts `+BATT` (~4.2 V) onto a 3.3 V GPIO through `R12`, and `D6` does not clamp it.
+pin 3 = GND). On the current unit the module works as intended and carries the daily
+gestures above. The first pre-release bench board's pad was damaged — it measured a clean
+3.3 V while the pin read LOW and latched no edge — because board power button `BT1` puts
+`+BATT` (~4.2 V) onto a 3.3 V GPIO through `R12`, and `D6` does not clamp it. That is why
+GPIO9 keeps a complete fallback.
 
 Consequences worth knowing before wiring one:
 
 - The firmware assumes a **momentary, active-HIGH** module (`INPUT_PULLUP`/`INPUT_PULLDOWN`
   is set from the `active_high` flag, and the ISR edge follows the same flag). An active-LOW
-  or latching module reads as dead or as one endless press — which powers the board off at 5 s.
+  or latching module reads as dead or as one endless press, which the firmware eventually
+  drops at the 15 s give-up timeout.
 - `tools/button_probe/` measures which kind of module is plugged in without flashing the
   application, and flipping the polarity is one argument to `button_input_configure()`.
 - The schematic now carries `D7` (BZV55B2V7, 2.7 V) as a clamp for this node. Note that the
@@ -177,9 +231,11 @@ the page's import function, not something the firmware reads at build time.
   configuration page from it.
 - **LAN name.** `lightpack.local` (mDNS), with the DHCP hostname `lightpack` set on every boot.
 - **Offline mode.** The radio is switched off entirely; everything on the device keeps working,
-  and the 3 s hold brings it back.
+  and a 3 s hold on either switch brings it back.
 - **ArduinoOTA.** `pio run -e C3-OTA -t upload` pushes over the network to `lightpack.local`.
 - **Browser OTA.** Upload `firmware.bin` from the page (§1, Option B).
+- **USB console.** The full configuration surface over the native USB cable, with no network at
+  all. It works in offline mode and even while the board is inside its config hotspot.
 
 ### Diagnostics that ship with it
 
@@ -215,6 +271,33 @@ been set.
 > trusted LAN that is the design; exposed to a wider network it is remote code execution.
 > Set the page login if that matters to you.
 
+### USB console — no network needed
+
+The same configuration surface is available over the C3's USB cable, for the bench, for a
+board whose antenna cannot hold a link, and for a board parked in offline mode. It is a
+**zero-install** static page: Chrome or Edge on a desktop, one URL, no Python and no build.
+
+- **Page:** [`console/`](console/) — open the published path
+  `https://machadoleonardo94.github.io/lux-et-tenebris/Firmware/lightpack-C3/console/`, or
+  serve the repository root (`python -m http.server 8000`) and open
+  `http://localhost:8000/Firmware/lightpack-C3/console/`. If you start the server inside
+  `Firmware/lightpack-C3` instead, the same page is at `http://localhost:8000/console/` —
+  the path has to match the server's working directory. The page explains its own browser
+  requirements; `file://` will not work.
+- **Protocol:** [`docs/usb-control.md`](docs/usb-control.md). Line-oriented, `@`-prefixed
+  JSON out and `key=value` batches in. A `SET` is transient and `COMMIT` writes flash, so a
+  slider drag does not hammer NVS. Presets import/export the same JSON the page uses.
+- **While the hotspot is up:** the firmware services USB from the portal loop and keeps
+  rendering the strip, so the cable is not dead for the 60 s window. Radio switching is
+  refused there; everything else works.
+- **One owner:** close `pio device monitor`, the Arduino IDE or any other terminal before
+  clicking Connect. The page reports a busy port rather than hanging.
+- **Connecting resets the board once.** The C3's USB Serial/JTAG resets when the host asserts
+  DTR/RTS, so opening the port reboots it; the console waits for the boot and retries the
+  handshake. The saved configuration is restored. Unsaved edits do not survive a reconnect.
+
+The USB console never flashes firmware; use the browser installer or PlatformIO for that.
+
 ---
 
 ## 5. Building from source
@@ -239,6 +322,13 @@ Flash: 61.9% (1,256,946 / 2,031,616 bytes)
 there is no `throw`/`try`/`catch` anywhere in this firmware, and the unwind tables were ~49 KB
 of dead weight in a partition that used to be 98% full.
 
+> **Windows Device Guard note.** If policy blocks `riscv32-esp-elf-gcc-ar.exe`, the build
+> stops with `Error 4551` while archiving the first library. `platformio.ini` therefore runs
+> [`tools/build_plain_ar.py`](tools/build_plain_ar.py) as a pre-script, which points the
+> archive step at the same toolchain's plain `ar`/`ranlib`. The firmware is built without
+> LTO, so the archives are equivalent. Remove the `extra_scripts` line if your policy allows
+> the wrapper.
+
 ### Diagnostic projects (not environments of this one)
 
 ```bash
@@ -257,12 +347,12 @@ while claiming to be a diagnostic.
 |---|---|---|
 | LED strip data | 1 | `strip_pin` |
 | Servo | 2 | Unrouted on this build (`#madhephaestus/ESP32Servo` commented out) |
-| Touch module (`Button_GPIO`) | 3 | `TOUCH1` signal; shared with `BT1` via `R12`, clamped by `D7` (schematic) |
+| Touch module (`Button_GPIO`) | 3 | `TOUCH1` signal; **daily control**; shared with `BT1` via `R12`, clamped by `D7` (schematic) |
 | Battery latch enable | 4 | Driven HIGH at boot; LOW cuts the latch |
 | Analog channel 0 | 0 | ADC |
 | Free GPIO A / B | 5 / 6 | `PORT3` |
 | I²C SDA / SCL | 7 / 8 | 100 kHz, `MPU6050` at 0x68/0x69 |
-| BOOT switch | 9 | **The entire user interface**; also the ROM's download-mode strap |
+| BOOT switch | 9 | **Security / recovery / fallback control**; also the ROM's download-mode strap |
 | Status pixel | 10 | `Status_LED`, WS2812B at D2 (confirmed working) |
 | Serial0 TX / RX | 20 / 21 | Unrouted |
 
@@ -289,8 +379,9 @@ its saved networks and its page login — the reflash costs a cable, not a confi
 
 ## 8. Known limitations
 
-1. **The touch pad is dead on the bench board** (§2). Design intent and the hardware cause are
-   documented in `docs/pre-release-plan.md`; the firmware's inputs live on GPIO9 instead.
+1. **The touch pad was dead on the first bench board** (§2). The current unit's module works
+   and carries the daily gestures; the electrical cause and the repair are documented in
+   `docs/pre-release-plan.md`, and GPIO9 remains the fallback and recovery input.
 2. **The zener on the schematic is the wrong value.** `D7` was added as `BZV55B2V7` (2.7 V);
    the C3 needs its clamp above VIH (~2.48 V), so 3.3 V or 3.6 V is correct. The `1N4148W` at
    `D6` was never a clamp either — its far end lands on the latch-gate node, not a 3.3 V rail.
@@ -300,9 +391,12 @@ its saved networks and its page login — the reflash costs a cable, not a confi
    `CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE` is off, so an image that boots but cannot join WiFi
    must be recovered over USB. Keep the last-known-good `firmware.bin`.
 5. **The page is unauthenticated by default** (§4).
-6. **`Adafruit SSD1306` / `Adafruit GFX` are in `lib_deps` but no display service exists.**
+6. **The USB console is Chromium-only.** Web Serial does not exist in Firefox, Safari or any
+   mobile browser, and the page must be served from `https://` or `localhost`. There is no
+   native-app fallback in this repository.
+7. **`Adafruit SSD1306` / `Adafruit GFX` are in `lib_deps` but no display service exists.**
    `display_started` in `shared/variables.h` is never set by anything.
-7. **Announce brightness is unverified behind a case diffuser** — the one open item in
+8. **Announce brightness is unverified behind a case diffuser** — the one open item in
    `docs/pre-release-plan.md` §8.
 
 ---
@@ -332,8 +426,13 @@ lightpack-C3/
 │   ├── V0.4-pre/               prebuilt binaries + FLASHING.md + manifest.json + checksums
 │   └── V0.3/                   lightpack_V03-source.zip (sources only)
 ├── docs/
-│   └── pre-release-plan.md     feature list, menu design, NVS cost analysis, open items
-├── tools/button_probe/         separate project: measures touch-module polarity
+│   ├── usb-control.md          USB protocol reference
+│   ├── pre-release-plan.md     feature list, menu design, NVS cost analysis, open items
+│   └── echoes_buttons_map/     porting notes from the Echoes board (button UX reference)
+├── console/                    zero-install Web Serial console (static HTML/CSS/JS)
+├── tools/
+│   ├── build_plain_ar.py       Windows Device Guard workaround for the archiver
+│   └── button_probe/           separate project: measures touch-module polarity
 └── src/
     ├── main.cpp                setup() / loop()
     ├── components/ESP32/
@@ -344,6 +443,7 @@ lightpack-C3/
     ├── services/
     │   ├── led_scripts.h       mode registry, effects, strip driver
     │   ├── webpage.h           page + JSON API
+    │   ├── usb_control.h       USB line protocol, ticks and events
     │   ├── readings.h          switches, ADC, rail
     │   ├── presets.h           NVS preset slots, versioned format
     │   ├── wifi_settings.h     portal, credentials, offline mode, mDNS
@@ -353,6 +453,6 @@ lightpack-C3/
     └── shared/                 pinout, variables, dependencies, library objects
 ```
 
-Folder names are under `Firmware/lightpack-C3/` except at the top of the list. Two things live
-outside it: `install/` at the **repository root** (the browser flasher, which consumes
-`releases/*/manifest.json`) and `docs/pre-release-plan.md`'s design notes for the unbuilt menu.
+Folder names are under `Firmware/lightpack-C3/` except at the top of the list. `install/` at
+the **repository root** is the browser flasher, which consumes `releases/*/manifest.json`; it
+and `console/` are both static pages that can be published by GitHub Pages.
