@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="660" viewBox="0 0 960 660" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="960" height="660" fill="#fdfdfd"/>
+
+  <text x="480" y="32" text-anchor="middle" font-size="20" font-weight="600" fill="#1a1a1a">V_REG vs estimated strip current — 144 white LEDs</text>
+  <text x="480" y="52" text-anchor="middle" font-size="12" fill="#666">2 s steps · 2 A board ceiling · 20-LED probe · C3 input ≈ V_REG − 0.30 V normal / −0.40 V at 2 A (SS14)</text>
+
+  <rect x="100" y="80" width="820" height="480" fill="#ffffff" stroke="#d0d0d0"/>
+
+  <!-- y grid and labels, 4.2 down to 3.0 -->
+  <g stroke="#eeeeee" stroke-width="1">
+    <line x1="100" y1="116.9" x2="920" y2="116.9"/>
+    <line x1="100" y1="153.8" x2="920" y2="153.8"/>
+    <line x1="100" y1="190.8" x2="920" y2="190.8"/>
+    <line x1="100" y1="227.7" x2="920" y2="227.7"/>
+    <line x1="100" y1="264.6" x2="920" y2="264.6"/>
+    <line x1="100" y1="301.5" x2="920" y2="301.5"/>
+    <line x1="100" y1="338.5" x2="920" y2="338.5"/>
+    <line x1="100" y1="375.4" x2="920" y2="375.4"/>
+    <line x1="100" y1="412.3" x2="920" y2="412.3"/>
+    <line x1="100" y1="449.2" x2="920" y2="449.2"/>
+    <line x1="100" y1="486.2" x2="920" y2="486.2"/>
+    <line x1="100" y1="523.1" x2="920" y2="523.1"/>
+    <line x1="100" y1="560.0" x2="920" y2="560.0"/>
+  </g>
+  <g font-size="11" fill="#555" text-anchor="end">
+    <text x="88" y="120.9">4.2</text>
+    <text x="88" y="157.8">4.1</text>
+    <text x="88" y="194.8">4.0</text>
+    <text x="88" y="231.7">3.9</text>
+    <text x="88" y="268.6">3.8</text>
+    <text x="88" y="305.5">3.7</text>
+    <text x="88" y="342.5">3.6</text>
+    <text x="88" y="379.4">3.5</text>
+    <text x="88" y="416.3">3.4</text>
+    <text x="88" y="453.2">3.3</text>
+    <text x="88" y="490.2">3.2</text>
+    <text x="88" y="527.1">3.1</text>
+    <text x="88" y="564.0">3.0</text>
+  </g>
+
+  <!-- x grid and labels -->
+  <g stroke="#eeeeee" stroke-width="1">
+    <line x1="100" y1="80" x2="100" y2="560"/>
+    <line x1="286.4" y1="80" x2="286.4" y2="560"/>
+    <line x1="472.7" y1="80" x2="472.7" y2="560"/>
+    <line x1="659.1" y1="80" x2="659.1" y2="560"/>
+    <line x1="845.5" y1="80" x2="845.5" y2="560"/>
+  </g>
+  <g font-size="11" fill="#555" text-anchor="middle">
+    <text x="100" y="580">0</text>
+    <text x="286.4" y="580">0.5</text>
+    <text x="472.7" y="580">1.0</text>
+    <text x="659.1" y="580">1.5</text>
+    <text x="845.5" y="580">2.0</text>
+  </g>
+  <text x="510" y="606" text-anchor="middle" font-size="12" fill="#444">Estimated strip current (A)</text>
+  <text x="50" y="320" text-anchor="middle" transform="rotate(-90 50 320)" font-size="12" fill="#444">V_REG (V)</text>
+
+  <!-- 3.70 V guard floor and 2 A ceiling -->
+  <line x1="100" y1="301.5" x2="920" y2="301.5" stroke="#d35400" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="660" y="296" text-anchor="end" font-size="11" fill="#d35400">3.70 V guard floor (V_REG)</text>
+  <line x1="845.5" y1="80" x2="845.5" y2="560" stroke="#b9770e" stroke-width="1.5" stroke-dasharray="2 4"/>
+  <text x="840" y="100" text-anchor="end" font-size="11" fill="#b9770e">2 A board ceiling</text>
+
+  <!-- data lines: 0, 1.2 A probe, 2 A -->
+  <polyline points="100,146.5 547.3,266.1 845.5,344.4" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+  <polyline points="100,102.2 547.3,159.8 845.5,220.3" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="7 5"/>
+  <polyline points="100,111.0 547.3,144.6 845.5,181.9" fill="none" stroke="#1e8449" stroke-width="2.5"/>
+  <polyline points="100,103.6 547.3,147.9 845.5,186.3" fill="none" stroke="#1e8449" stroke-width="2" stroke-dasharray="7 5"/>
+  <polyline points="100,97.7 547.3,338.5 845.5,499.5" fill="none" stroke="#6c3483" stroke-width="2.5"/>
+
+  <!-- points -->
+  <g fill="#c0392b">
+    <circle cx="100" cy="146.5" r="4"/><circle cx="547.3" cy="266.1" r="4"/><circle cx="845.5" cy="344.4" r="4"/>
+  </g>
+  <g fill="#c0392b">
+    <circle cx="100" cy="102.2" r="3.5"/><circle cx="547.3" cy="159.8" r="3.5"/><circle cx="845.5" cy="220.3" r="3.5"/>
+  </g>
+  <g fill="#1e8449">
+    <circle cx="100" cy="111.0" r="4"/><circle cx="547.3" cy="144.6" r="4"/><circle cx="845.5" cy="181.9" r="4"/>
+  </g>
+  <g fill="#1e8449">
+    <circle cx="100" cy="103.6" r="3.5"/><circle cx="547.3" cy="147.9" r="3.5"/><circle cx="845.5" cy="186.3" r="3.5"/>
+  </g>
+  <g fill="#6c3483">
+    <circle cx="100" cy="97.7" r="4"/><circle cx="547.3" cy="338.5" r="4"/><circle cx="845.5" cy="499.5" r="4"/>
+  </g>
+
+  <!-- red-test 2 A points -->
+  <circle cx="845.5" cy="372.4" r="4" fill="#c0392b" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="845.5" cy="230.7" r="4" fill="#c0392b" stroke="#ffffff" stroke-width="1.5"/>
+  <text x="858" y="376" font-size="9" fill="#c0392b">red</text>
+  <text x="858" y="234" font-size="9" fill="#c0392b">red</text>
+
+  <!-- 14500 battery crossing the floor -->
+  <circle cx="684.2" cy="301.5" r="5" fill="none" stroke="#c0392b" stroke-width="1.5"/>
+  <line x1="660" y1="330" x2="684" y2="303" stroke="#c0392b" stroke-width="1" stroke-dasharray="2 2"/>
+  <text x="655" y="340" text-anchor="end" font-size="11" fill="#c0392b">14500 battery: 3.70 V at ≈1.57 A</text>
+
+  <text x="690" y="170" font-size="11" fill="#1e8449">LiPo: 2 A still 4.02 V</text>
+  <text x="620" y="522" font-size="11" fill="#6c3483">USB only: strip 3.16 V, C3 on 5 V</text>
+
+  <!-- legend -->
+  <rect x="120" y="380" width="285" height="140" rx="6" fill="#ffffff" stroke="#dddddd"/>
+  <text x="132" y="398" font-size="11" font-weight="600" fill="#333">Supply</text>
+  <g font-size="11" fill="#333">
+    <line x1="132" y1="415" x2="162" y2="415" stroke="#c0392b" stroke-width="2.5"/><text x="170" y="419">14500, battery</text>
+    <line x1="132" y1="435" x2="162" y2="435" stroke="#c0392b" stroke-width="2" stroke-dasharray="7 5"/><text x="170" y="439">14500, USB</text>
+    <line x1="132" y1="455" x2="162" y2="455" stroke="#1e8449" stroke-width="2.5"/><text x="170" y="459">LiPo, battery</text>
+    <line x1="132" y1="475" x2="162" y2="475" stroke="#1e8449" stroke-width="2" stroke-dasharray="7 5"/><text x="170" y="479">LiPo, USB</text>
+    <line x1="132" y1="495" x2="162" y2="495" stroke="#6c3483" stroke-width="2.5"/><text x="170" y="499">USB only, no cell</text>
+  </g>
+  <text x="132" y="513" font-size="10" fill="#777">small dots: red-test 2 A points</text>
+
+  <text x="480" y="638" text-anchor="middle" font-size="10" fill="#888">Bench 2026-11-15 · 144 white LEDs · SS14 drop not compensated · docs/power-characterisation.md</text>
+</svg>

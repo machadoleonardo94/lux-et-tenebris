@@ -87,6 +87,9 @@ and do not use it.
 | `@PRESET CLEAR n` | `presets` | Empty a slot |
 | `@IMPACT mag` | `ack` | Inject a preview impact (0–255) for flame tuning |
 | `@RADIO on\|off\|toggle` | `ack` | Switch the WiFi radio; USB is unaffected |
+| `@STRESS <mask> [ceiling] [step] [rail_floor]` | `ack` | Power stress test; mask R=1 G=2 B=4, ceiling 500–6000 mA, step 500/2000 ms, rail floor 0=ignore / 3000 mV |
+| `@SENSE <count> [burst_ms]` | `ack` | Channel resistance: 1–100 white LEDs, 200/2000 ms burst, 5 s unplug |
+| `@SAFE OFF` | `ack` | Clear safe mode without a power cycle |
 | `@UPDATE BEGIN <size>` | `ack` (`state:"ready"`) | Start an app-only OTA into the inactive slot |
 | `@UPDATE DATA <offset> <base64>` | `ack` (`state:"data"`) | One 2 KiB chunk; offset must equal the board's received count or be a retry |
 | `@UPDATE END` | `ack` (`state:"complete"`) | Mark the new slot bootable and reboot |
@@ -291,22 +294,93 @@ This command exists from **0.5.0-dev**; older builds answer `unknown command`.
 A board that predates it must be flashed once with PlatformIO or the browser
 installer.
 
+### 3.9 Power stress test and safe mode
+
+`@STRESS 7` starts the bench characterisation of the supply. The colour is a
+**3-bit mask**: `R=1`, `G=2`, `B=4` (7 white, 3 yellow, 5 magenta, 6 cyan). The
+old names `white`/`red`/`green`/`blue` are still accepted. Optionally,
+`@STRESS 7 4000 500 0` selects a **test-only ceiling** (500–6000 mA, default
+2000; out-of-range values are clamped), a **step time** (500 ms fast, default;
+2000 ms precise) and an optional **rail floor** (default 3000 mV; **0 disables**
+the 3.0 V collapse stop so the lab can find the absolute limit). It is a
+**blocking** run: the control link, the web server and the mode renderer are not
+serviced until it ends. The console builds this line from the Run test controls;
+nothing has to be typed. Requirements and sequence:
+
+- the radio must be off (`@RADIO off` first); the command is refused otherwise;
+- the test uses the **live LED count** from the shared page (`leds`), so changing
+  it between runs needs no reflash;
+- the strip blanks for 5 s — that is the window to unplug USB and test the
+  battery; the ramp continues without the cable;
+- then a probe of up to 20 LEDs (scaled so it never exceeds the selected ceiling)
+  estimates the source resistance, and the selected channels ramp from
+  brightness 0 to 255 in +5 steps at the selected cadence;
+- it stops at the selected ceiling, at brightness 255 on a strip too short to
+  reach it, on a brown-out, on a rail collapse below 3.0 V, on a GPIO9 press, or
+  after 180 s.
+
+**2 A is the continuous benchmark.** 3–6 A exist to force a collapse in
+the lab, in 500 ms bursts; they are not the normal budget and must not be used
+for sustained operation.
+
+The result is written to NVS and appears in every `state` document as
+`stress_result`, `stress_phase`, `stress_color` (the mask), `stress_leds`,
+`stress_brightness`, `stress_ceiling_ma`, `stress_step_ms`, `stress_rail_floor_mv`,
+`stress_est_ma`,
+`stress_v_start`, `stress_v_min`, `stress_sag_mv`, `stress_v_off`,
+`stress_v_on`, `stress_r_mohm` and `stress_elapsed_ms`. A finished run pushes
+one state frame if USB is still attached; after a battery run the reconnect
+resets the C3, and the state is re-read from NVS, so the result is not tied to
+a reply that may be lost. `stress_run:true` means a run was interrupted before
+it could store a result.
+
+A brown-out also arms **safe mode**: the next boot shows a red/yellow warning on
+the status pixel, fills the strip soft red, and waits for a click on either
+switch (or 5 s, after which it continues without one — the timeout exists so a
+blocking warning can never lock the USB console out). The strip then runs at 70%
+of the configured brightness until `@SAFE OFF` or a five-click power-off clears
+the flag.
+
+Both the stress test and the sense run **blank the capacitive touch pad for 1 s**
+after the test ends. A 3 A / 6 A burst can couple a false press into the module;
+the pad is discarded, including pending clicks, for that second, so the mode
+cannot change behind the user's back when the test finishes. GPIO9 (the BOOT
+switch) stays live for an abort or recovery.
+
+### 3.10 Channel resistance sense
+
+`@SENSE 20 200` lights 20 white LEDs at full brightness for a 200 ms burst, after
+the same 5 s cable-removal window as the stress test, and reports V_REG blank and
+lit, the model current (60 mA per white LED) and the source resistance. It is a
+separate blocking run, decoupled from the stress ramp, so a 1/10/20/50/100 LED
+linearity sweep can be run quickly. The result is stored as `sense_*` in the
+state and the last result in NVS; a USB-attached run pushes one state frame.
+
+- count 1–100 LEDs, burst 200 ms (default) or 2000 ms;
+- 100 white LEDs is ~6 A: the PMOS is rated **3.6 A continuous / 5 A max /
+  20 A pulses**, so the 2 s / 100-LED run is lab-only; use 200 ms for the sweep;
+- the current is the firmware model, not a measurement. R drifting with count is
+  the cell/model linearity, exactly what the sweep is for.
+
 ---
 
 ## 4. Configuration fields
 
-The 28 names are the `/api/config` argument names and the keys of the preset
-struct. They are declared once in `src/services/presets.h` (`PRESET_FIELDS`), and
-the browser copies them in `console/js/spec.js`; a test asserts the two lists
-match.
+The 40 names are the `/api/config` argument names; 39 of them are also the keys of
+the preset struct. They are declared once in `src/services/presets.h`
+(`PRESET_FIELDS`), and the browser copies them in `console/js/spec.js`; a test
+asserts the two lists match. `budget` is a config field but deliberately not a
+preset field: it describes the cell/cable/strip, not a look.
 
 ```
 mode
-red green blue brightness
+red green blue brightness budget
 whip_speed whip_length whip_period whip_peak whip_offset
-rainbow_speed rainbow_min_ms rainbow_max_ms
+rainbow_speed rainbow_min_ms rainbow_max_ms rainbow_level
 leds
 flame_decay flame_spatial flame_power_slope flame_power_max flame_power_idle
+fade_decay fade_trigger fade_length_gain fade_length_z_gain fade_length_base
+fade_power_gain fade_power_base fade_color_gain fade_idle_length fade_idle_power
 step_baseline_tau_ms step_threshold step_release step_jerk_min step_min_gap_ms
 step_impact_min step_impact_max step_magnitude_min step_magnitude_max
 ```
@@ -320,8 +394,9 @@ keep a second copy:
 `flame_decay_min/max`, `flame_spatial_min/max`, `flame_power_slope_max`,
 `step_baseline_tau_min_ms/max`, `step_threshold_min/max`, `step_release_min`,
 `step_jerk_floor/max`, `step_gap_min_ms/max`, `step_impact_min_floor`,
-`step_impact_max_ceiling`, `strip_leds_min`, `num_leds`, plus
-`dirty` and `portal`.
+`step_impact_max_ceiling`, `strip_leds_min`, `num_leds`, `budget_min/max`,
+`budget_brightness`, `guard_scale`, `guard_active`, `guard_floor_mv`,
+`guard_recover_mv`, `power_suggested_ma`, plus `dirty` and `portal`.
 
 The device clamps every write; a host that sends a value outside the range still
 gets a successful ack with the clamped value in `changed`.
