@@ -10,6 +10,7 @@ void flame_sanitize();
 uint8_t flame_power_for(float magnitude);
 uint8_t flame_shade(uint8_t power, uint8_t channel);
 void fade_strip();
+void fade_sanitize();
 void constant_brightness();
 void strip_sanitize();
 uint16_t strip_leds();
@@ -608,31 +609,90 @@ void flame_steps()
     strip.show();
 }
 
+void fade_sanitize()
+{
+    //? Mirrors the other sanitisers: each check keeps a divisor, a length or a
+    //? colour channel inside the range fade_strip() can draw. Called on NVS load
+    //* and on every web write.
+    if (fade.decay < 0.50f)
+        fade.decay = 0.50f;
+    if (fade.decay > 0.995f)
+        fade.decay = 0.995f;
+
+    if (fade.trigger < 0.02f)
+        fade.trigger = 0.02f;
+    if (fade.trigger > 2.00f)
+        fade.trigger = 2.00f;
+
+    if (fade.length_gain < 0.0f)
+        fade.length_gain = 0.0f;
+    if (fade.length_gain > 40.0f)
+        fade.length_gain = 40.0f;
+    if (fade.length_z_gain < 0.0f)
+        fade.length_z_gain = 0.0f;
+    if (fade.length_z_gain > 40.0f)
+        fade.length_z_gain = 40.0f;
+    if (fade.length_base < 0.0f)
+        fade.length_base = 0.0f;
+    if (fade.length_base > 40.0f)
+        fade.length_base = 40.0f;
+
+    if (fade.power_gain < 0.0f)
+        fade.power_gain = 0.0f;
+    if (fade.power_gain > 10.0f)
+        fade.power_gain = 10.0f;
+    if (fade.power_base < 0.0f)
+        fade.power_base = 0.0f;
+    if (fade.power_base > 50.0f)
+        fade.power_base = 50.0f;
+
+    if (fade.color_gain < 1)
+        fade.color_gain = 1;
+    if (fade.color_gain > 20)
+        fade.color_gain = 20;
+
+    if (fade.idle_length > strip_leds())
+        fade.idle_length = (uint8_t)strip_leds();
+}
+
 void fade_strip()
 
 {
-    max_gyro_x *= 0.9; // Decay over time
-    max_gyro_y *= 0.9;
-    max_gyro_z *= 0.9;
+    max_gyro_x *= fade.decay; // Decay over time
+    max_gyro_y *= fade.decay;
+    max_gyro_z *= fade.decay;
     // Update hold values
     max_gyro_x = max(max_gyro_x, abs(g.gyro.x));
     max_gyro_y = max(max_gyro_y, abs(g.gyro.y));
     max_gyro_z = max(max_gyro_z, abs(g.gyro.z));
 
-    if (max_gyro_z > 0.2)
+    if (max_gyro_z > fade.trigger)
     {
-        lenght = 20 * max_gyro_x + 20 * max_gyro_y + 15 * max_gyro_z + 10;
-        power = 2 * max_gyro_x + 2 * max_gyro_y + 5;
+        const float length = fade.length_gain * max_gyro_x +
+                             fade.length_gain * max_gyro_y +
+                             fade.length_z_gain * max_gyro_z +
+                             fade.length_base;
+        lenght = (int)length;
+        if (lenght < 0)
+            lenght = 0;
+        if (lenght > strip_leds())
+            lenght = strip_leds();
+
+        power = (int)(fade.power_gain * max_gyro_x + fade.power_gain * max_gyro_y + fade.power_base);
+
         //! led_strip.* here is per-frame scratch owned by this mode. It is NOT
         //! the user's palette; keep the palette in `palette` (variables.h).
-        led_strip.red = max_gyro_x * 7;
-        led_strip.green = max_gyro_y * 7;
-        led_strip.blue = max_gyro_z * 7;
+        const float red = max_gyro_x * fade.color_gain;
+        const float green = max_gyro_y * fade.color_gain;
+        const float blue = max_gyro_z * fade.color_gain;
+        led_strip.red = (uint8_t)(red > 255.0f ? 255.0f : red);
+        led_strip.green = (uint8_t)(green > 255.0f ? 255.0f : green);
+        led_strip.blue = (uint8_t)(blue > 255.0f ? 255.0f : blue);
     }
     else
     {
-        lenght = 5; // Dim when stationary
-        power = 5;  // Dim when stationary
+        lenght = fade.idle_length; // Dim when stationary
+        power = fade.idle_power;
     }
 
     for (int i = 0; i < lenght; i++)
@@ -1017,13 +1077,18 @@ void rainbow_flow()
         gap = rainbow_next_gap_ms();
     }
 
-    //* 3. Paint the bands.
+    //* 3. Paint the bands. The mode-local level is applied here, before the
+    //? global brightness: the rainbow is the one always-full-saturation mode,
+    //* so it needs its own trim rather than dragging every mode down with it.
     for (int i = 0; i < leds; i++)
     {
         uint8_t red = 0;
         uint8_t green = 0;
         uint8_t blue = 0;
         rainbow_hue_to_rgb(hues[i], red, green, blue);
+        red = (uint8_t)(((uint16_t)red * rainbow.level) / 255U);
+        green = (uint8_t)(((uint16_t)green * rainbow.level) / 255U);
+        blue = (uint8_t)(((uint16_t)blue * rainbow.level) / 255U);
         strip.setPixelColor(i, strip.Color(red, green, blue));
     }
     strip.show();
@@ -1051,6 +1116,25 @@ void strip_channel_test()
     //* is the first place that knows it is about to load the rail, and because
     //! these three steps are the only LED current the boot draws before loop().
     boot_rail_baseline(supply_rail_mv());
+
+    //* A board that just recovered from a brown-out is in safe mode: do not walk
+    //! the three channels, which is the most current the boot ever asks for. One
+    //? soft red fill is enough to say "power problem" and keeps the sag reading
+    //* meaningful at a known, small load.
+    if (safe_boot_active)
+    {
+        Serial.println("[STRIP] safe mode: soft red instead of the channel test");
+        strip.setBrightness(255);
+        for (uint16_t i = 0; i < strip_leds(); i++)
+            strip.setPixelColor(i, strip.Color(20, 0, 0));
+        strip.show();
+        delay(600);
+        boot_rail_note_step("SAFE");
+        strip.clear();
+        strip.show();
+        delay(200);
+        return;
+    }
 
     for (int i = 0; i < strip_leds(); i++)
         strip.setPixelColor(i, strip.Color(25, 0, 0));
@@ -1218,10 +1302,35 @@ void update_strip(int mode)
     //* Push the configured brightness to the NeoPixel drivers only when it
     //* actually changes. Default of 255 (see variables.h) is a no-op, so the
     //* scripts' own colour maths are unaffected until the user dims the strip.
-    static uint8_t applied_brightness = 0;
-    if (applied_brightness != led_strip.brightness)
+    //? Safe mode keeps POWER_SAFE_PERCENT of that brightness. Because the driver
+    //* scales the whole frame, the same fraction of the current is saved in every
+    //* mode without touching any mode's colour maths.
+    uint8_t target_brightness = led_strip.brightness;
+
+    //* 1. The power budget is the worst-case white ceiling for this strip:
+    //? budget_ma / (active_leds * 60 mA) * 255. It caps the configured
+    //* brightness; the real current is usually lower for non-white modes.
+    const uint16_t budget_leds = strip_leds();
+    if (budget_leds > 0)
     {
-        applied_brightness = led_strip.brightness;
+        const uint32_t full_ma = (uint32_t)budget_leds * 60UL;
+        const uint32_t budget_brightness = ((uint32_t)power_budget_ma * 255UL) / full_ma;
+        if (budget_brightness < 255UL && target_brightness > (uint8_t)budget_brightness)
+            target_brightness = (uint8_t)budget_brightness;
+    }
+
+    //* 2. The 10 Hz guard's trim (power_guard.h). 255 means untouched.
+    target_brightness = (uint8_t)(((uint16_t)target_brightness * power_guard_scale) / 255U);
+
+    //* 3. Safe mode after a real brown-out keeps POWER_SAFE_PERCENT.
+    if (safe_boot_active)
+        target_brightness = (uint8_t)(((uint16_t)target_brightness * POWER_SAFE_PERCENT) / 100U);
+
+    static uint8_t applied_brightness = 0;
+    if (strip_brightness_dirty || applied_brightness != target_brightness)
+    {
+        applied_brightness = target_brightness;
+        strip_brightness_dirty = false;
         strip.setBrightness(applied_brightness);
     }
 

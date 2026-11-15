@@ -128,6 +128,11 @@ void webpage_config_load()
   rainbow.speed = preferences.getFloat("rbwspd", rainbow.speed);
   rainbow.min_ms = preferences.getUShort("rbwmin", rainbow.min_ms);
   rainbow.max_ms = preferences.getUShort("rbwmax", rainbow.max_ms);
+  rainbow.level = preferences.getUChar("rbwlev", rainbow.level);
+
+  //* 0.6 device power budget. Kept in the live "device" namespace but NOT in a
+  //? preset: it describes this cell/cable/strip, not a look.
+  power_budget_ma = preferences.getUShort("budget", power_budget_ma);
 
   strip_settings.active_leds = preferences.getUShort("leds", strip_settings.active_leds);
 
@@ -136,6 +141,17 @@ void webpage_config_load()
   flame.power_slope = preferences.getFloat("flpslope", flame.power_slope);
   flame.power_max = preferences.getUChar("flpmax", flame.power_max);
   flame.power_idle = preferences.getUChar("flpidle", flame.power_idle);
+
+  fade.decay = preferences.getFloat("fddec", fade.decay);
+  fade.trigger = preferences.getFloat("fdtrg", fade.trigger);
+  fade.length_gain = preferences.getFloat("fdlen", fade.length_gain);
+  fade.length_z_gain = preferences.getFloat("fdlenz", fade.length_z_gain);
+  fade.length_base = preferences.getFloat("fdlenb", fade.length_base);
+  fade.power_gain = preferences.getFloat("fdpwr", fade.power_gain);
+  fade.power_base = preferences.getFloat("fdpwrb", fade.power_base);
+  fade.color_gain = preferences.getUChar("fdcol", fade.color_gain);
+  fade.idle_length = preferences.getUChar("fdidlen", fade.idle_length);
+  fade.idle_power = preferences.getUChar("fdidpwr", fade.idle_power);
 
   step.baseline_tau_ms = preferences.getUShort("stbal", step.baseline_tau_ms);
   step.threshold = preferences.getFloat("stthr", step.threshold);
@@ -159,6 +175,7 @@ void webpage_config_load()
   whip_sanitize();
   flame_sanitize();
   rainbow_sanitize();
+  fade_sanitize();
 
   Serial.printf("[WEB] Config loaded: mode=%d rgb=%u,%u,%u bright=%u\n",
                 mode, palette.red, palette.green, palette.blue,
@@ -178,6 +195,13 @@ void webpage_config_load()
                 flame.power_slope, flame.power_max, flame.power_idle);
   Serial.printf("[WEB] Rainbow: speed=%.2f gap=%u..%ums\n",
                 rainbow.speed, rainbow.min_ms, rainbow.max_ms);
+  Serial.printf("[WEB] Rainbow: level=%u/255\n", rainbow.level);
+  Serial.printf("[WEB] Fade: decay=%.3f trigger=%.2f len=%.0f/%.0f/%.0f color=%u idle=%u/%u\n",
+                fade.decay, fade.trigger, fade.length_gain, fade.length_z_gain,
+                fade.length_base, fade.color_gain, fade.idle_length, fade.idle_power);
+  power_suggested_ma = power_suggestion_ma();
+  Serial.printf("[WEB] Power: budget=%u mA guard=%u/255 suggested=%u mA\n",
+                power_budget_ma, power_guard_scale, power_suggested_ma);
 
   //* NVS and RAM agree again, whatever they held before. The USB console reads
   //? this through /api/state to draw its unsaved dot; the page ignores it.
@@ -217,6 +241,12 @@ void webpage_config_save()
   preferences.putFloat("rbwspd", rainbow.speed);
   preferences.putUShort("rbwmin", rainbow.min_ms);
   preferences.putUShort("rbwmax", rainbow.max_ms);
+  preferences.putUChar("rbwlev", rainbow.level);
+
+  //* Device power budget: written with the live configuration but deliberately
+  //? absent from struct_preset, so a preset applied on another board cannot
+  //* carry this board's cell/cable limit with it.
+  preferences.putUShort("budget", power_budget_ma);
 
   preferences.putUShort("leds", strip_settings.active_leds);
 
@@ -225,6 +255,17 @@ void webpage_config_save()
   preferences.putFloat("flpslope", flame.power_slope);
   preferences.putUChar("flpmax", flame.power_max);
   preferences.putUChar("flpidle", flame.power_idle);
+
+  preferences.putFloat("fddec", fade.decay);
+  preferences.putFloat("fdtrg", fade.trigger);
+  preferences.putFloat("fdlen", fade.length_gain);
+  preferences.putFloat("fdlenz", fade.length_z_gain);
+  preferences.putFloat("fdlenb", fade.length_base);
+  preferences.putFloat("fdpwr", fade.power_gain);
+  preferences.putFloat("fdpwrb", fade.power_base);
+  preferences.putUChar("fdcol", fade.color_gain);
+  preferences.putUChar("fdidlen", fade.idle_length);
+  preferences.putUChar("fdidpwr", fade.idle_power);
 
   preferences.putUShort("stbal", step.baseline_tau_ms);
   preferences.putFloat("stthr", step.threshold);
@@ -356,6 +397,30 @@ void webpage_state_json(String &json)
   json += String(RAINBOW_SPEED_MIN, 1);
   json += F(",\"rainbow_speed_max\":");
   json += String(RAINBOW_SPEED_MAX, 1);
+  json += F(",\"rainbow_level\":");
+  json += String(rainbow.level);
+
+  //* Gyro fade (mode 4) tunables and their ranges, 0.6.
+  json += F(",\"fade_decay\":");
+  json += String(fade.decay, 3);
+  json += F(",\"fade_trigger\":");
+  json += String(fade.trigger, 2);
+  json += F(",\"fade_length_gain\":");
+  json += String(fade.length_gain, 1);
+  json += F(",\"fade_length_z_gain\":");
+  json += String(fade.length_z_gain, 1);
+  json += F(",\"fade_length_base\":");
+  json += String(fade.length_base, 1);
+  json += F(",\"fade_power_gain\":");
+  json += String(fade.power_gain, 1);
+  json += F(",\"fade_power_base\":");
+  json += String(fade.power_base, 1);
+  json += F(",\"fade_color_gain\":");
+  json += String(fade.color_gain);
+  json += F(",\"fade_idle_length\":");
+  json += String(fade.idle_length);
+  json += F(",\"fade_idle_power\":");
+  json += String(fade.idle_power);
 
   //* Strip size. `num_leds` stays the size of the NeoPixel buffer - the hard
   //* ceiling the driver owns - while `active_leds` is what the scripts light,
@@ -364,8 +429,137 @@ void webpage_state_json(String &json)
   json += String(NUM_LEDS);
   json += F(",\"active_leds\":");
   json += String(strip_leds());
+  //* The USB console addresses this value by its /api/config field name, `leds`,
+  //? while the HTTP page reads the longer `active_leds`. Both are the same live
+  //! count; exporting only one of them is what left the console's LED-count input
+  //* blank while its subtitle had the number.
+  json += F(",\"leds\":");
+  json += String(strip_leds());
   json += F(",\"strip_leds_min\":");
   json += String(STRIP_LEDS_MIN);
+
+  //* Safe mode and the last power stress test. These are DEVICE state, not
+  //? configuration: they describe the cell, cable and strip on this board and
+  //* must not travel in a preset. The console renders them on every connect, so
+  //? a result in NVS is never lost to a reconnect.
+  json += F(",\"safe_boot\":");
+  json += safe_boot_active ? F("true") : F("false");
+  json += F(",\"safe_pct\":");
+  json += String(POWER_SAFE_PERCENT);
+  json += F(",\"mcu_ma\":");
+  json += String(POWER_MCU_MA);
+
+  //* 0.6 power budget and 10 Hz guard. `budget_brightness` is the worst-case
+  //? white ceiling the budget implies for this strip, so the page can show why
+  //* the configured brightness may be capped.
+  json += F(",\"budget_ma\":");
+  json += String(power_budget_ma);
+  //? The USB console addresses this by its /api/config argument name, `budget`.
+  json += F(",\"budget\":");
+  json += String(power_budget_ma);
+  json += F(",\"budget_min\":");
+  json += String(POWER_BUDGET_MIN_MA);
+  json += F(",\"budget_default\":");
+  json += String(POWER_BUDGET_DEFAULT_MA);
+  json += F(",\"budget_max\":");
+  json += String(POWER_BUDGET_MAX_MA);
+  json += F(",\"guard_scale\":");
+  json += String(power_guard_scale);
+  json += F(",\"guard_active\":");
+  json += power_guard_active ? F("true") : F("false");
+  json += F(",\"guard_floor_mv\":");
+  json += String(POWER_GUARD_FLOOR_MV);
+  json += F(",\"guard_recover_mv\":");
+  json += String(POWER_GUARD_RECOVER_MV);
+  power_suggested_ma = power_suggestion_ma();
+  json += F(",\"power_suggested_ma\":");
+  json += String(power_suggested_ma);
+
+  uint16_t budget_brightness = 255;
+  const uint16_t budget_leds = strip_leds();
+  if (budget_leds > 0)
+  {
+    const uint32_t full_ma = (uint32_t)budget_leds * 60UL;
+    const uint32_t cap = ((uint32_t)power_budget_ma * 255UL) / full_ma;
+    budget_brightness = (cap < 255UL) ? (uint16_t)cap : 255;
+  }
+  json += F(",\"budget_brightness\":");
+  json += String(budget_brightness);
+  json += F(",\"stress_run\":");
+  json += stress_run_flag ? F("true") : F("false");
+  json += F(",\"stress_result\":");
+  json += String(stress_last.result);
+  json += F(",\"stress_phase\":");
+  json += String(stress_last.phase);
+  json += F(",\"stress_color\":");
+  json += String(stress_last.color);
+  json += F(",\"stress_leds\":");
+  json += String(stress_last.leds);
+  json += F(",\"stress_brightness\":");
+  json += String(stress_last.brightness);
+  json += F(",\"stress_est_ma\":");
+  json += String(stress_last.est_ma);
+  json += F(",\"stress_v_start\":");
+  json += String(stress_last.v_start);
+  json += F(",\"stress_v_min\":");
+  json += String(stress_last.v_min);
+  json += F(",\"stress_sag_mv\":");
+  json += String(stress_last.sag_mv);
+  json += F(",\"stress_v_off\":");
+  json += String(stress_last.v_off);
+  json += F(",\"stress_v_on\":");
+  json += String(stress_last.v_on);
+  json += F(",\"stress_r_mohm\":");
+  json += String(stress_last.r_mohm);
+  json += F(",\"stress_elapsed_ms\":");
+  json += String(stress_last.elapsed_ms);
+  json += F(",\"stress_ceiling_ma\":");
+  json += String(stress_last.ceiling_ma);
+  json += F(",\"stress_step_ms\":");
+  json += String(stress_last.step_ms);
+  json += F(",\"stress_rail_floor_mv\":");
+  json += String(stress_last.rail_floor_mv);
+  //* Test-only limits for the console's selectors. The normal budget is a later
+  //? 0.6 field; these two are what the Diagnostics panel is allowed to ask for.
+  json += F(",\"stress_ceiling_min\":");
+  json += String((unsigned)STRESS_CEILING_MIN_MA);
+  json += F(",\"stress_ceiling_default\":");
+  json += String((unsigned)STRESS_CEILING_DEFAULT_MA);
+  json += F(",\"stress_ceiling_max\":");
+  json += String((unsigned)STRESS_CEILING_MAX_MA);
+  json += F(",\"stress_step_fast_ms\":");
+  json += String((unsigned)STRESS_STEP_FAST_MS);
+  json += F(",\"stress_step_precise_ms\":");
+  json += String((unsigned)STRESS_STEP_PRECISE_MS);
+  json += F(",\"stress_rail_floor_default\":");
+  json += String((unsigned)STRESS_RAIL_FLOOR_DEFAULT_MV);
+
+  //* Standalone channel-resistance sweep. Separate from the stress record: one
+  //? short burst, no ramp, so a 1..100 LED linearity run is quick.
+  json += F(",\"sense_run\":");
+  json += sense_run_flag ? F("true") : F("false");
+  json += F(",\"sense_count\":");
+  json += String(sense_last.count);
+  json += F(",\"sense_burst_ms\":");
+  json += String(sense_last.burst_ms);
+  json += F(",\"sense_ma\":");
+  json += String(sense_last.ma);
+  json += F(",\"sense_v_off\":");
+  json += String(sense_last.v_off);
+  json += F(",\"sense_v_on\":");
+  json += String(sense_last.v_on);
+  json += F(",\"sense_r_mohm\":");
+  json += String(sense_last.r_mohm);
+  json += F(",\"sense_elapsed_ms\":");
+  json += String(sense_last.elapsed_ms);
+  json += F(",\"sense_count_min\":");
+  json += String(SENSE_COUNT_MIN);
+  json += F(",\"sense_count_max\":");
+  json += String(SENSE_COUNT_MAX);
+  json += F(",\"sense_burst_fast_ms\":");
+  json += String(SENSE_BURST_FAST_MS);
+  json += F(",\"sense_burst_precise_ms\":");
+  json += String(SENSE_BURST_PRECISE_MS);
 
   //* Which of the three network states the board is in. Reaching this endpoint at
   //? all means NET_CONNECTED, so this is mostly for the page's own consistency -
@@ -770,6 +964,20 @@ bool webpage_config_apply_arg(const char *name, const String &value)
     rainbow.max_ms = (uint16_t)max_ms;
     changed = true;
   }
+  if (web_server.hasArg("rainbow_level"))
+  {
+    rainbow.level = (uint8_t)constrain(web_server.arg("rainbow_level").toInt(), 0, 255);
+    changed = true;
+  }
+
+  //* Power budget, 0.6. Clamped to the bench range; the guard and safe mode are
+  //? separate layers and are not writable from here.
+  if (web_server.hasArg("budget"))
+  {
+    power_budget_ma = (uint16_t)constrain(web_server.arg("budget").toInt(),
+                                          POWER_BUDGET_MIN_MA, POWER_BUDGET_MAX_MA);
+    changed = true;
+  }
 
   //* Strip size. Bounded by the buffer the driver allocated, not by anything
   //* the request says: NUM_LEDS pixels exist and no more.
@@ -834,6 +1042,69 @@ bool webpage_config_apply_arg(const char *name, const String &value)
     if (idle > 255)
       idle = 255;
     flame.power_idle = (uint8_t)idle;
+    changed = true;
+  }
+
+  //* Gyro fade tunables, 0.6. Per-field ranges only; fade_sanitize() below is
+  //* the relational backstop.
+  if (web_server.hasArg("fade_decay"))
+  {
+    float decay = web_server.arg("fade_decay").toFloat();
+    if (decay < 0.50f)
+      decay = 0.50f;
+    if (decay > 0.995f)
+      decay = 0.995f;
+    fade.decay = decay;
+    changed = true;
+  }
+  if (web_server.hasArg("fade_trigger"))
+  {
+    float trigger = web_server.arg("fade_trigger").toFloat();
+    if (trigger < 0.02f)
+      trigger = 0.02f;
+    if (trigger > 2.00f)
+      trigger = 2.00f;
+    fade.trigger = trigger;
+    changed = true;
+  }
+  if (web_server.hasArg("fade_length_gain"))
+  {
+    fade.length_gain = constrain(web_server.arg("fade_length_gain").toFloat(), 0.0f, 40.0f);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_length_z_gain"))
+  {
+    fade.length_z_gain = constrain(web_server.arg("fade_length_z_gain").toFloat(), 0.0f, 40.0f);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_length_base"))
+  {
+    fade.length_base = constrain(web_server.arg("fade_length_base").toFloat(), 0.0f, 40.0f);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_power_gain"))
+  {
+    fade.power_gain = constrain(web_server.arg("fade_power_gain").toFloat(), 0.0f, 10.0f);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_power_base"))
+  {
+    fade.power_base = constrain(web_server.arg("fade_power_base").toFloat(), 0.0f, 50.0f);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_color_gain"))
+  {
+    fade.color_gain = (uint8_t)constrain(web_server.arg("fade_color_gain").toInt(), 1, 20);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_idle_length"))
+  {
+    fade.idle_length = (uint8_t)constrain(web_server.arg("fade_idle_length").toInt(), 0, NUM_LEDS);
+    changed = true;
+  }
+  if (web_server.hasArg("fade_idle_power"))
+  {
+    fade.idle_power = (uint8_t)constrain(web_server.arg("fade_idle_power").toInt(), 0, 255);
     changed = true;
   }
 
@@ -961,6 +1232,7 @@ void webpage_handle_set_config()
   whip_sanitize();
   flame_sanitize();
   rainbow_sanitize();
+  fade_sanitize();
   webpage_config_save();
 
   //? Proof on serial that the write actually landed, rather than having to
@@ -977,6 +1249,13 @@ void webpage_handle_set_config()
                 flame.power_idle);
   Serial.printf("[WEB] Rainbow -> speed=%.2f gap=%u..ums\n",
                 rainbow.speed, rainbow.min_ms, rainbow.max_ms);
+  Serial.printf("[WEB] Rainbow -> level=%u/255\n", rainbow.level);
+  Serial.printf("[WEB] Fade -> decay=%.3f trigger=%.2f len=%.0f/%.0f/%.0f color=%u idle=%u/%u\n",
+                fade.decay, fade.trigger, fade.length_gain, fade.length_z_gain,
+                fade.length_base, fade.color_gain, fade.idle_length, fade.idle_power);
+  Serial.printf("[WEB] Power -> budget=%u mA guard=%u/255 active=%u suggested=%u mA\n",
+                power_budget_ma, power_guard_scale, power_guard_active,
+                power_suggestion_ma());
 
   webpage_handle_state();
 }
@@ -1418,11 +1697,12 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
     <label class="filebtn">Import<input type="file" id="presetImport" accept=".json,application/json"></label>
   </div>
   <p class="hint" id="presetInfo"></p>
-  <p class="hint">A slot holds everything on this page: mode, colour, brightness,
-     strip length, the impact detector and every tunable below. Click a slot to
-     apply it, or pick one and save the current settings into it. Export writes a
-     JSON file built by this page, not by the device. Import applies each preset
-     in the file and then saves it into its slot, so the device is left on the
+  <p class="hint">A slot holds the look: mode, colour, brightness, strip length, the
+     impact detector, the flame, the whip, the rainbow (level included) and the gyro
+     fade. The power budget is device-only and is deliberately not carried in a slot.
+     Click a slot to apply it, or pick one and save the current settings into it. Export
+     writes a JSON file built by this page, not by the device. Import applies each
+     preset in the file and then saves it into its slot, so the device is left on the
      last one the file contained.</p>
 </section>
 
@@ -1568,6 +1848,9 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
   <div class="ctl"><label for="rbmax">Max wait</label>
     <input type="range" id="rbmax" min="50" max="60000" step="50">
     <output id="rbmaxVal"></output></div>
+  <div class="ctl"><label for="rblev">Level</label>
+    <input type="range" id="rblev" min="0" max="255" step="1">
+    <output id="rblevVal"></output></div>
   <p class="hint" id="rainbowInfo"></p>
   <p class="hint">The starting LED is given a new random colour after a wait drawn
      between <strong>Min wait</strong> and <strong>Max wait</strong>, and that colour
@@ -1577,12 +1860,60 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
 </section>
 
 <section>
+  <h2>Gyro fade</h2>
+  <div class="ctl"><label for="fddec">Decay</label>
+    <input type="range" id="fddec" min="0.5" max="0.995" step="0.005">
+    <output id="fddecVal"></output></div>
+  <div class="ctl"><label for="fdtrg">Trigger</label>
+    <input type="range" id="fdtrg" min="0.02" max="2" step="0.01">
+    <output id="fdtrgVal"></output></div>
+  <div class="ctl"><label for="fdlen">Length gain</label>
+    <input type="range" id="fdlen" min="0" max="40" step="1">
+    <output id="fdlenVal"></output></div>
+  <div class="ctl"><label for="fdlenz">Z length gain</label>
+    <input type="range" id="fdlenz" min="0" max="40" step="1">
+    <output id="fdlenzVal"></output></div>
+  <div class="ctl"><label for="fdlenb">Length base</label>
+    <input type="range" id="fdlenb" min="0" max="40" step="1">
+    <output id="fdlenbVal"></output></div>
+  <div class="ctl"><label for="fdpwr">Power gain</label>
+    <input type="range" id="fdpwr" min="0" max="10" step="0.5">
+    <output id="fdpwrVal"></output></div>
+  <div class="ctl"><label for="fdpwb">Power base</label>
+    <input type="range" id="fdpwb" min="0" max="50" step="1">
+    <output id="fdpwbVal"></output></div>
+  <div class="ctl"><label for="fdcol">Colour gain</label>
+    <input type="range" id="fdcol" min="1" max="20" step="1">
+    <output id="fdcolVal"></output></div>
+  <div class="ctl"><label for="fdidlen">Idle length</label>
+    <input type="range" id="fdidlen" min="0" max="150" step="1">
+    <output id="fdidlenVal"></output></div>
+  <div class="ctl"><label for="fdidpwr">Idle power</label>
+    <input type="range" id="fdidpwr" min="0" max="255" step="1">
+    <output id="fdidpwrVal"></output></div>
+  <p class="hint" id="fadeInfo"></p>
+  <p class="hint">The gyro peaks decay by <strong>Decay</strong> each frame. While
+     |gyro&nbsp;z| is above <strong>Trigger</strong> the mode lights a length from
+     the three axis peaks (gains + base) and colours it by the same peaks. Below the
+     trigger it rests at <strong>Idle length</strong> / <strong>Idle power</strong>.</p>
+</section>
+
+<section>
   <h2>Brightness</h2>
   <div class="row">
     <input type="range" id="bright" min="0" max="255" step="1">
     <output id="brightVal">255</output>
   </div>
-  <p class="hint">Applies to every mode.</p>
+  <div class="ctl"><label for="budget">Max current</label>
+    <input type="range" id="budget" min="100" max="2000" step="50">
+    <output id="budgetVal"></output></div>
+  <p class="hint" id="powerInfo"></p>
+  <p class="hint">Applies to every mode. The <strong>Max current</strong> budget caps
+     the worst-case white current for the configured strip (60&nbsp;mA/LED), so it
+     may cap the level below 255. The 10&nbsp;Hz guard trims the effective level
+     when V_REG falls under 3.70&nbsp;V and recovers it above 3.75&nbsp;V; it never
+     changes the stored brightness. The suggested limit is advisory, from the last
+     test, and is not applied automatically.</p>
 </section>
 
 <section>
@@ -1991,6 +2322,44 @@ function render() {
     $('#bright').value = state.brightness;
     $('#brightVal').textContent = state.brightness;
   }
+  if (document.activeElement !== $('#budget')) {
+    $('#budget').value = state.budget_ma;
+    $('#budgetVal').textContent = state.budget_ma + ' mA';
+  }
+  if (document.activeElement !== $('#rblev')) {
+    $('#rblev').value = state.rainbow_level;
+    $('#rblevVal').textContent = state.rainbow_level;
+  }
+  var fadeRows = [
+    ['fddec', state.fade_decay, Number(state.fade_decay).toFixed(3)],
+    ['fdtrg', state.fade_trigger, Number(state.fade_trigger).toFixed(2)],
+    ['fdlen', state.fade_length_gain, Number(state.fade_length_gain).toFixed(0) + ' LED'],
+    ['fdlenz', state.fade_length_z_gain, Number(state.fade_length_z_gain).toFixed(0) + ' LED'],
+    ['fdlenb', state.fade_length_base, Number(state.fade_length_base).toFixed(0) + ' LED'],
+    ['fdpwr', state.fade_power_gain, Number(state.fade_power_gain).toFixed(1)],
+    ['fdpwb', state.fade_power_base, Number(state.fade_power_base).toFixed(1)],
+    ['fdcol', state.fade_color_gain, String(state.fade_color_gain)],
+    ['fdidlen', state.fade_idle_length, state.fade_idle_length + ' LED'],
+    ['fdidpwr', state.fade_idle_power, String(state.fade_idle_power)]
+  ];
+  fadeRows.forEach(function (f) {
+    var el = document.getElementById(f[0]);
+    if (document.activeElement !== el) { el.value = f[1]; }
+    document.getElementById(f[0] + 'Val').textContent = f[2];
+  });
+  $('#fadeInfo').textContent = 'At rest ' + state.fade_idle_length + ' LEDs at ' +
+    state.fade_idle_power + '/255; gyro peaks decay ' + Number(state.fade_decay).toFixed(3) +
+    ' per frame.';
+  var guardPct = Math.round(Number(state.guard_scale) * 100 / 255);
+  var cap = Number(state.budget_brightness ?? 255);
+  var constraint = Number(state.brightness) > cap
+    ? ' Load exceeds budget: capped at ' + cap + '/255.'
+    : ' No constraints on this device.';
+  $('#powerInfo').textContent = 'Worst-case white ceiling ' + state.budget_brightness +
+    '/255 for ' + state.active_leds + ' LEDs. Guard ' + guardPct + '%' +
+    (state.guard_active ? ' (trimming)' : '') + '. Suggested ' +
+    (state.power_suggested_ma ? state.power_suggested_ma + ' mA' : '—') +
+    ' from the last test (advisory, not applied).' + constraint;
 
   var rows = {
     'Mode': state.mode_label + ' (' + state.mode_key + ')',
@@ -2319,7 +2688,19 @@ $('#bright').addEventListener('change', function (e) {
  ['woffset', 'whip_offset'],
  ['rbspd', 'rainbow_speed'],
  ['rbmin', 'rainbow_min_ms'],
- ['rbmax', 'rainbow_max_ms']].forEach(function (f) {
+ ['rbmax', 'rainbow_max_ms'],
+ ['rblev', 'rainbow_level'],
+ ['budget', 'budget', function (v) { return v + ' mA'; }],
+ ['fddec', 'fade_decay', function (v) { return Number(v).toFixed(3); }],
+ ['fdtrg', 'fade_trigger', function (v) { return Number(v).toFixed(2); }],
+ ['fdlen', 'fade_length_gain', function (v) { return Number(v).toFixed(0) + ' LED'; }],
+ ['fdlenz', 'fade_length_z_gain', function (v) { return Number(v).toFixed(0) + ' LED'; }],
+ ['fdlenb', 'fade_length_base', function (v) { return Number(v).toFixed(0) + ' LED'; }],
+ ['fdpwr', 'fade_power_gain', function (v) { return Number(v).toFixed(1); }],
+ ['fdpwb', 'fade_power_base', function (v) { return Number(v).toFixed(1); }],
+ ['fdcol', 'fade_color_gain'],
+ ['fdidlen', 'fade_idle_length', function (v) { return v + ' LED'; }],
+ ['fdidpwr', 'fade_idle_power']].forEach(function (f) {
   var el = document.getElementById(f[0]);
   var show = f[2] || function (v) { return v; };
   el.addEventListener('input', function () {

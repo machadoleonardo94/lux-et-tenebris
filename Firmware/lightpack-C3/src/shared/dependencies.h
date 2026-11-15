@@ -51,6 +51,15 @@
 #include "services/gyros.h"
 #include "services/readings.h"
 #include "services/led_scripts.h"
+//* Power management comes after the strip and the switches it drives. Safe mode
+//? is the boot warning that follows a brown-out; the stress test is the bench
+//* characterisation that fills the same NVS namespace with a result.
+#include "services/safe_mode.h"
+#include "services/stress_test.h"
+//* The standalone channel-resistance sense. Decoupled from the stress ramp so a
+//* 1..100 LED linearity sweep does not need the load stress block.
+#include "services/channel_sense.h"
+#include "services/power_guard.h"
 #include "services/serial_outputs.h"
 #include "services/wifi_settings.h"
 #include "services/webpage.h"

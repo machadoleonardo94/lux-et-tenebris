@@ -224,11 +224,21 @@ int usb_find_seq(const char *args)
 
 bool usb_field_known(const char *key)
 {
+    //* The power budget is a /api/config field but deliberately not a preset
+    //? field (device property), so it is not in PRESET_FIELDS and needs its own
+    //* check here.
+    if (strcmp(key, "budget") == 0)
+        return true;
+
     for (uint8_t i = 0; i < PRESET_FIELD_COUNT; i++)
         if (strcmp(PRESET_FIELDS[i].name, key) == 0)
             return true;
     return false;
 }
+
+//* Set by usb_handle_set() when the budget moved, so the ACK can report it even
+//? though it is not one of the preset fields the diff walks.
+bool usb_budget_changed = false;
 
 //* ---------------------- CONFIG DIFF ----------------------
 //? A SET answers with the fields that actually moved, not with the whole state:
@@ -288,6 +298,15 @@ void usb_send_set_ack(int seq, uint8_t count, const struct_preset &before,
         json += field.name;
         json += F("\":");
         usb_append_field_value(json, after, field);
+    }
+
+    if (usb_budget_changed)
+    {
+        if (!first)
+            json += ',';
+        first = false;
+        json += F("\"budget\":");
+        json += String(power_budget_ma);
     }
 
     json += F("}}\n");
@@ -465,6 +484,7 @@ void usb_handle_set(char *args)
     struct_preset before = {};
     struct_preset after = {};
     preset_capture(before);
+    const uint16_t budget_before = power_budget_ma;
 
     for (uint8_t i = 0; i < count; i++)
         webpage_config_apply_arg(keys[i], String(values[i]));
@@ -477,7 +497,9 @@ void usb_handle_set(char *args)
     whip_sanitize();
     flame_sanitize();
     rainbow_sanitize();
+    fade_sanitize();
     preset_capture(after);
+    usb_budget_changed = (budget_before != power_budget_ma);
 
     bool changed = false;
     for (uint8_t i = 0; i < PRESET_FIELD_COUNT; i++)
@@ -488,7 +510,7 @@ void usb_handle_set(char *args)
             break;
         }
     }
-    if (changed)
+    if (changed || usb_budget_changed)
         config_dirty = true;
 
     usb_send_set_ack(seq, count, before, after);
@@ -548,6 +570,167 @@ void usb_handle_impact(char *args)
     json += F(",\"mode\":");
     json += String(mode);
     json += F("}\n");
+    usb_write_line(json);
+}
+
+void usb_handle_stress(char *args)
+{
+    //* The stress test measures the strip, so the radio has to be quiet. Refusing
+    //? here is the same rule the test itself enforces; this one can say why.
+    if (net_state != NET_OFFLINE)
+    {
+        usb_send_error("stress", -1, "switch the radio off before a stress test");
+        return;
+    }
+
+    char wants[16];
+    uint8_t length = 0;
+    const char *p = args;
+    while (*p == ' ')
+        p++;
+    while (*p != '\0' && *p != ' ' && length < sizeof(wants) - 1)
+        wants[length++] = *p++;
+    wants[length] = '\0';
+
+    //* Colour is a 3-bit mask so the console can mix channels: R=1, G=2, B=4.
+    //? The old colour names stay accepted for hand-written lines.
+    uint8_t color;
+    const int mask_arg = atoi(wants);
+    if (mask_arg >= 1 && mask_arg <= 7)
+        color = (uint8_t)mask_arg;
+    else if (usb_ieq(wants, "white"))
+        color = 7;
+    else if (usb_ieq(wants, "red"))
+        color = 1;
+    else if (usb_ieq(wants, "green"))
+        color = 2;
+    else if (usb_ieq(wants, "blue"))
+        color = 4;
+    else
+    {
+        usb_send_error("stress", -1, "expected a mask 1..7 (R=1 G=2 B=4), or white/red/green/blue");
+        return;
+    }
+
+    //* Optional test-only ceiling and step: `@STRESS white 4000 500`.
+    //? Absent values keep the normal 2 A / 500 ms defaults. Above 2 A is
+    //* lab-only; the test is the exception, never the sustained budget.
+    uint16_t ceiling_ma = (uint16_t)STRESS_CEILING_DEFAULT_MA;
+    uint16_t step_ms = (uint16_t)STRESS_STEP_FAST_MS;
+
+    while (*p == ' ')
+        p++;
+    if (*p != '\0')
+    {
+        ceiling_ma = (uint16_t)atoi(p);
+        while (*p != '\0' && *p != ' ')
+            p++;
+    }
+    while (*p == ' ')
+        p++;
+    if (*p != '\0')
+        step_ms = (uint16_t)atoi(p);
+
+    //* Optional lab-only rail floor: 0 disables the 3.0 V collapse guard so the
+    //? test can find the absolute limit. Absent means the normal 3000 mV.
+    while (*p != '\0' && *p != ' ')
+        p++;
+    while (*p == ' ')
+        p++;
+    uint16_t rail_floor_mv = (uint16_t)STRESS_RAIL_FLOOR_DEFAULT_MV;
+    if (*p != '\0')
+        rail_floor_mv = (uint16_t)atoi(p);
+    if (rail_floor_mv > STRESS_RAIL_FLOOR_MAX_MV)
+        rail_floor_mv = (uint16_t)STRESS_RAIL_FLOOR_MAX_MV;
+
+    if (ceiling_ma < STRESS_CEILING_MIN_MA)
+        ceiling_ma = (uint16_t)STRESS_CEILING_MIN_MA;
+    if (ceiling_ma > STRESS_CEILING_MAX_MA)
+        ceiling_ma = (uint16_t)STRESS_CEILING_MAX_MA;
+    if (step_ms != STRESS_STEP_FAST_MS && step_ms != STRESS_STEP_PRECISE_MS)
+        step_ms = (uint16_t)STRESS_STEP_FAST_MS;
+
+    if (!stress_test_request(color, ceiling_ma, step_ms, rail_floor_mv))
+    {
+        usb_send_error("stress", -1, "a stress test is already pending or running");
+        return;
+    }
+
+    String json;
+    json.reserve(300);
+    usb_begin_ack(json, "stress", -1);
+    json += F(",\"color\":\"");
+    json += wants;
+    json += F("\",\"mask\":");
+    json += String((unsigned)color);
+    json += F(",\"ceiling_ma\":");
+    json += String((unsigned)ceiling_ma);
+    json += F(",\"step_ms\":");
+    json += String((unsigned)step_ms);
+    json += F(",\"rail_floor_mv\":");
+    json += String((unsigned)rail_floor_mv);
+    json += F(",\"started\":true}\n");
+    usb_write_line(json);
+}
+
+void usb_handle_sense(char *args)
+{
+    if (net_state != NET_OFFLINE)
+    {
+        usb_send_error("sense", -1, "switch the radio off before a sense run");
+        return;
+    }
+
+    const int count = atoi(args);
+    if (count < SENSE_COUNT_MIN || count > SENSE_COUNT_MAX)
+    {
+        usb_send_error("sense", -1, "count must be 1..100 LEDs");
+        return;
+    }
+
+    const char *p = args;
+    while (*p != '\0' && *p != ' ')
+        p++;
+    while (*p == ' ')
+        p++;
+
+    uint16_t burst_ms = (uint16_t)SENSE_BURST_FAST_MS;
+    if (*p != '\0')
+        burst_ms = (uint16_t)atoi(p);
+    if (burst_ms != SENSE_BURST_FAST_MS && burst_ms != SENSE_BURST_PRECISE_MS)
+        burst_ms = (uint16_t)SENSE_BURST_FAST_MS;
+
+    if (!sense_test_request((uint8_t)count, burst_ms))
+    {
+        usb_send_error("sense", -1, "a sense run is already pending or running");
+        return;
+    }
+
+    String json;
+    json.reserve(200);
+    usb_begin_ack(json, "sense", -1);
+    json += F(",\"count\":");
+    json += String((unsigned)count);
+    json += F(",\"burst_ms\":");
+    json += String((unsigned)burst_ms);
+    json += F(",\"started\":true}\n");
+    usb_write_line(json);
+}
+
+void usb_handle_safe(char *args)
+{
+    if (!usb_ieq(args, "off"))
+    {
+        usb_send_error("safe", -1, "expected OFF");
+        return;
+    }
+
+    safe_mode_clear();
+
+    String json;
+    json.reserve(160);
+    usb_begin_ack(json, "safe", -1);
+    json += F(",\"safe_boot\":false}\n");
     usb_write_line(json);
 }
 
@@ -974,6 +1157,21 @@ void usb_handle_line(char *line)
         usb_handle_radio(args);
         return;
     }
+    if (usb_ieq(line, "STRESS"))
+    {
+        usb_handle_stress(args);
+        return;
+    }
+    if (usb_ieq(line, "SENSE"))
+    {
+        usb_handle_sense(args);
+        return;
+    }
+    if (usb_ieq(line, "SAFE"))
+    {
+        usb_handle_safe(args);
+        return;
+    }
     if (usb_ieq(line, "COMMIT"))
     {
         webpage_config_save();
@@ -1229,6 +1427,20 @@ void usb_control_loop()
 
     if (!connected)
         return;
+
+    //* One unsolicited state frame when a stress test finishes on USB. The test
+    //? blocks the control loop for its whole run, so a host that stayed attached
+    //? would otherwise not see the result until it asked again.
+    if (stress_report_pending)
+    {
+        stress_report_pending = false;
+        usb_send_state(-1);
+    }
+    if (sense_report_pending)
+    {
+        sense_report_pending = false;
+        usb_send_state(-1);
+    }
 
     usb_update_slow();
     usb_emit_events();

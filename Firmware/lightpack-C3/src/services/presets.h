@@ -51,7 +51,11 @@
 //? slots as empty instead of drawing nonsense - but it did so silently, as a single
 //* [E] line in the serial log. PRESET_INCOMPATIBLE below is what makes that state
 //* visible instead of indistinguishable from an empty slot.
-#define PRESET_FORMAT_VERSION 2
+//?   3  struct_preset grew with the 0.6 schema: rainbow_level and the ten gyro
+//?      fade tunables. The device power budget is deliberately NOT in the preset
+//?      (it describes this cell/cable/strip, not a look). Version 2 slots are
+//*      reported as incompatible rather than misread.
+#define PRESET_FORMAT_VERSION 3
 
 //* ---------------------- STORED FORM ----------------------
 
@@ -69,6 +73,7 @@ typedef struct presetSlot
     struct_whipSettings whip;
     struct_rainbowSettings rainbow;
     struct_flameSettings flame;
+    struct_fadeSettings fade;
     struct_stepSettings step;
 } struct_preset;
 
@@ -115,12 +120,23 @@ const struct_presetField PRESET_FIELDS[] = {
     {"rainbow_speed", PRESET_F32, PRESET_NEST(rainbow, struct_rainbowSettings, speed)},
     {"rainbow_min_ms", PRESET_U16, PRESET_NEST(rainbow, struct_rainbowSettings, min_ms)},
     {"rainbow_max_ms", PRESET_U16, PRESET_NEST(rainbow, struct_rainbowSettings, max_ms)},
+    {"rainbow_level", PRESET_U8, PRESET_NEST(rainbow, struct_rainbowSettings, level)},
     {"leds", PRESET_U16, PRESET_FLAT(active_leds)},
     {"flame_decay", PRESET_F32, PRESET_NEST(flame, struct_flameSettings, decay)},
     {"flame_spatial", PRESET_F32, PRESET_NEST(flame, struct_flameSettings, spatial)},
     {"flame_power_slope", PRESET_F32, PRESET_NEST(flame, struct_flameSettings, power_slope)},
     {"flame_power_max", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, power_max)},
     {"flame_power_idle", PRESET_U8, PRESET_NEST(flame, struct_flameSettings, power_idle)},
+    {"fade_decay", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, decay)},
+    {"fade_trigger", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, trigger)},
+    {"fade_length_gain", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, length_gain)},
+    {"fade_length_z_gain", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, length_z_gain)},
+    {"fade_length_base", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, length_base)},
+    {"fade_power_gain", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, power_gain)},
+    {"fade_power_base", PRESET_F32, PRESET_NEST(fade, struct_fadeSettings, power_base)},
+    {"fade_color_gain", PRESET_U8, PRESET_NEST(fade, struct_fadeSettings, color_gain)},
+    {"fade_idle_length", PRESET_U8, PRESET_NEST(fade, struct_fadeSettings, idle_length)},
+    {"fade_idle_power", PRESET_U8, PRESET_NEST(fade, struct_fadeSettings, idle_power)},
     {"step_baseline_tau_ms", PRESET_U16, PRESET_NEST(step, struct_stepSettings, baseline_tau_ms)},
     {"step_threshold", PRESET_F32, PRESET_NEST(step, struct_stepSettings, threshold)},
     {"step_release", PRESET_F32, PRESET_NEST(step, struct_stepSettings, release)},
@@ -250,6 +266,7 @@ void preset_capture(struct_preset &p)
     p.whip = whip;
     p.rainbow = rainbow;
     p.flame = flame;
+    p.fade = fade;
     p.step = step;
 }
 
@@ -329,6 +346,7 @@ bool preset_apply(uint8_t slot)
     whip = p.whip;
     rainbow = p.rainbow;
     flame = p.flame;
+    fade = p.fade;
     step = p.step;
 
     //! Same order and same reasoning as webpage_config_load(): strip_sanitize()
@@ -341,6 +359,7 @@ bool preset_apply(uint8_t slot)
     whip_sanitize();
     flame_sanitize();
     rainbow_sanitize();
+    fade_sanitize();
 
     //? Persist it as the boot configuration too: the page's contract everywhere
     //? else is that what you just set is what comes back after a reset, and a

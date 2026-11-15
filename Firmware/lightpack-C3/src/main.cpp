@@ -62,6 +62,15 @@ void setup()
   Serial.println("\n\nESP32-C3 Lightpack Let it Go ");
   Serial.println("===========================");
 
+  //* The power state comes from NVS and the reset reason, and has to be known
+  //? BEFORE the strip self-test: safe mode replaces the R/G/B channel walk with a
+  //? soft red fill, and a stress test that a reset interrupted is finalised here
+  //* so its result survives the reconnect. It runs after Serial.begin() so the
+  //? warning lines land in a console that is actually listening.
+  safe_mode_load_flag();
+  stress_test_boot();
+  sense_test_boot();
+
   //* The two facts a board that misbehaves on one supply and not another is
   //? asked for first: why the last run ended, and what the rail looked like
   //? before any LED drew current. Read here, at rest, so the number below is
@@ -131,6 +140,10 @@ void setup()
   //* than the difference between compile-time defaults and NVS.
   usb_control_begin();
 
+  //* If the device recovers from brownout, the power budget is set to 70% and the
+  // user must click to acknowledge it and proceed.
+  safe_mode_warning();
+
   //* Network bring-up, then the device configuration webpage - except that the
   //? page is no longer started from here. setup_WIFI() reads the stored offline
   //? switch and the stored credentials and leaves the board in one of three
@@ -190,6 +203,13 @@ void loop()
   //? the same pass rather than the next one, and the check functions themselves
   //* perform the transition, so this only carries the join and the retry.
   wifi_loop();
+
+  //* The power stress test owns the strip for its whole run. It is deliberately
+  //? blocking and serviced from one place, so no web request, WiFi burst or mode
+  //* frame can perturb the ramp it is measuring.
+  stress_test_loop();
+  sense_test_loop();
+  power_guard_loop();
 
   update_strip(mode);
 

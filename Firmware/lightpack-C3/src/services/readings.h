@@ -42,6 +42,11 @@ void led_notice(uint8_t r, uint8_t g, uint8_t b, uint16_t ms);
 //* action and every switch draws the same confirmation for the same action.
 void ui_action_feedback(uint8_t action);
 
+//* Safe mode lives in services/safe_mode.h, included after this header. A
+//? five-click power-off is the deliberate way OUT of it, so the flag has to be
+//* cleared before the latch opens and the board loses the chance to write it.
+void safe_mode_clear();
+
 //* Each switch owns its click map. Declared before setup_button_interrupt() stores
 //* them in the wiring table; defined with the rest of the gesture code below.
 void touch_click_resolve(uint8_t clicks);
@@ -527,6 +532,12 @@ void power_off_sequence()
     }
 
     Serial.printf("[POWER] Latch cut at %lu ms\n", (unsigned long)millis());
+
+    //* A deliberate power-off also means "start clean next time": clear the
+    //? safe-mode flag before the latch opens, or the next boot would warn again
+    //* about a supply the user has already decided to retry.
+    safe_mode_clear();
+
     //* Red, steady, on both WS2812B channels. This is the last thing the board
     //? shows, so it has to be readable in one glance and it has to be red: the
     //* user is about to lose the device and has one second to change their mind.
@@ -830,6 +841,17 @@ void boot_click_resolve(uint8_t clicks)
     }
 }
 
+//* Blank the touch pad for a while after a load test.
+//? A 3 A burst can couple into the capacitive module and latch a false press;
+//! the ISR is real, the gesture is not. The pad is discarded for the window, so
+//* the mode cannot change behind the user's back when the test ends.
+uint32_t touch_suppress_until_ms = 0;
+
+void button_suppress_touch(uint32_t ms)
+{
+    touch_suppress_until_ms = millis() + ms;
+}
+
 //* The touch pad: the daily interface.
 //?   1 click  next mode, 2 clicks previous mode, 5 clicks power off,
 //*   >= 3 s   radio on/off, >= 6 s config hotspot.
@@ -838,6 +860,18 @@ void boot_click_resolve(uint8_t clicks)
 //* firmware - the board would look bricked until the button was let go.
 void check_button()
 {
+    //* Load-test transient gate. Discard whatever the pad latched, including the
+    //? click counters, until the window passes. GPIO9 is a mechanical switch and
+    //* stays live; this is only the capacitive pad.
+    if ((int32_t)(millis() - touch_suppress_until_ms) < 0)
+    {
+        button_discard_press(touch_button);
+        touch_button.click_count = 0;
+        touch_button.counter = 0;
+        touch_button.click_last_ms = 0;
+        return;
+    }
+
     const uint32_t before = touch_button.event_count;
     button_poll(touch_button);
 

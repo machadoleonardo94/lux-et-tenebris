@@ -23,7 +23,7 @@
 //? Reported by the USB console's PING, and shown in its title bar. Bump it with
 //? the release, not with every build: the build date travels beside it and is
 //* what tells two images of the same version apart.
-#define LIGHTPACK_FW_VERSION "0.5.0-dev"
+#define LIGHTPACK_FW_VERSION "0.6.0-dev"
 
 //* ---------------------- NETWORK STATE ----------------------
 //? The board is in exactly one of these three states. It lives here rather than in
@@ -226,9 +226,33 @@ typedef struct rainbowSettings
     float speed = 2.0f;     // LEDs the pattern advances per frame (a frame is LED_SCRIPT_FRAME_MS)
     uint16_t min_ms = 400;  // Shortest wait before the starting LED is given a new random colour
     uint16_t max_ms = 2000; // Longest wait before the starting LED is given a new random colour
+    uint8_t level = 128;    // Mode-local brightness trim, 0-255 (applied before the global brightness)
 } struct_rainbowSettings;
 
 struct_rainbowSettings rainbow;
+
+//* ---------------------- GYRO FADE TUNABLES (mode 4) ----------------------
+//? Mode 4 was fixed constants until 0.6. The values below are the constants it
+//? shipped with, now exposed: the gyro peak decays by `decay` each frame, the
+//? lit length is a weighted sum of the three gyro axes, and the colour is the
+//? same sum scaled by `color_gain`. `trigger` is the gyro-z floor below which
+//? the mode idles at idle_length / idle_power.
+//! Sanitised by fade_sanitize() (services/led_scripts.h) on every load/write.
+typedef struct fadeSettings
+{
+    float decay = 0.90f;         // Gyro peak kept per frame, 0.50-0.995
+    float trigger = 0.20f;       // Gyro-z floor for the active state
+    float length_gain = 20.0f;   // Lit LEDs per unit of |gyro x| / |gyro y|
+    float length_z_gain = 15.0f; // Lit LEDs per unit of |gyro z|
+    float length_base = 10.0f;   // Lit LEDs added to the active length
+    float power_gain = 2.0f;     // Unused brightness term kept for the 0.6 schema
+    float power_base = 5.0f;     // Unused brightness term kept for the 0.6 schema
+    uint8_t color_gain = 7;      // Colour scale from the gyro peaks
+    uint8_t idle_length = 5;     // Lit LEDs while stationary
+    uint8_t idle_power = 5;      // Brightness while stationary
+} struct_fadeSettings;
+
+struct_fadeSettings fade;
 
 //* ---------------------- STRIP SIZE ----------------------
 //? NUM_LEDS (shared/library_objects.h) is the COMPILED size of the NeoPixel
@@ -253,6 +277,58 @@ typedef struct stripSettings
 } struct_stripSettings;
 
 struct_stripSettings strip_settings;
+
+//* ---------------------- POWER / SAFE MODE ----------------------
+//? The power budget is a DEVICE property, not a look: the cell, the cable and
+//? the strip length travel with the board, while a preset travels between boards.
+//? That is why the safe-mode flag and the stress record live in their own NVS
+//* namespace instead of in the "device" configuration preset_* reads.
+//!
+//! `safe_boot_active` is the RAM mirror of the flag. It is loaded before the strip
+//? self-test so the self-test can show the soft red warning instead of the R/G/B
+//* channel walk, and it is cleared by a deliberate power-off or the console.
+#define POWER_NVS_NAMESPACE "power"
+#define POWER_SAFE_KEY "safe"
+//* Headroom the strip budget does NOT include: the module, its radio peaks and
+//? the supervisor draw this on the same rail. The stress test reports the strip
+//* current; the console adds this to show the total the cell actually sees.
+#define POWER_MCU_MA 200
+//* Safe mode keeps this much of the configured brightness, which is the same
+//? fraction of the current for every frame the driver scales. The absolute
+//* current budget (mA) that replaces it is a later 0.6 field.
+#define POWER_SAFE_PERCENT 70
+
+bool safe_boot_active = false;
+
+//* ---------------------- POWER BUDGET AND 10 Hz GUARD (0.6) ----------------------
+//? Two independent layers over the brightness:
+//?   1. The BUDGET is the user's maximum strip current, converted to a brightness
+//?      ceiling with the worst-case white model (60 mA/LED). It is a device
+//?      property, not a look, so it is deliberately NOT carried in a preset.
+//?   2. The GUARD is the 10 Hz voltage feedback. Below 3.70 V it trims the
+//?      effective brightness in small steps; above 3.75 V it recovers slowly.
+//?      It never changes the stored brightness, so the strip returns to the
+//?      configured level once the rail recovers.
+//! The guard is a self-regulation aid, not a brown-out cure: safe mode is still
+//? what runs after the C3 actually resets.
+#define POWER_BUDGET_MIN_MA 100
+#define POWER_BUDGET_DEFAULT_MA 1000
+#define POWER_BUDGET_MAX_MA 2000
+#define POWER_GUARD_FLOOR_MV 3700
+#define POWER_GUARD_RECOVER_MV 3750
+#define POWER_GUARD_INTERVAL_MS 100
+#define POWER_GUARD_STEP 5
+#define POWER_GUARD_RAMP 255
+
+uint16_t power_budget_ma = POWER_BUDGET_DEFAULT_MA;
+uint8_t power_guard_scale = POWER_GUARD_RAMP; // 255 = no trim
+bool power_guard_active = false;
+uint16_t power_suggested_ma = 0; // advisory only, from the last test
+
+//? Set by anything that has changed strip brightness behind update_strip()'s
+//* back - today the stress test - so the next frame pushes it to the driver
+//* again instead of trusting the cached value.
+bool strip_brightness_dirty = false;
 
 //* ---------------------- STEP FLAME TUNABLES (mode 2) ----------------------
 //? Exposed on the device configuration webpage. The dynamics that consume these
