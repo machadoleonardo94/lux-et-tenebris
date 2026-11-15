@@ -901,25 +901,6 @@ void usb_send_update_state(const char *state)
     usb_write_line(json);
 }
 
-void ota_fail_status()
-{
-    //* The update is over: release the strip, force the next mode frame to push
-    //? the stored brightness again, and report the failure on the status pixel.
-    strip_update_hold = false;
-    strip_brightness_dirty = true;
-    led_notice_until_ms = 0;
-
-    for (uint8_t i = 0; i < 3; i++)
-    {
-        onboard_led.setPixelColor(0, strip.Color(255, 0, 0));
-        onboard_led.show();
-        delay(150);
-        onboard_led.setPixelColor(0, strip.Color(0, 0, 0));
-        onboard_led.show();
-        delay(150);
-    }
-}
-
 void usb_handle_update(char *args)
 {
     if (args == nullptr || *args == '\0')

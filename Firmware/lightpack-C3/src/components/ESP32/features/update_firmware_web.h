@@ -148,11 +148,14 @@ void webpage_handle_update_upload()
         Serial.printf("[WEB] Writing to '%s' at 0x%08X (%u KB)\n", target->label,
                       (unsigned)target->address, (unsigned)(target->size / 1024));
 
-        //* Physical progress. The strip is frozen for the duration of the
-        //? upload, so the onboard LED is the only indication that anything is
-        //? happening; update_onboard_LED() repaints it once loop() resumes.
-        onboard_led.setPixelColor(0, strip.Color(0, 0, 60));
-        onboard_led.show();
+        //* The upload owns the strip and the status pixel, exactly like the USB
+        //? path: strip off, purple heartbeat while chunks arrive, solid purple on
+        //* a stall and three red blinks on failure.
+        strip_update_hold = true;
+        strip.setBrightness(0);
+        strip.clear();
+        strip.show();
+        ota_last_chunk_ms = millis();
     }
     else if (!webpage_update_active)
     {
@@ -175,6 +178,7 @@ void webpage_handle_update_upload()
             return;
         }
         webpage_update_bytes += upload.currentSize;
+        ota_last_chunk_ms = millis();
     }
     else if (upload.status == UPLOAD_FILE_END)
     {
@@ -256,6 +260,15 @@ void webpage_handle_update_done()
     //? take away, and the page shows a network error instead of the result.
     web_server.client().flush();
     web_server.client().stop();
+
+    //* The reply is on the wire; a failure now releases the strip and blinks red
+    //* three times without holding the page's request open.
+    if (webpage_update_failed)
+    {
+        if (Update.isRunning())
+            Update.abort();
+        ota_fail_status();
+    }
 }
 
 //* GET /api/update: what the page needs before it offers a file.

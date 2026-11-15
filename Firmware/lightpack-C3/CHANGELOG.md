@@ -4,6 +4,15 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [0.6.1-dev] - 2026-11-15
+
+Version stamp and the main-page OTA status.
+
+- `0.6.1-dev` version so an update is distinguishable from the installed build.
+- The web upload owns the strip: off during the transfer, purple heartbeat on
+  progress, solid on a stall, three red blinks on failure.
+- The main page shows the running firmware version.
+
 ## [0.6.0-dev] - 2026-11-15
 
 Bench power characterisation, safe mode and the 0.6 configuration schema.

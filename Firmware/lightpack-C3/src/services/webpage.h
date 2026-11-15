@@ -344,6 +344,7 @@ void webpage_state_json(String &json)
   json += String(palette.blue);
   json += F(",\"brightness\":");
   json += String(led_strip.brightness);
+  json += F(",\"firmware\":\"" LIGHTPACK_FW_VERSION "\"");
   json += F(",\"whip_speed\":");
   json += String(whip.speed, 2);
   json += F(",\"whip_length\":");
@@ -1964,7 +1965,7 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
 </section>
 
 <section>
-  <h2>Firmware</h2>
+  <h2>Firmware <span id="fwVersion" class="muted"></span></h2>
   <div class="row">
     <label class="filebtn">Choose firmware.bin<input type="file" id="fwFile"
       accept=".bin,application/octet-stream"></label>
@@ -1978,9 +1979,9 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
      factory image is not an app image and will be rejected. The running firmware
      is never overwritten, and a rejected or interrupted upload leaves the device
      on the firmware it is running now. Settings and presets live in NVS and
-     survive the update. The strip freezes while the transfer runs: the whole
-     upload is parsed inside one pass of the main loop, and the progress bar is
-     measuring the browser's send, not the flash write.</p>
+     survive the update. The strip is held off while the transfer runs; the
+     status pixel heartbeats purple on progress, turns solid if the upload
+     stalls, and blinks red three times if the update fails.</p>
 </section>
 
 <section id="security">
@@ -2384,6 +2385,8 @@ function render() {
   $('#status').innerHTML = Object.keys(rows).map(function (k) {
     return '<dt>' + k + '</dt><dd>' + rows[k] + '</dd>';
   }).join('');
+
+  $('#fwVersion').textContent = state.firmware || '—';
 
   //* Strip size. The buffer size is the ceiling the device reports; the live
   //* count is what every other LED-measured slider has to stay within.

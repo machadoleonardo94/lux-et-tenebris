@@ -482,6 +482,26 @@ void update_onboard_LED()
     */
 }
 
+//* Release the OTA strip hold and report a failed update with three red blinks.
+//? Called by both OTA paths (USB and the main page's web upload) after they have
+//* answered the host, so the blink does not hold the reply.
+void ota_fail_status()
+{
+    strip_update_hold = false;
+    strip_brightness_dirty = true;
+    led_notice_until_ms = 0;
+
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        onboard_led.setPixelColor(0, strip.Color(255, 0, 0));
+        onboard_led.show();
+        delay(150);
+        onboard_led.setPixelColor(0, strip.Color(0, 0, 0));
+        onboard_led.show();
+        delay(150);
+    }
+}
+
 //* ---------------------- STEP FLAME (mode 2) ----------------------
 //? A step lights the whole strip at a brightness set by the impact, then every
 //? LED decays its own brightness towards the idle floor. The decay is worse the

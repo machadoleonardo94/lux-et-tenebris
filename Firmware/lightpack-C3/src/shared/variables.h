@@ -23,7 +23,7 @@
 //? Reported by the USB console's PING, and shown in its title bar. Bump it with
 //? the release, not with every build: the build date travels beside it and is
 //* what tells two images of the same version apart.
-#define LIGHTPACK_FW_VERSION "0.6.0-dev"
+#define LIGHTPACK_FW_VERSION "0.6.1-dev"
 
 //* ---------------------- NETWORK STATE ----------------------
 //? The board is in exactly one of these three states. It lives here rather than in

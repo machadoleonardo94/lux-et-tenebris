@@ -1,17 +1,17 @@
 {
   "name": "lightpack-C3",
-  "version": "0.6.0-dev",
-  "built": "2026-11-15T20:46:55-03:00",
-  "source": "0.6-schema",
-  "size": 1304704,
-  "sha256": "4393ED08C8DDCC052397201414C9BF8F227BCFA8FFE255BCBBDC7CD61824BF8D",
-  "notes": "0.6 schema: power budget and 10 Hz guard, rainbow level, gyro-fade tunables, preset v3; bench stress/sense and safe mode. The OTA holds the strip off; the status pixel heartbeats purple on progress, goes solid on a stall, and blinks red three times on failure. App-only USB OTA; NVS preserved.",
+  "version": "0.6.1-dev",
+  "built": "2026-11-15T20:57:39-03:00",
+  "source": "0.6.1-schema",
+  "size": 1304880,
+  "sha256": "938D85A7AB23A4C0227A7CC109B7EE35383B41113020F08FCED3FAF80AADE49F",
+  "notes": "0.6.1: version stamp plus the main-page OTA status. The web upload holds the strip off, heartbeats the status pixel purple on progress, goes solid on a stall, and blinks red three times on failure. The main page shows the running firmware version.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
         { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
-        { "path": "firmware.bin", "offset": 65536, "sha256": "4393ED08C8DDCC052397201414C9BF8F227BCFA8FFE255BCBBDC7CD61824BF8D" }
+        { "path": "firmware.bin", "offset": 65536, "sha256": "938D85A7AB23A4C0227A7CC109B7EE35383B41113020F08FCED3FAF80AADE49F" }
       ]
     }
   ]
