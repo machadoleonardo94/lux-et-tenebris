@@ -42,6 +42,9 @@ Bench power characterisation, safe mode and the 0.6 configuration schema.
 
 ### Release
 
+- USB OTA owns the strip: it is held off for the whole update. The status pixel
+  shows a purple heartbeat while chunks arrive, solid purple on a stall, and
+  three red blinks on failure.
 - `releases/latest` is now 0.6.0-dev.
 
 ## [Unreleased]

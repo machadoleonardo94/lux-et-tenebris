@@ -338,6 +338,25 @@ void ui_action_feedback(uint8_t action)
 //* Colour: green joined, cyan not joined, red radio off. One blink, then dark.
 void update_onboard_LED()
 {
+    //* A USB OTA owns the status pixel too: purple heartbeat while chunks are
+    //? arriving, solid purple if none has for OTA_HEARTBEAT_STALE_MS. The
+    //* heartbeat is progress; the solid state is the stall indication.
+    if (strip_update_hold)
+    {
+        if (millis() - status_led.update_time < 5)
+            return;
+        status_led.update_time = millis();
+
+        const uint32_t now = millis();
+        const bool progressing = (now - ota_last_chunk_ms) < OTA_HEARTBEAT_STALE_MS;
+        const bool on = progressing
+                            ? ((now % OTA_HEARTBEAT_PERIOD_MS) < OTA_HEARTBEAT_ON_MS)
+                            : true;
+        onboard_led.setPixelColor(0, on ? strip.Color(100, 0, 100) : strip.Color(0, 0, 0));
+        onboard_led.show();
+        return;
+    }
+
     //* A notice owns the pixel until its deadline. Checked before the repaint
     //? gate below, so a notice is drawn on the very next pass rather than up to
     //* 5 ms later.
@@ -1285,6 +1304,12 @@ void led_mode_prev()
 
 void update_strip(int mode)
 {
+    //* A USB OTA owns the strip: it has blanked it and is using the status pixel
+    //? for progress. Repainting a mode here would put the full strip current back
+    //* on the rail during the flash writes.
+    if (strip_update_hold)
+        return;
+
     //* A UI flash owns the strip for its short life. strip_flash() already painted
     //? every active pixel and called show(), so standing down here is all that is
     //* needed; the selected mode repaints on the first frame after the deadline.

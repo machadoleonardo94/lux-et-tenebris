@@ -901,6 +901,25 @@ void usb_send_update_state(const char *state)
     usb_write_line(json);
 }
 
+void ota_fail_status()
+{
+    //* The update is over: release the strip, force the next mode frame to push
+    //? the stored brightness again, and report the failure on the status pixel.
+    strip_update_hold = false;
+    strip_brightness_dirty = true;
+    led_notice_until_ms = 0;
+
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        onboard_led.setPixelColor(0, strip.Color(255, 0, 0));
+        onboard_led.show();
+        delay(150);
+        onboard_led.setPixelColor(0, strip.Color(0, 0, 0));
+        onboard_led.show();
+        delay(150);
+    }
+}
+
 void usb_handle_update(char *args)
 {
     if (args == nullptr || *args == '\0')
@@ -935,6 +954,7 @@ void usb_handle_update(char *args)
         if (size == 0 || end == rest || *end != '\0')
         {
             usb_send_error("update", -1, "expected BEGIN <image bytes>");
+            ota_fail_status();
             return;
         }
 
@@ -953,6 +973,7 @@ void usb_handle_update(char *args)
             if (esp_ota_set_boot_partition(running) != ESP_OK)
             {
                 usb_send_error("update", -1, "could not select the inactive OTA slot");
+                ota_fail_status();
                 return;
             }
             target = esp_ota_get_next_update_partition(nullptr);
@@ -960,25 +981,32 @@ void usb_handle_update(char *args)
         if (target == nullptr || target == running)
         {
             usb_send_error("update", -1, "no inactive OTA slot");
+            ota_fail_status();
             return;
         }
         if (usb_update_total > target->size)
         {
             usb_send_error("update", -1, "image does not fit the OTA slot");
+            ota_fail_status();
             return;
         }
 
         if (!Update.begin(usb_update_total, U_FLASH))
         {
             usb_send_error("update", -1, Update.errorString());
+            ota_fail_status();
             return;
         }
 
         //! Flash writes draw current. With 250 LEDs lit the rail sits near
         //! 4.2 V and the C3 can brown out; blank the strip before the first
-        //* sector erase. The normal loop repaints it if the update aborts.
+        //* sector erase and keep every mode from repainting it until END.
+        strip_update_hold = true;
+        strip.setBrightness(0);
         strip.clear();
         strip.show();
+        //* The OTA heartbeat in update_onboard_LED starts from this timestamp.
+        ota_last_chunk_ms = millis();
 
         usb_update_active = true;
         usb_update_reboot_at = 0;
@@ -1052,6 +1080,7 @@ void usb_handle_update(char *args)
         }
 
         usb_update_received += decoded;
+        ota_last_chunk_ms = millis();
         usb_send_update_state("data");
         return;
     }
@@ -1089,7 +1118,11 @@ void usb_handle_update(char *args)
             Update.abort();
         usb_update_active = false;
         usb_update_reboot_at = 0;
+        strip_update_hold = false;
+        strip_brightness_dirty = true;
+        //? Answer before the blink so the console is not held for 900 ms.
         usb_send_update_state("aborted");
+        ota_fail_status();
         return;
     }
 

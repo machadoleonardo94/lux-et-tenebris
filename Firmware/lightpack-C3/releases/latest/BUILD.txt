@@ -3,11 +3,12 @@ lightpack-C3 USB update channel
 
 firmware:      0.6.0-dev
 source:        0.6-schema
-built:         2026-11-15T20:26:35-03:00
-firmware.bin:  1304384 bytes
-sha256:        675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909
+built:         2026-11-15T20:46:55-03:00
+firmware.bin:  1304704 bytes
+sha256:        4393ED08C8DDCC052397201414C9BF8F227BCFA8FFE255BCBBDC7CD61824BF8D
 
 0.6 adds the power budget and 10 Hz guard, the rainbow level, the gyro-fade
 tunables and preset v3, together with the bench stress/sense tools and safe mode.
-The USB OTA path is unchanged: app-only image, inactive slot, NVS preserved.
+During a USB OTA the strip is held off and the status pixel heartbeats purple;
+a stalled update shows solid purple and a failed one gives three red blinks.
 A board on 0.5.0-dev or newer can update from the console.

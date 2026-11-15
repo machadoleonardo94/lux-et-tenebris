@@ -1,25 +1,17 @@
 {
   "name": "lightpack-C3",
   "version": "0.6.0-dev",
-  "built": "2026-11-15T20:26:35-03:00",
+  "built": "2026-11-15T20:46:55-03:00",
   "source": "0.6-schema",
-  "size": 1304384,
-  "sha256": "675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909",
-  "notes": "0.6 schema: power budget and 10 Hz guard, rainbow level, gyro-fade tunables, preset v3; bench stress/sense and safe mode. App-only USB OTA; NVS preserved.",
+  "size": 1304704,
+  "sha256": "4393ED08C8DDCC052397201414C9BF8F227BCFA8FFE255BCBBDC7CD61824BF8D",
+  "notes": "0.6 schema: power budget and 10 Hz guard, rainbow level, gyro-fade tunables, preset v3; bench stress/sense and safe mode. The OTA holds the strip off; the status pixel heartbeats purple on progress, goes solid on a stall, and blinks red three times on failure. App-only USB OTA; NVS preserved.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
-        {
-          "path": "boot_app0.bin",
-          "offset": 57344,
-          "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0"
-        },
-        {
-          "path": "firmware.bin",
-          "offset": 65536,
-          "sha256": "675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909"
-        }
+        { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
+        { "path": "firmware.bin", "offset": 65536, "sha256": "4393ED08C8DDCC052397201414C9BF8F227BCFA8FFE255BCBBDC7CD61824BF8D" }
       ]
     }
   ]

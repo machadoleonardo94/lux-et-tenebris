@@ -334,6 +334,19 @@ uint16_t power_suggested_ma = 0; // advisory only, from the last test
 //* again instead of trusting the cached value.
 bool strip_brightness_dirty = false;
 
+//* True while a USB OTA owns the board. update_strip() stands down so the modes
+//? cannot repaint the strip during the flash writes; the OTA itself blanks the
+//* strip and shows progress on the onboard status pixel instead.
+bool strip_update_hold = false;
+
+//* OTA heartbeat. The status pixel is purple at ~1 Hz while chunks are arriving;
+//? no chunk for OTA_HEARTBEAT_STALE_MS turns it solid purple, which reads as a
+//* stall rather than progress.
+#define OTA_HEARTBEAT_STALE_MS 3000
+#define OTA_HEARTBEAT_PERIOD_MS 1000
+#define OTA_HEARTBEAT_ON_MS 100
+uint32_t ota_last_chunk_ms = 0;
+
 //* ---------------------- STEP FLAME TUNABLES (mode 2) ----------------------
 //? Exposed on the device configuration webpage. The dynamics that consume these
 //? live in flame_steps() (services/led_scripts.h); ranges are enforced by
