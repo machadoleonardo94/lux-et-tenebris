@@ -1,20 +1,13 @@
 lightpack-C3 USB update channel
 ===============================
 
-firmware:      0.5.0-dev
-source:        usb-ota2
-built:         2026-11-14T01:35:57-03:00
-firmware.bin:  1,282,864 bytes
-sha256:        0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6
+firmware:      0.6.0-dev
+source:        0.6-schema
+built:         2026-11-15T20:26:35-03:00
+firmware.bin:  1304384 bytes
+sha256:        675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909
 
-The console verifies firmware.bin against the manifest SHA-256, sends it as
-base64 chunks with UPDATE BEGIN/DATA/END, and the board writes it through
-Update.h. NVS is untouched; the running image stays valid until END.
-
-usb-ota2 includes the slot-selection repair (never write the running slot), the
-strip blank before the first flash erase, and keeping the OTA state across a
-transient USB CDC drop during a flash write.
-
-The first firmware with this protocol had to be installed over USB once with
-`pio run -e C3-USB -t upload` (or the browser installer). Boards on 0.5.0-dev
-can now update from the console.
+0.6 adds the power budget and 10 Hz guard, the rainbow level, the gyro-fade
+tunables and preset v3, together with the bench stress/sense tools and safe mode.
+The USB OTA path is unchanged: app-only image, inactive slot, NVS preserved.
+A board on 0.5.0-dev or newer can update from the console.

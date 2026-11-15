@@ -54,7 +54,7 @@ uint32_t usb_next_tick_ms = 0;
 uint32_t usb_loop_count = 0;
 uint32_t usb_loop_rate_last = 0;
 uint32_t usb_loop_rate_ms = 0;
-uint16_t usb_loop_rate = 0;
+//? usb_loop_rate itself lives in shared/variables.h so webpage.h can export it.
 uint32_t usb_rail_mv = 0;
 uint32_t usb_slow_ms = 0;
 

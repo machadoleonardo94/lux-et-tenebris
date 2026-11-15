@@ -199,7 +199,7 @@ function loadDemo() {
     step_gap_min_ms: 20, step_gap_max_ms: 10000,
     step_impact_min_floor: 0, step_impact_max_ceiling: 50,
     step_cadence_max_sps: 500, flame_power_soft: 15, flame_power_hard: 75,
-    uptime_ms: 7234000, gyro: true, rssi: 0,
+    uptime_ms: 7234000, loop_rate: 2400, rail_mv: 4012, free_heap: 123456, gyro: true, rssi: 0,
     ip: '0.0.0.0', hostname: 'lightpack', wifi_ssid: '',
   };
 
@@ -1628,9 +1628,12 @@ function renderDiagnostics() {
   setText('diag-proto', pong ? String(pong.proto) : '1');
   setText('diag-uptime', tick ? formatUptime(tick.ms) : state ? formatUptime(state.uptime_ms) : '—');
   setText('diag-mode', state ? `${state.mode_label || 'Unknown'} (${state.mode})` : '—');
-  setText('diag-loop', tick ? `${tick.lp} Hz` : '—');
-  setText('diag-rail', tick ? `${tick.rail} mV` : '—');
-  setText('diag-heap', tick ? `${Math.round(Number(tick.heap) / 1024)} KB` : '—');
+  setText('diag-loop', tick ? `${tick.lp} Hz`
+    : state && state.loop_rate ? `${state.loop_rate} Hz` : '—');
+  setText('diag-rail', tick ? `${tick.rail} mV`
+    : state && state.rail_mv ? `${state.rail_mv} mV` : '—');
+  setText('diag-heap', tick ? `${Math.round(Number(tick.heap) / 1024)} KB`
+    : state && state.free_heap ? `${Math.round(Number(state.free_heap) / 1024)} KB` : '—');
   setText('diag-net', state ? `${state.net}${state.portal ? ' (config hotspot)' : ''}${state.offline_mode ? ' (offline mode)' : ''}` : '—');
   setText('diag-rssi', state && state.rssi ? `${state.rssi} dBm` : '—');
   setText('diag-ip', state ? state.ip : '—');

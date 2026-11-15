@@ -1,11 +1,11 @@
 {
   "name": "lightpack-C3",
-  "version": "0.5.0-dev",
-  "built": "2026-11-14T01:35:57-03:00",
-  "source": "usb-ota2",
-  "size": 1282864,
-  "sha256": "0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6",
-  "notes": "App-only USB OTA image. NVS is preserved; the inactive slot is written.",
+  "version": "0.6.0-dev",
+  "built": "2026-11-15T20:26:35-03:00",
+  "source": "0.6-schema",
+  "size": 1304384,
+  "sha256": "675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909",
+  "notes": "0.6 schema: power budget and 10 Hz guard, rainbow level, gyro-fade tunables, preset v3; bench stress/sense and safe mode. App-only USB OTA; NVS preserved.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
@@ -18,7 +18,7 @@
         {
           "path": "firmware.bin",
           "offset": 65536,
-          "sha256": "0144481023242E7511874E4C8BD0D23E75C8B6A3ED5A6B9301C0B2DCC9AD99A6"
+          "sha256": "675E6A67ECF3AA6F2F96B46128ED94A916FC05FC4EA13FE3E9A6AA5F42E18909"
         }
       ]
     }

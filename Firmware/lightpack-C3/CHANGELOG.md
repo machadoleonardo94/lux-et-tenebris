@@ -4,10 +4,49 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [0.6.0-dev] - 2026-11-15
+
+Bench power characterisation, safe mode and the 0.6 configuration schema.
+
+### Power
+
+- Safe-mode recovery after a brown-out: 70% brightness, red/yellow warning, a
+  5 s acknowledgement timeout and 1 s of touch blanking after a load test.
+- Blocking power stress test and standalone channel-resistance sense: 1-100
+  white LEDs, 200 ms / 2 s bursts, test-only rail floor (0 = lab absolute
+  limit), 2-6 A ceiling and 500 ms / 2 s steps.
+- 0.6 power budget (1000 mA default, 2000 max) and the 10 Hz 3.70 V guard with
+  a 3.75 V recovery band; the stored brightness is never rewritten.
+- Advisory suggested limit from the last battery test; never applied
+  automatically.
+- Bench data across 14500, LiPo, USB and no-cell at 2 A, 3.6 A, 4 A and 5 A;
+  PMOS envelope 3.6 A continuous / 5 A max / 20 A pulses.
+
+### Schema
+
+- Rainbow flow level (0-255, default 128), applied before the global brightness.
+- Gyro-fade tunables: decay, trigger, length gains, colour gain, idle state.
+- Preset format v3 (39 fields); v2 slots are reported incompatible. The power
+  budget is deliberately device-only and excluded from presets.
+
+### Console
+
+- Power stress and channel-resistance panels with channel mask, current limit,
+  fast/precise burst and rail guard.
+- Budget, rainbow level and gyro-fade fields; `budget` is accepted by SET and
+  reported in the ACK so it autosaves and refreshes.
+- Shared summary shows the worst-case load and an explicit budget/guard/safe
+  notice.
+- Diagnostics fill loop rate, LED rail and free heap from the state when the
+  live stream is off.
+
+### Release
+
+- `releases/latest` is now 0.6.0-dev.
+
 ## [Unreleased]
 
 Two-button control surface, colour-coded action feedback, and a zero-install USB console.
-No release images yet.
 
 ### Wi-Fi
 

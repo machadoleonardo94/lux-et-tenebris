@@ -92,6 +92,10 @@ uint32_t loopTimer = 0;
 uint32_t globalTimer = 0;
 uint32_t loopCounter = 0;
 
+//* Main-loop rate measured by the USB service, also exposed in /api/state so the
+//? console's diagnostics do not depend on the optional tick stream.
+uint16_t usb_loop_rate = 0;
+
 int position = 0;
 int power = 5;
 int lenght = 0;

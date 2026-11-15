@@ -662,6 +662,15 @@ void webpage_state_json(String &json)
 
   json += F(",\"uptime_ms\":");
   json += String(millis());
+  //* Diagnostics that used to exist only on the optional tick stream. The
+  //? console can now fill Loop rate / LED rail / Free heap from the state even
+  //* when the Live stream is off.
+  json += F(",\"loop_rate\":");
+  json += String((unsigned)usb_loop_rate);
+  json += F(",\"rail_mv\":");
+  json += String((unsigned long)adcVoltage);
+  json += F(",\"free_heap\":");
+  json += String((unsigned long)ESP.getFreeHeap());
   json += F(",\"gyro\":");
   json += gyro_started ? "true" : "false";
   json += F(",\"rssi\":");
