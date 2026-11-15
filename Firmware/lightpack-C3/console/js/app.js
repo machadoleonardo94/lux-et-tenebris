@@ -73,6 +73,8 @@ const app = {
 
   lastTickFrame: null,
   diagAt: 0,
+  stressRunning: false,
+  senseRunning: false,
 
   updateManifest: null,
   updateBusy: false,
@@ -159,6 +161,11 @@ function loadDemo() {
   app.state = {
     mode: 5, mode_key: 'whip', mode_label: 'Pulse whip',
     red: 255, green: 140, blue: 0, brightness: 180,
+    budget: 1000, budget_ma: 1000, budget_min: 100, budget_default: 1000,
+    budget_max: 2000, budget_brightness: 255,
+    guard_scale: 255, guard_active: false, guard_floor_mv: 3700, guard_recover_mv: 3750,
+    power_suggested_ma: 1614,
+    rainbow_level: 128,
     whip_speed: 4.5, whip_length: 24, whip_period: 1200, whip_peak: 200, whip_offset: 0,
     whip_travel_ms: 1520, whip_in_flight: 1, whip_max_heads: 12,
     whip_speed_min: 0.1, whip_speed_max: 20, whip_length_min: 1,
@@ -168,9 +175,19 @@ function loadDemo() {
     rainbow_gap_floor_ms: 50, rainbow_gap_ceiling_ms: 10000,
     rainbow_speed_min: 0.1, rainbow_speed_max: 20,
     num_leds: 250, active_leds: 60, leds: 60, strip_leds_min: 1,
+    safe_boot: false, safe_pct: 70, stress_run: false,
+    stress_result: 1, stress_phase: 2, stress_color: 7, stress_leds: 144, stress_brightness: 59,
+    stress_est_ma: 1999, stress_v_start: 4050, stress_v_min: 3210, stress_sag_mv: 840,
+    stress_v_off: 4050, stress_v_on: 3860, stress_r_mohm: 158, stress_elapsed_ms: 24000,
+    stress_ceiling_ma: 2000, stress_step_ms: 500, stress_rail_floor_mv: 3000,
+    sense_run: false, sense_count: 20, sense_burst_ms: 200, sense_ma: 1200,
+    sense_v_off: 4168, sense_v_on: 4008, sense_r_mohm: 133, sense_elapsed_ms: 6200,
     net: 'offline', offline_mode: true, dirty: true,
     flame_decay: 0.9, flame_spatial: 2, flame_power_slope: 5,
     flame_power_max: 75, flame_power_idle: 5,
+    fade_decay: 0.9, fade_trigger: 0.2, fade_length_gain: 20, fade_length_z_gain: 15,
+    fade_length_base: 10, fade_power_gain: 2, fade_power_base: 5,
+    fade_color_gain: 7, fade_idle_length: 5, fade_idle_power: 5,
     flame_decay_min: 0, flame_decay_max: 0.995,
     flame_spatial_min: 0, flame_spatial_max: 10, flame_power_slope_max: 25,
     step_baseline_tau_ms: 2000, step_threshold: 1.2, step_release: 0.45,
@@ -431,6 +448,10 @@ function bindEvents() {
   $('#impactMag').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') previewImpact();
   });
+
+  $('#btnStressRun').addEventListener('click', () => runStressTest());
+  $('#btnSafeOff').addEventListener('click', () => clearSafeMode());
+  $('#btnSenseRun').addEventListener('click', () => runSense());
 
   $('#btnPresetExport').addEventListener('click', () => exportPresets());
   $('#presetFile').addEventListener('change', (event) => {
@@ -789,7 +810,20 @@ function handleLine(line) {
 function handleFrame(frame) {
   if (frame.t === 'state') {
     app.state = frame.state;
+
+    //* The firmware's live strip length is named `active_leds`, while the
+    //? /api/config field (and the console's input) is `leds`. Normalise the one
+    //* spelling into the other so an older board cannot blank the field.
+    if (app.state && app.state.leds === undefined && app.state.active_leds !== undefined) {
+      app.state.leds = app.state.active_leds;
+    }
+
     app.touched = false;
+    //* A state frame means the board is answering again: the blocking ramp has
+    //? finished (or the page reconnected after it), so the local "running" badge
+    //* must not stick.
+    app.stressRunning = false;
+    app.senseRunning = false;
     renderState();
   } else if (frame.t === 'presets') {
     app.presets = Array.isArray(frame.slots) ? frame.slots : [];
@@ -1053,6 +1087,8 @@ function renderState() {
   renderConnectionUI();
   renderDirty();
   renderDiagnostics();
+  renderStress();
+  renderSense();
 }
 
 function syncField(key) {
@@ -1097,8 +1133,50 @@ function renderDerived() {
   const state = app.state;
   if (!state) return;
 
+  //* Worst-case white load at the current settings, after the budget's
+  //? brightness ceiling. The "of" value is the configured budget, so the line
+  //* reads as "what this would draw / what it is allowed to draw".
+  const budget = Number(state.budget ?? state.budget_ma ?? 0);
+  const leds = Number(state.active_leds) || 0;
+  //* Mirror the firmware's worst-case ceiling so the line follows the budget
+  //? immediately after the ACK, without waiting for the next full state.
+  const budgetCap = (budget > 0 && leds > 0)
+    ? Math.min(255, Math.floor(budget * 255 / (leds * 60)))
+    : 255;
+  const configured = Number(state.brightness) || 0;
+  const guardScale = Number(state.guard_scale ?? 255);
+  const safeActive = Boolean(state.safe_boot);
+  const safePct = Number(state.safe_pct ?? 70);
+  const capped = Math.min(configured, budgetCap);
+  const guarded = Math.round(capped * guardScale / 255);
+  const safe = safeActive ? Math.round(guarded * safePct / 100) : guarded;
+  const maxLoad = Math.round(leds * 60 * safe / 255);
   setText('stripInfo',
-    `${state.active_leds} of ${state.num_leds} LEDs lit · brightness ${state.brightness}/255`);
+    `${state.active_leds} of ${state.num_leds} LEDs lit · brightness ${state.brightness}/255 · ` +
+    `Max load ${maxLoad} of ${budget} mA`);
+
+  //* One explicit feedback line: no silent caps. The budget is checked first
+  //? because it is the persistent limit the user chose; the guard and safe mode
+  //* are transient layers above it.
+  let notice;
+  let warn = false;
+  if (safeActive && safe < guarded) {
+    notice = `Safe mode: brightness capped at ${safe}/255`;
+    warn = true;
+  } else if (state.guard_active && guarded < capped) {
+    notice = `Rail guard trimming: effective ${guarded}/255`;
+    warn = true;
+  } else if (configured > budgetCap) {
+    notice = `Load exceeds budget, brightness capped at ${budgetCap}/255`;
+    warn = true;
+  } else {
+    notice = 'No constraints on this device';
+  }
+  const noticeEl = $('#budgetNotice');
+  if (noticeEl) {
+    noticeEl.textContent = notice;
+    noticeEl.className = 'hint ' + (warn ? 'warn' : 'ok');
+  }
 
   if (state.whip_travel_ms !== undefined) {
     setText('whipDerived',
@@ -1251,6 +1329,20 @@ function renderConnectionUI() {
   $('#colorPicker').disabled = !ready;
   for (const button of $$('#swatches button')) button.disabled = !ready;
   for (const button of $$('#modes button')) button.disabled = !ready;
+
+  //* The stress test needs a real board, a state document and the radio off. The
+  //? state field is what the firmware itself enforces; disabling here is the UI.
+  const stressReady = !app.demo && app.connected && Boolean(app.state) && Boolean(app.state.offline_mode);
+  $('#btnStressRun').disabled = !stressReady;
+  for (const id of ['#stressR', '#stressG', '#stressB', '#stressMa', '#stressFast', '#stressNoRail']) {
+    const element = $(id);
+    if (element) element.disabled = !stressReady;
+  }
+  $('#btnSenseRun').disabled = !stressReady;
+  for (const id of ['#senseCount', '#senseBurst']) {
+    const element = $(id);
+    if (element) element.disabled = !stressReady;
+  }
 
   const fileButton = document.querySelector('label.filebtn');
   if (fileButton) fileButton.classList.toggle('disabled', !ready);
@@ -1545,6 +1637,216 @@ function renderDiagnostics() {
   setText('diag-host', state ? state.hostname : '—');
   setText('diag-ssid', state ? (state.wifi_ssid || 'nothing saved') : '—');
   setText('diag-save', state ? (state.dirty ? 'RAM differs from flash' : 'RAM matches flash') : '—');
+}
+
+//* ---------------------- POWER STRESS TEST ----------------------
+//? The four colour buttons start the firmware's blocking ramp. The result is a
+//? state field, not a one-shot reply: the board is reset by the reconnect itself,
+//? so the page must be able to render the last result from NVS on every connect.
+const STRESS_RESULT_NAMES = {
+  0: 'no test recorded',
+  1: 'brown-out',
+  2: 'interrupted',
+  3: 'hit the selected ceiling',
+  4: 'held full white',
+  5: 'rail collapsed',
+  6: 'aborted',
+};
+const STRESS_PHASE_NAMES = ['before the ramp', 'probe', 'ramp'];
+
+//* The firmware's stress colour is a 3-bit mask: R=1, G=2, B=4.
+function colorMaskName(mask) {
+  const value = Number(mask) || 0;
+  const parts = [];
+  if (value & 1) parts.push('R');
+  if (value & 2) parts.push('G');
+  if (value & 4) parts.push('B');
+  return parts.length ? parts.join('+') : '—';
+}
+
+function renderStress() {
+  const state = app.state;
+
+  const result = state ? Number(state.stress_result) || 0 : 0;
+  const rows = [];
+
+  if (!state || result === 0) {
+    rows.push(['Result', 'no test recorded']);
+  } else {
+    const seconds = Number(state.stress_elapsed_ms || 0) / 1000;
+    const mcuMa = Number(state.mcu_ma) || 200;
+    rows.push(['Result', STRESS_RESULT_NAMES[result] || `code ${result}`]);
+    rows.push(['Stopped during', STRESS_PHASE_NAMES[Number(state.stress_phase)] || '—']);
+    rows.push(['Test ceiling', `${state.stress_ceiling_ma ?? '—'} mA${Number(state.stress_ceiling_ma) > 2000 ? ' (lab)' : ''}`]);
+    rows.push(['Step time', `${state.stress_step_ms ?? '—'} ms`]);
+    rows.push(['Rail guard', Number(state.stress_rail_floor_mv) === 0
+      ? 'disabled (lab)'
+      : `${state.stress_rail_floor_mv ?? '—'} mV`]);
+    rows.push(['Channels', colorMaskName(state.stress_color)]);
+    rows.push(['LEDs', String(state.stress_leds ?? '—')]);
+    rows.push(['Brightness at end', `${state.stress_brightness ?? '—'}/255`]);
+    rows.push(['Estimated strip current', `${state.stress_est_ma ?? '—'} mA`]);
+    rows.push(['Total with MCU reserve', `${(Number(state.stress_est_ma) || 0) + mcuMa} mA`]);
+    rows.push(['V_REG at start', `${state.stress_v_start ?? '—'} mV`]);
+    rows.push(['V_REG min (last step)', `${state.stress_v_min ?? '—'} mV (sag ${state.stress_sag_mv ?? '—'} mV)`]);
+    rows.push(['Probe', `blank ${state.stress_v_off ?? '—'} mV / lit ${state.stress_v_on ?? '—'} mV`]);
+    rows.push(['Source resistance', `${state.stress_r_mohm ?? '—'} mΩ`]);
+    rows.push(['Ramp duration', `${seconds.toFixed(1)} s`]);
+  }
+
+  if (state && state.stress_run) {
+    rows.push(['State', 'a test is marked as running; wait for it to finish, then reconnect']);
+  }
+
+  const list = $('#stressResult');
+  list.innerHTML = rows.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
+
+  setText('stressState', app.stressRunning
+    ? 'test running'
+    : (state && state.safe_boot ? `safe mode ${state.safe_pct}%` : ''));
+
+  let hint = 'Connect to the board with the radio off to run a test.';
+  if (app.demo) {
+    hint = 'Demo data — connect a board to run a real test.';
+  } else if (app.connected && state) {
+    if (!state.offline_mode) {
+      hint = 'Switch the radio off above first: a TX burst would skew the ramp.';
+    } else if (state.stress_run) {
+      hint = 'A test is marked as running. Let it finish, then reconnect to read the result.';
+    } else if (state.safe_boot) {
+      hint = 'Safe mode is active. Clear it once the supply is understood.';
+    } else {
+      hint = 'Ready. The board blanks the strip for 5 s, then ramps.';
+    }
+  }
+  setText('stressHint', hint);
+
+  $('#btnSafeOff').disabled = app.demo || !app.connected || !state || !state.safe_boot;
+}
+
+async function runStressTest() {
+  if (app.demo || !app.connected || !app.state) return;
+  if (!app.state.offline_mode) {
+    showError('Switch the radio off before a stress test.');
+    return;
+  }
+
+  const mask = ($('#stressR')?.checked ? 1 : 0) |
+    ($('#stressG')?.checked ? 2 : 0) |
+    ($('#stressB')?.checked ? 4 : 0);
+  if (!mask) {
+    showError('Select at least one channel (R, G or B).');
+    return;
+  }
+
+  let ceiling = Number($('#stressMa')?.value);
+  if (!Number.isFinite(ceiling)) ceiling = 2000;
+  ceiling = Math.min(6000, Math.max(500, Math.round(ceiling)));
+  $('#stressMa').value = String(ceiling);
+
+  const step = $('#stressFast')?.checked ? 500 : 2000;
+  const noRail = Boolean($('#stressNoRail')?.checked);
+  const railFloor = noRail ? 0 : 3000;
+  const lab = ceiling > 2000;
+  const channels = colorMaskName(mask);
+
+  const ok = confirm(
+    `Run ${channels} at ${ceiling} mA, ${step} ms steps?\n\n` +
+    (lab ? 'LAB ONLY: above the 2 A continuous benchmark. This can force a brown-out.\n\n' : '') +
+    (noRail ? 'LAB ONLY: the 3.0 V rail guard is DISABLED. The strip rail may collapse far below 3 V.\n\n' : '') +
+    'The strip blanks for 5 seconds, then ramps. Unplug USB during the blank to test ' +
+    'the battery, then reconnect to read the result.'
+  );
+  if (!ok) return;
+
+  try {
+    await request(commands.stress(mask, ceiling, step, railFloor),
+      (frame) => frame.t === 'ack' && frame.cmd === 'stress', 2500);
+    app.stressRunning = true;
+    renderStress();
+    setText('stressHint', `Started: ${channels}, ${ceiling} mA, ${step} ms, ` +
+      `${noRail ? 'no rail guard' : '3.0 V rail guard'}. Unplug USB now if you are testing the ` +
+      'battery; reconnect afterwards to read the result.');
+  } catch (error) {
+    showError(`Could not start the stress test: ${error.message}`);
+  }
+}
+
+async function clearSafeMode() {
+  if (app.demo || !app.connected) return;
+
+  try {
+    await request(commands.safeOff(), (frame) => frame.t === 'ack' && frame.cmd === 'safe', 2000);
+    if (app.state) app.state.safe_boot = false;
+    renderStress();
+    setText('stressHint', 'Safe mode cleared: the configured brightness is back in force.');
+  } catch (error) {
+    showError(`Could not clear safe mode: ${error.message}`);
+  }
+}
+
+//* ---------------------- CHANNEL RESISTANCE ----------------------
+//? A single short burst, no ramp: 1..100 white LEDs, 200 ms or 2 s, after the
+//? same 5 s cable-removal window. The result is a state field, so a battery run
+//? survives the reconnect like the stress result.
+function renderSense() {
+  const state = app.state;
+  const rows = [];
+
+  if (!state || !state.sense_count) {
+    rows.push(['Result', 'no sense run recorded']);
+  } else {
+    const vOff = Number(state.sense_v_off) || 0;
+    const vOn = Number(state.sense_v_on) || 0;
+    rows.push(['LEDs', String(state.sense_count)]);
+    rows.push(['Burst', `${state.sense_burst_ms ?? '—'} ms`]);
+    rows.push(['Model current', `${state.sense_ma ?? '—'} mA`]);
+    rows.push(['V_REG blank', `${vOff} mV`]);
+    rows.push(['V_REG lit', `${vOn} mV`]);
+    rows.push(['Drop', `${vOff - vOn} mV`]);
+    rows.push(['Source R', `${state.sense_r_mohm ?? '—'} mΩ`]);
+  }
+
+  const list = $('#senseResult');
+  list.innerHTML = rows.map(([label, value]) => `<dt>${label}</dt><dd>${value}</dd>`).join('');
+
+  setText('senseState', app.senseRunning ? 'sense running' : '');
+  $('#btnSenseRun').disabled = app.demo || !app.connected || !state || !state.offline_mode;
+}
+
+async function runSense() {
+  if (app.demo || !app.connected || !app.state) return;
+  if (!app.state.offline_mode) {
+    showError('Switch the radio off before a sense run.');
+    return;
+  }
+
+  let count = Number($('#senseCount')?.value);
+  if (!Number.isFinite(count)) count = 20;
+  count = Math.min(100, Math.max(1, Math.round(count)));
+  $('#senseCount').value = String(count);
+
+  const burst = Number($('#senseBurst')?.value) === 2000 ? 2000 : 200;
+  const ma = count * 60;
+  const lab = burst === 2000 && ma >= 3600;
+
+  const ok = confirm(
+    `Sense ${count} white LEDs at full brightness, ${burst} ms burst?\n\n` +
+    (lab ? `LAB ONLY: ${ma} mA for 2 s is at/above the PMOS 3.6 A continuous rating.\n\n` : '') +
+    'The strip blanks for 5 s: unplug USB there to test the battery. ' +
+    'Reconnect afterwards to read the V drop and source resistance.'
+  );
+  if (!ok) return;
+
+  try {
+    await request(commands.sense(count, burst),
+      (frame) => frame.t === 'ack' && frame.cmd === 'sense', 2500);
+    app.senseRunning = true;
+    renderSense();
+    setText('senseState', 'sense running');
+  } catch (error) {
+    showError(`Could not start the sense run: ${error.message}`);
+  }
 }
 
 function clearLive() {

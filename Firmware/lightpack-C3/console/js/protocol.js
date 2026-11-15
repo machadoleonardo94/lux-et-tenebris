@@ -7,7 +7,7 @@
 //? This module is deliberately DOM-free and dependency-free: the browser app,
 //? the node tests and any future CLI all parse the port the same way.
 
-import { FIELD_KEYS } from './spec.js';
+import { FIELD_KEYS, FIELD_SPECS } from './spec.js';
 
 export const PROTO_VERSION = 1;
 export const MAX_LINE = 1024;
@@ -93,6 +93,9 @@ export const commands = {
   stream: (hz) => buildCommand('STREAM', Math.max(0, Math.min(50, Math.round(hz)))),
   radio: (mode) => buildCommand('RADIO', mode),
   impact: (magnitude) => buildCommand('IMPACT', Math.max(0, Math.min(255, Math.round(magnitude)))),
+  stress: (color, ceiling, step, railFloor) => buildCommand('STRESS', color, ceiling, step, railFloor),
+  sense: (count, burst) => buildCommand('SENSE', count, burst),
+  safeOff: () => buildCommand('SAFE', 'OFF'),
   presetList: () => buildCommand('PRESET', 'LIST'),
   presetGet: (slot) => buildCommand('PRESET', 'GET', slot),
   presetApply: (slot) => buildCommand('PRESET', 'APPLY', slot),
@@ -127,10 +130,11 @@ export function buildSet(values, seq) {
   return line;
 }
 
-/** The 28 fields the state document and the preset table share, in spec order. */
+/** The preset fields the state document and the preset table share, in spec order. */
 export function configFromState(state) {
   const config = {};
   for (const key of FIELD_KEYS) {
+    if (FIELD_SPECS[key] && FIELD_SPECS[key].preset === false) continue;
     if (state && Object.prototype.hasOwnProperty.call(state, key)) config[key] = state[key];
   }
   return config;

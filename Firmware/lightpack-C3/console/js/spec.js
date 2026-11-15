@@ -36,6 +36,12 @@ export const FIELD_SPECS = {
     label: 'Brightness', page: 'shared', min: 0, max: 255, step: 1, decimals: 0,
     help: 'Applied by the NeoPixel driver to every mode.',
   },
+  budget: {
+    label: 'Max current', page: 'shared',
+    min: (s) => s.budget_min ?? 100, max: (s) => s.budget_max ?? 2000,
+    step: 50, decimals: 0, unit: 'mA', preset: false,
+    help: 'Worst-case white current ceiling for this strip. Device-only: not carried in a preset.',
+  },
   leds: {
     label: 'LED count', page: 'shared', min: (s) => s.strip_leds_min ?? 1,
     max: (s) => s.num_leds ?? 250, step: 1, decimals: 0,
@@ -166,17 +172,63 @@ export const FIELD_SPECS = {
     max: (s) => s.rainbow_gap_ceiling_ms ?? 10000, step: 50, decimals: 0, unit: 'ms',
     help: 'Longest wait before the starting LED gets a new random colour.',
   },
+  rainbow_level: {
+    label: 'Level', page: 'rainbow', min: 0, max: 255, step: 1, decimals: 0,
+    help: 'Mode-local brightness trim, before the global brightness. The rainbow is the one always-full-saturation mode.',
+  },
+
+  // Gyro fade
+  fade_decay: {
+    label: 'Decay', page: 'fade', min: 0.5, max: 0.995, step: 0.001, decimals: 3,
+    help: 'Fraction of the gyro peak kept per frame.',
+  },
+  fade_trigger: {
+    label: 'Trigger', page: 'fade', min: 0.02, max: 2, step: 0.01, decimals: 2,
+    help: 'Gyro-z floor below which the mode idles.',
+  },
+  fade_length_gain: {
+    label: 'Length gain', page: 'fade', min: 0, max: 40, step: 1, decimals: 0, unit: 'LED',
+    help: 'Lit LEDs per unit of |gyro x| / |gyro y|.',
+  },
+  fade_length_z_gain: {
+    label: 'Z length gain', page: 'fade', min: 0, max: 40, step: 1, decimals: 0, unit: 'LED',
+    help: 'Lit LEDs per unit of |gyro z|.',
+  },
+  fade_length_base: {
+    label: 'Length base', page: 'fade', min: 0, max: 40, step: 1, decimals: 0, unit: 'LED',
+    help: 'Lit LEDs added to the active length.',
+  },
+  fade_power_gain: {
+    label: 'Power gain', page: 'fade', min: 0, max: 10, step: 0.5, decimals: 1,
+    help: 'Reserved brightness term in the 0.6 schema.',
+  },
+  fade_power_base: {
+    label: 'Power base', page: 'fade', min: 0, max: 50, step: 1, decimals: 1,
+    help: 'Reserved brightness term in the 0.6 schema.',
+  },
+  fade_color_gain: {
+    label: 'Colour gain', page: 'fade', min: 1, max: 20, step: 1, decimals: 0,
+    help: 'Scales the gyro peaks into the RGB colour.',
+  },
+  fade_idle_length: {
+    label: 'Idle length', page: 'fade', min: 0, max: 150, step: 1, decimals: 0, unit: 'LED',
+    help: 'Lit LEDs while stationary.',
+  },
+  fade_idle_power: {
+    label: 'Idle power', page: 'fade', min: 0, max: 255, step: 1, decimals: 0,
+    help: 'Brightness while stationary.',
+  },
 };
 
 export const FIELD_KEYS = Object.keys(FIELD_SPECS);
 
 export const PAGES = [
-  { id: 'shared', label: 'Shared', hint: 'Palette, brightness and the number of LEDs every mode draws on.' },
+  { id: 'shared', label: 'Shared', hint: 'Palette, brightness, power budget and the number of LEDs every mode draws on.' },
   { id: 'flame', label: 'Step flame', hint: 'How an impact is drawn, and how long it takes to fade.' },
   { id: 'impact', label: 'Impact detector', hint: 'What counts as an impact. This is shared by every mode that reacts to movement.' },
   { id: 'whip', label: 'Pulse whip', hint: 'A hump of light travelling from the start of the strip.' },
   { id: 'rainbow', label: 'Rainbow flow', hint: 'Random colours drifting toward the far end.' },
-  { id: 'fade', label: 'Gyro fade', hint: 'No tunables: the gyro drives the colour and the lit length directly.' },
+  { id: 'fade', label: 'Gyro fade', hint: 'How the gyro peaks decay into the lit length and colour.' },
   { id: 'presets', label: 'Presets', hint: 'Five complete configurations stored in NVS.' },
   { id: 'diagnostics', label: 'Diagnostics', hint: 'Device, network, sensor and input state.' },
 ];

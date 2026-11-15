@@ -115,6 +115,7 @@
 
         <div id="sharedFields" class="fields"></div>
         <p class="hint" id="stripInfo">Connect to read the strip length the firmware was built for.</p>
+        <p class="hint" id="budgetNotice"></p>
       </section>
 
       <section id="page-flame" class="page" hidden aria-labelledby="page-flame-title">
@@ -174,18 +175,20 @@
       <section id="page-fade" class="page" hidden aria-labelledby="page-fade-title">
         <div class="page-head">
           <h1 id="page-fade-title">Gyro fade</h1>
-          <p>This mode has no tunables. It derives its colour and the number of lit LEDs from the gyro
-             directly, so the only controls that affect it are the strip length and brightness on the
-             Shared page.</p>
+          <p>The gyro peaks decay each frame into a lit length and a colour. Decay, trigger,
+             the three length terms, the colour gain and the idle state are tunable here.</p>
         </div>
+        <div id="fadeFields" class="fields"></div>
         <p class="hint">Open Diagnostics for the live gyro numbers while the mode runs.</p>
       </section>
 
       <section id="page-presets" class="page" hidden aria-labelledby="page-presets-title">
         <div class="page-head">
           <h1 id="page-presets-title">Presets</h1>
-          <p>A slot holds everything on this console: mode, colour, brightness, strip length, the impact
-             detector and every tunable. Applying one also writes it as the boot configuration.</p>
+          <p>A slot holds the look: mode, colour, brightness, strip length, the impact detector,
+             the flame, the whip, the rainbow (level included) and the gyro fade. The power budget
+             is device-only and is not carried in a slot. Applying one also writes it as the boot
+             configuration.</p>
         </div>
 
         <div class="row">
@@ -220,6 +223,63 @@
           </div>
           <p class="hint">Switching the radio off leaves USB, the strip and every mode working. Switching it
              on joins the saved network in the background; this console never needs that join.</p>
+        </div>
+
+        <div class="panel stress-panel">
+          <div class="panel-head">
+            <h2>Power stress test</h2>
+            <span id="stressState" class="muted"></span>
+          </div>
+          <p class="hint">Ramps the selected channels from off to the selected limit (or full
+             brightness on a short strip) and records where the rail gives up. The board blanks the
+             strip for five seconds first: unplug USB there to test the battery. Reconnect afterwards
+             to read the result &mdash; it is stored in NVS, so the reconnect cannot lose it. The radio
+             must be off; the USB link is enough.</p>
+          <div class="row stress-buttons">
+            <span class="muted">Channels</span>
+            <label class="switch mini" title="Red"><input id="stressR" type="checkbox" checked><span>R</span></label>
+            <label class="switch mini" title="Green"><input id="stressG" type="checkbox" checked><span>G</span></label>
+            <label class="switch mini" title="Blue"><input id="stressB" type="checkbox" checked><span>B</span></label>
+            <label for="stressMa">Limit</label>
+            <input id="stressMa" type="number" min="500" max="6000" step="100" value="2000" aria-label="Current limit in mA">
+            <span class="muted">mA</span>
+            <label class="switch mini" title="500 ms steps; unchecked = 2 s precise"><input id="stressFast" type="checkbox" checked><span>Fast</span></label>
+            <label class="switch mini" title="Lab: continue below the 3.0 V rail floor"><input id="stressNoRail" type="checkbox"><span>No rail guard</span></label>
+            <button id="btnStressRun" class="btn primary" type="button" disabled>Run test</button>
+            <button id="btnSafeOff" class="btn ghost" type="button" disabled>Clear safe mode</button>
+          </div>
+          <p class="hint">Fast = 500 ms steps; unchecked = 2 s precise. Above 2000 mA is lab only: it
+             exceeds the continuous benchmark and may force a brown-out on the 14500. The limit is
+             clamped to 500&ndash;6000 mA. <strong>No rail guard</strong> disables the test's 3.0 V
+             collapse stop so the run can find the absolute limit; it is lab-only and the normal
+             10 Hz guard is unaffected.</p>
+          <p class="hint" id="stressHint">Connect to the board with the radio off to run a test.</p>
+          <dl id="stressResult" class="diag"></dl>
+        </div>
+
+        <div class="panel sense-panel">
+          <div class="panel-head">
+            <h2>Channel resistance</h2>
+            <span id="senseState" class="muted"></span>
+          </div>
+          <p class="hint">Lights N white LEDs at full brightness after a 5 s cable-removal window and
+             reports the source resistance from the V_REG drop. Decoupled from the stress ramp, so a
+             1, 10, 20, 50, 100 LED sweep is quick. The current is the model (60 mA per white LED);
+             drift in R across counts is the cell/model linearity.</p>
+          <div class="row">
+            <label for="senseCount">LEDs</label>
+            <input id="senseCount" type="number" min="1" max="100" step="1" value="20" aria-label="Sense LED count">
+            <label for="senseBurst">Burst</label>
+            <select id="senseBurst">
+              <option value="200" selected>200 ms</option>
+              <option value="2000">2 s</option>
+            </select>
+            <button id="btnSenseRun" class="btn primary" type="button" disabled>Sense</button>
+          </div>
+          <p class="hint">100 white LEDs is ~6 A. The PMOS is rated 3.6 A continuous / 5 A max,
+             20 A pulses: 100 LEDs at 2 s is lab-only and above the continuous rating; use 200 ms
+             for the sweep.</p>
+          <dl id="senseResult" class="diag"></dl>
         </div>
 
         <div class="panel update-panel">

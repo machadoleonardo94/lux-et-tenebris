@@ -24,25 +24,31 @@ import {
   parsePresetDoc,
   sanitizeConfig,
 } from '../js/protocol.js';
-import { FIELD_KEYS, boundsFor } from '../js/spec.js';
+import { FIELD_KEYS, FIELD_SPECS, boundsFor } from '../js/spec.js';
 
-// The 28 names in src/services/presets.h's PRESET_FIELDS, written out here on
-// purpose: if the firmware table and the browser spec drift apart, this fails.
+// The 39 preset names in src/services/presets.h's PRESET_FIELDS, written out here
+// on purpose: if the firmware table and the browser spec drift apart, this fails.
+// `budget` is a /api/config field but deliberately not a preset field.
 const FIRMWARE_FIELDS = [
   'mode',
   'red', 'green', 'blue', 'brightness',
   'whip_speed', 'whip_length', 'whip_period', 'whip_peak', 'whip_offset',
-  'rainbow_speed', 'rainbow_min_ms', 'rainbow_max_ms',
+  'rainbow_speed', 'rainbow_min_ms', 'rainbow_max_ms', 'rainbow_level',
   'leds',
   'flame_decay', 'flame_spatial', 'flame_power_slope', 'flame_power_max', 'flame_power_idle',
+  'fade_decay', 'fade_trigger', 'fade_length_gain', 'fade_length_z_gain', 'fade_length_base',
+  'fade_power_gain', 'fade_power_base', 'fade_color_gain', 'fade_idle_length', 'fade_idle_power',
   'step_baseline_tau_ms', 'step_threshold', 'step_release', 'step_jerk_min', 'step_min_gap_ms',
   'step_impact_min', 'step_impact_max', 'step_magnitude_min', 'step_magnitude_max',
 ];
 
-test('the browser spec covers exactly the firmware field table', () => {
-  assert.equal(FIELD_KEYS.length, 28);
-  assert.equal(new Set(FIELD_KEYS).size, 28);
-  assert.deepEqual([...FIELD_KEYS].sort(), [...FIRMWARE_FIELDS].sort());
+test('the browser spec covers every config field and every preset field', () => {
+  const presetKeys = FIELD_KEYS.filter((k) => FIELD_SPECS[k].preset !== false);
+  assert.equal(FIELD_KEYS.length, 40);
+  assert.equal(new Set(FIELD_KEYS).size, 40);
+  assert.equal(presetKeys.length, 39);
+  assert.deepEqual([...presetKeys].sort(), [...FIRMWARE_FIELDS].sort());
+  assert.ok(FIELD_KEYS.includes('budget'));
 });
 
 test('formatNumber keeps values in the form usb_is_number() accepts', () => {
@@ -65,14 +71,17 @@ test('buildSet builds one ordered batch and rejects unknown fields', () => {
   assert.throws(() => buildSet({}), /at least one field/);
 });
 
-test('one full 28-field batch fits the firmware line limit', () => {
+test('one full 40-field batch fits the firmware line limit', () => {
   const values = {
-    mode: 2, red: 255, green: 128, blue: 64, brightness: 200,
+    mode: 2, red: 255, green: 128, blue: 64, brightness: 200, budget: 2000,
     whip_speed: 20, whip_length: 250, whip_period: 5000, whip_peak: 255, whip_offset: 255,
-    rainbow_speed: 20, rainbow_min_ms: 10000, rainbow_max_ms: 10000,
+    rainbow_speed: 20, rainbow_min_ms: 10000, rainbow_max_ms: 10000, rainbow_level: 255,
     leds: 250,
     flame_decay: 0.995, flame_spatial: 10, flame_power_slope: 25,
     flame_power_max: 255, flame_power_idle: 255,
+    fade_decay: 0.995, fade_trigger: 2, fade_length_gain: 40, fade_length_z_gain: 40,
+    fade_length_base: 40, fade_power_gain: 10, fade_power_base: 50,
+    fade_color_gain: 20, fade_idle_length: 150, fade_idle_power: 255,
     step_baseline_tau_ms: 20000, step_threshold: 20, step_release: 19.99,
     step_jerk_min: 500, step_min_gap_ms: 10000,
     step_impact_min: 49.9, step_impact_max: 50,
@@ -95,6 +104,15 @@ test('command builders match the firmware verbs', () => {
   assert.equal(commands.presetSave(2, 'Bench test'), '@PRESET SAVE 2 name=Bench test\n');
   assert.equal(commands.presetSave(2, '  '), '@PRESET SAVE 2\n');
   assert.equal(buildCommand('PRESET', 'LIST'), '@PRESET LIST\n');
+  assert.equal(commands.stress('white'), '@STRESS white\n');
+  assert.equal(commands.stress('blue'), '@STRESS blue\n');
+  assert.equal(commands.stress(7, 4000, 500), '@STRESS 7 4000 500\n');
+  assert.equal(commands.stress(3, 500, 2000), '@STRESS 3 500 2000\n');
+  assert.equal(commands.stress(7, 4000, 500, 0), '@STRESS 7 4000 500 0\n');
+  assert.equal(commands.stress(7, 6000, 500, 3000), '@STRESS 7 6000 500 3000\n');
+  assert.equal(commands.sense(20, 200), '@SENSE 20 200\n');
+  assert.equal(commands.sense(100, 2000), '@SENSE 100 2000\n');
+  assert.equal(commands.safeOff(), '@SAFE OFF\n');
 });
 
 test('LineDecoder survives arbitrary chunk boundaries and CRLF', () => {
@@ -130,7 +148,7 @@ test('parseLine separates frames, logs and malformed frames', () => {
   assert.equal(parseLine('@{"ok":true}').kind, 'bad');
 });
 
-test('configFromState picks the 28 fields and ignores derived values', () => {
+test('configFromState picks the 39 preset fields and ignores derived values', () => {
   const state = {
     mode: 5, red: 1, green: 2, blue: 3, brightness: 4,
     whip_travel_ms: 999, mode_key: 'whip', active_leds: 60,

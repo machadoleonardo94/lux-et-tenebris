@@ -103,11 +103,11 @@ what the screenshot above uses.
 3. The **mode bar** is live: clicking a mode changes the strip immediately (and
    auto-saves, if that is on).
 4. The **left pages** group the tunables by the mode that consumes them:
-   * Shared — palette, brightness, LED count;
+   * Shared — palette, brightness, power budget, LED count;
    * Step flame — the flash/decay values and the impact preview;
    * Impact detector — threshold, release, jerk gate, refractory, scale;
    * Pulse whip, Rainbow flow — their tunables;
-   * Gyro fade — no tunables, by design;
+   * Gyro fade — decay, trigger, length terms, colour gain, idle state;
    * Presets, Diagnostics.
 5. **Save to flash** persists the live configuration. **Revert** discards unsaved
    edits and reloads NVS.
