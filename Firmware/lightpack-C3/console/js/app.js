@@ -1602,6 +1602,17 @@ async function runRecovery() {
     const boot = await fetchImage(bootPart);
     const appImage = await fetchImage(appPart);
 
+    //* The console's normal link owns the same Web Serial port. Recovery needs
+    //? the port exclusively, so drop the app-level connection before the picker.
+    if (app.link) {
+      try {
+        await app.link.close();
+      } catch {}
+    }
+    app.connected = false;
+    app.port = null;
+    renderConnectionUI();
+
     const port = await navigator.serial.requestPort();
     transport = new Transport(port, true);
     const loader = new ESPLoader({

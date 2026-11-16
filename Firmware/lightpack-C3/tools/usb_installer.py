@@ -27,6 +27,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -79,6 +80,21 @@ def find_port(explicit: str | None) -> str:
     raise SystemExit("no lightpack-C3 USB device found; pass --port")
 
 
+def find_esptool() -> str | None:
+    """PlatformIO ships esptool.py as a script, not as an importable module."""
+    candidates = []
+    core = os.environ.get("PLATFORMIO_CORE_DIR")
+    if core:
+        candidates.append(Path(core) / "packages" / "tool-esptoolpy" / "esptool.py")
+    home = os.environ.get("USERPROFILE") or os.environ.get("HOME")
+    if home:
+        candidates.append(Path(home) / ".platformio" / "packages" / "tool-esptoolpy" / "esptool.py")
+    for candidate in candidates:
+        if candidate.is_file():
+            return str(candidate)
+    return None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Firmware-agnostic lightpack-C3 installer")
     parser.add_argument("--base", default=DEFAULT_BASE, help="release URL ending in /")
@@ -99,10 +115,10 @@ def main() -> int:
         boot_path.write_bytes(images[BOOT_APP0_OFFSET])
         app_path.write_bytes(images[APP_OFFSET])
 
+        esptool = find_esptool()
         command = [
             sys.executable,
-            "-m",
-            "esptool",
+            *([esptool] if esptool else ["-m", "esptool"]),
             "--chip",
             "esp32c3",
             "--port",
