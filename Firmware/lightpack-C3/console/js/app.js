@@ -1537,14 +1537,6 @@ async function installLatest() {
 //* Recovery writes boot_app0 + app through the C3 ROM via the vendored
 //? esptool-js. It does not use the app-level @UPDATE link, so it works on a board
 //* whose installed firmware predates that command.
-function binaryString(bytes) {
-  let out = '';
-  const CHUNK = 0x8000;
-  for (let i = 0; i < bytes.length; i += CHUNK) {
-    out += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
-  }
-  return out;
-}
 
 async function runRecovery() {
   if (app.demo) {
@@ -1629,8 +1621,8 @@ async function runRecovery() {
     await loader.main();
     await loader.writeFlash({
       fileArray: [
-        { data: binaryString(boot), address: 0xE000 },
-        { data: binaryString(appImage), address: 0x10000 },
+        { data: boot, address: 0xE000 },
+        { data: appImage, address: 0x10000 },
       ],
       flashSize: 'keep',
       flashMode: 'keep',

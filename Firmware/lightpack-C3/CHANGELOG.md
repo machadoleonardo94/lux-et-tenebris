@@ -18,6 +18,8 @@ Network provisioning over USB.
 - Recovery opens the port picker immediately on the click (Chrome drops the user
   activation after the image download) and shows the GPIO9 steps inline, so a
   suppressed `confirm()` can no longer make the button do nothing.
+- Recovery hands the image bytes to esptool-js as `Uint8Array`; its `writeFlash`
+  rejects the binary-string form with "File 1 data must be a Uint8Array".
 
 ## [0.6.2-dev] - 2026-11-16
 
