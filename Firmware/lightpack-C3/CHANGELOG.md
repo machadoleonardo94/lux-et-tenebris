@@ -4,6 +4,18 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [0.6.3-dev] - 2026-11-16
+
+Network provisioning over USB.
+
+- The console's Shared page gains a **Network** panel: SSID and password, then
+  **Connect**. It sends `@WIFI {"ssid","pass"}` over the USB link; the board
+  stores slot 0, leaves offline mode and starts the join. No 6 s hotspot hold is
+  needed when both values are already known.
+- The password is written to the board and never read back or echoed in the ACK.
+- The command uses the same `wifi_credential_store` / `wifi_offline_store` /
+  `wifi_join_begin` path as `POST /api/wifi`.
+
 ## [0.6.2-dev] - 2026-11-16
 
 Recovery hotfix.

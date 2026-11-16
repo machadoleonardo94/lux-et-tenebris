@@ -472,6 +472,8 @@ function bindEvents() {
     renderUpdatePanel();
   });
   $('#btnInstallUpdate').addEventListener('click', () => installLatest());
+  $('#btnRecovery').addEventListener('click', () => runRecovery());
+  $('#btnWifiConnect').addEventListener('click', () => connectWifi());
 
   $('#btnReboot').addEventListener('click', () => rebootBoard());
   $('#btnCopyDiag').addEventListener('click', () => copyDiagnostics());
@@ -1356,6 +1358,7 @@ function renderConnectionUI() {
   }
 
   renderUpdatePanel();
+  renderNetwork();
 }
 
 //* ---------------------- USB UPDATER ----------------------
@@ -1738,6 +1741,45 @@ function renderUpdatePanel() {
     else if (!app.updateManifest) hint.textContent = 'Check for a build first.';
     else if (!app.connected) hint.textContent = 'Connect to the board first.';
     else hint.textContent = 'Ready. The strip is held off during the transfer; NVS is preserved.';
+  }
+}
+
+function renderNetwork() {
+  setText('wifiCurrent', app.state ? (app.state.wifi_ssid || 'none saved') : '');
+  const button = $('#btnWifiConnect');
+  if (button) button.disabled = !app.connected || app.demo;
+}
+
+async function connectWifi() {
+  const ssid = $('#wifiSsid').value.trim();
+  const pass = $('#wifiPass').value;
+  if (!ssid) {
+    showError('Enter the network name first.');
+    return;
+  }
+  if (!app.connected) {
+    showError('Connect to the board first.');
+    return;
+  }
+
+  const button = $('#btnWifiConnect');
+  button.disabled = true;
+  setText('wifiStatus', 'Sending…');
+  try {
+    const ack = await request(
+      commands.wifi(ssid, pass),
+      (frame) => frame.t === 'ack' && frame.cmd === 'wifi',
+      8000,
+    );
+    if (!ack.ok) throw new Error(ack.err || 'the board refused the network');
+    setText('wifiStatus', `Saved ${ack.ssid}; joining…`);
+    log(`wifi: saved ${ack.ssid}`);
+    $('#wifiPass').value = '';
+  } catch (error) {
+    setText('wifiStatus', '');
+    showError(`Wi-Fi: ${error.message}`);
+  } finally {
+    button.disabled = !app.connected || app.demo;
   }
 }
 

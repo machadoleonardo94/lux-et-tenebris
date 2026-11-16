@@ -1132,6 +1132,70 @@ void usb_handle_update(char *args)
     usb_send_error("update", -1, "expected BEGIN, DATA, END or ABORT");
 }
 
+//* Minimal reader for the two-string @WIFI object. The console sends
+//? {"ssid":"...","pass":"..."} through JSON.stringify; the firmware has no JSON
+//* library linked, and the shape is fixed, so quotes and the common escapes are
+//* enough. The password is never logged.
+String usb_json_field(const char *json, const char *name)
+{
+    const String needle = String("\"") + name + "\":\"";
+    const char *start = strstr(json, needle.c_str());
+    if (start == nullptr)
+        return String();
+    start += needle.length();
+
+    String out;
+    out.reserve(64);
+    while (*start != '\0' && *start != '"')
+    {
+        if (*start == '\\' && start[1] != '\0')
+        {
+            start++;
+            switch (*start)
+            {
+            case 'n': out += '\n'; break;
+            case 't': out += '\t'; break;
+            case 'r': out += '\r'; break;
+            case '"': out += '"'; break;
+            case '\\': out += '\\'; break;
+            case '/': out += '/'; break;
+            default: out += *start; break;
+            }
+            start++;
+        }
+        else
+        {
+            out += *start++;
+        }
+    }
+    return out;
+}
+
+void usb_handle_wifi(char *args)
+{
+    const String ssid = usb_json_field(args, "ssid");
+    const String password = usb_json_field(args, "pass");
+    if (ssid.length() == 0)
+    {
+        usb_send_error("wifi", -1, "expected {\"ssid\":\"...\",\"pass\":\"...\"}");
+        return;
+    }
+
+    //* Same path as POST /api/wifi: store the credential, leave offline mode,
+    //? and let the pending join move the radio. The password is never echoed.
+    wifi_credential_store(0, ssid.c_str(), password.c_str());
+    wifi_offline_store(false);
+    wifi_join_begin(0);
+
+    String json;
+    json.reserve(180);
+    usb_json_begin(json, "ack", -1);
+    json += F(",\"ok\":true,\"cmd\":\"wifi\",\"saved\":true,\"ssid\":\"");
+    json += webpage_json_escape(ssid.c_str());
+    json += F("\"}\n");
+    usb_write_line(json);
+}
+
 void usb_handle_line(char *line)
 {
     if (*line == '\0')
@@ -1191,6 +1255,11 @@ void usb_handle_line(char *line)
     if (usb_ieq(line, "RADIO"))
     {
         usb_handle_radio(args);
+        return;
+    }
+    if (usb_ieq(line, "WIFI"))
+    {
+        usb_handle_wifi(args);
         return;
     }
     if (usb_ieq(line, "STRESS"))

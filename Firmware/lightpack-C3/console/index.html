@@ -116,6 +116,21 @@
         <div id="sharedFields" class="fields"></div>
         <p class="hint" id="stripInfo">Connect to read the strip length the firmware was built for.</p>
         <p class="hint" id="budgetNotice"></p>
+
+        <div class="panel inline-panel">
+          <div class="panel-head"><h2>Network</h2><span id="wifiCurrent" class="mono muted"></span></div>
+          <p class="hint">Send a network name and password over USB. The board saves the credential and
+             leaves offline mode, so the 6 s hotspot hold is not needed when the details are known. The
+             password is written to the board and never read back.</p>
+          <div class="inline-row">
+            <label for="wifiSsid">SSID</label>
+            <input id="wifiSsid" type="text" placeholder="Network name" autocomplete="off">
+            <label for="wifiPass">Password</label>
+            <input id="wifiPass" type="password" placeholder="Password" autocomplete="new-password">
+            <button id="btnWifiConnect" class="btn" type="button" disabled>Connect</button>
+            <span id="wifiStatus" class="muted"></span>
+          </div>
+        </div>
       </section>
 
       <section id="page-flame" class="page" hidden aria-labelledby="page-flame-title">

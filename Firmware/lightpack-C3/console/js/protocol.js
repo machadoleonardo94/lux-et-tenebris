@@ -92,6 +92,7 @@ export const commands = {
   reboot: () => buildCommand('REBOOT'),
   stream: (hz) => buildCommand('STREAM', Math.max(0, Math.min(50, Math.round(hz)))),
   radio: (mode) => buildCommand('RADIO', mode),
+  wifi: (ssid, pass) => buildCommand('WIFI', JSON.stringify({ ssid, pass })),
   impact: (magnitude) => buildCommand('IMPACT', Math.max(0, Math.min(255, Math.round(magnitude)))),
   stress: (color, ceiling, step, railFloor) => buildCommand('STRESS', color, ceiling, step, railFloor),
   sense: (count, burst) => buildCommand('SENSE', count, burst),

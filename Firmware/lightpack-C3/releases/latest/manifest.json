@@ -1,17 +1,17 @@
 {
   "name": "lightpack-C3",
-  "version": "0.6.2-dev",
-  "built": "2026-11-16T10:21:12-03:00",
-  "source": "0.6.2-recovery",
-  "size": 1305744,
-  "sha256": "B6D4EDBDA2718503AD554A4AEB7EC21A0E0B6C546831BA8809A8D915BD524FA0",
-  "notes": "0.6.2: console Update and Recovery. Recovery uses the vendored esptool-js 0.7.1 through the C3 ROM bootloader (GPIO9 install mode), writing boot_app0 at 0xE000 and the app at 0x10000; NVS is preserved. The device page remains the single-update fallback.",
+  "version": "0.6.3-dev",
+  "built": "2026-11-16T10:39:59-03:00",
+  "source": "0.6.3-wifi",
+  "size": 1306480,
+  "sha256": "7B50276F6CA5DF3AC878665BB151A390D6FF06B0B541CC5101D60280DA21CAF5",
+  "notes": "0.6.3: the console Shared page sends SSID/password over USB with @WIFI; the board stores slot 0, leaves offline mode and joins. No 6 s hotspot hold needed. The password is never read back. Includes the Recovery button listener fix and the PlatformIO esptool path fix.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
         { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
-        { "path": "firmware.bin", "offset": 65536, "sha256": "B6D4EDBDA2718503AD554A4AEB7EC21A0E0B6C546831BA8809A8D915BD524FA0" }
+        { "path": "firmware.bin", "offset": 65536, "sha256": "7B50276F6CA5DF3AC878665BB151A390D6FF06B0B541CC5101D60280DA21CAF5" }
       ]
     }
   ]
