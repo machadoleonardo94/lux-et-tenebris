@@ -24,6 +24,7 @@ void wifi_credential_store(uint8_t slot, const char *ssid, const char *password)
 void wifi_credential_clear(uint8_t slot);
 bool wifi_credential_join(uint8_t slot);
 bool wifi_credential_join_active();
+bool wifi_credential_join_saved();
 void wifi_credentials_migrate();
 void wifi_recovery_wipe();
 void wifi_adopt_join();
@@ -370,7 +371,7 @@ void net_enter_connecting()
     //* this state always aims at the network the board currently believes in.
     //! Skipped when the portal just left us joined.
     if (WiFi.status() != WL_CONNECTED)
-        wifi_credential_join_active();
+        wifi_credential_join_saved();
 
     wifi_lost_at = 0;
     wifi_retry_at = millis();
@@ -853,6 +854,23 @@ bool wifi_credential_join(uint8_t slot)
 bool wifi_credential_join_active()
 {
     return wifi_credential_join(wifi_credential_active());
+}
+
+//* Aim at a slot that actually holds a network: the active one when it is
+//? provisioned, otherwise the next non-empty slot. The radio-on path uses this so
+//* a board whose active pointer sits on a cleared slot still joins its fallback.
+bool wifi_credential_join_saved()
+{
+    if (!wifi_has_credentials())
+        return false;
+
+    uint8_t slot = wifi_credential_active();
+    if (!wifi_credential_present(slot))
+        slot = wifi_credential_next(slot);
+    if (!wifi_credential_present(slot))
+        return false;
+
+    return wifi_credential_join(slot);
 }
 
 //* One-time adoption of a network configured by a build that had no slots. Back

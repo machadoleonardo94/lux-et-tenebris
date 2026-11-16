@@ -87,6 +87,9 @@ and do not use it.
 | `@PRESET CLEAR n` | `presets` | Empty a slot |
 | `@IMPACT mag` | `ack` | Inject a preview impact (0–255) for flame tuning |
 | `@RADIO on\|off\|toggle` | `ack` | Switch the WiFi radio; USB is unaffected |
+| `@WIFI {"slot":0,"ssid":"…","pass":"…"}` | `ack` | Save a network in slot 0/1, leave offline mode and join it; the password is never echoed |
+| `@WIFI {"slot":0,"clear":true}` | `ack` | Forget one saved network |
+| `@WIFI {"retry":true}` | `ack` | Rejoin a non-empty saved slot, falling back to the other |
 | `@STRESS <mask> [ceiling] [step] [rail_floor]` | `ack` | Power stress test; mask R=1 G=2 B=4, ceiling 500–6000 mA, step 500/2000 ms, rail floor 0=ignore / 3000 mV |
 | `@SENSE <count> [burst_ms]` | `ack` | Channel resistance: 1–100 white LEDs, 200/2000 ms burst, 5 s unplug |
 | `@SAFE OFF` | `ack` | Clear safe mode without a power cycle |

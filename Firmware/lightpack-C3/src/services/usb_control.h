@@ -1132,10 +1132,9 @@ void usb_handle_update(char *args)
     usb_send_error("update", -1, "expected BEGIN, DATA, END or ABORT");
 }
 
-//* Minimal reader for the two-string @WIFI object. The console sends
-//? {"ssid":"...","pass":"..."} through JSON.stringify; the firmware has no JSON
-//* library linked, and the shape is fixed, so quotes and the common escapes are
-//* enough. The password is never logged.
+//* Minimal readers for the small @WIFI object. The console sends JSON through
+//? JSON.stringify; the firmware has no JSON library linked, and the shape is
+//* fixed, so quotes and the common escapes are enough. The password is never logged.
 String usb_json_field(const char *json, const char *name)
 {
     const String needle = String("\"") + name + "\":\"";
@@ -1171,29 +1170,91 @@ String usb_json_field(const char *json, const char *name)
     return out;
 }
 
+//* Integer field of the same small object, for the slot number.
+int usb_json_int(const char *json, const char *name, int fallback)
+{
+    const String needle = String("\"") + name + "\":";
+    const char *start = strstr(json, needle.c_str());
+    if (start == nullptr)
+        return fallback;
+    return atoi(start + needle.length());
+}
+
+void usb_send_wifi_ack(int slot, bool saved, const String &ssid, bool retry)
+{
+    String json;
+    json.reserve(220);
+    usb_json_begin(json, "ack", -1);
+    json += F(",\"ok\":true,\"cmd\":\"wifi\",\"slot\":");
+    json += String(slot);
+    json += F(",\"saved\":");
+    json += saved ? F("true") : F("false");
+    json += F(",\"ssid\":\"");
+    json += webpage_json_escape(ssid.c_str());
+    json += F("\",\"retry\":");
+    json += retry ? F("true") : F("false");
+    json += F(",\"has_credentials\":");
+    json += wifi_has_credentials() ? F("true") : F("false");
+    json += F("}\n");
+    usb_write_line(json);
+}
+
 void usb_handle_wifi(char *args)
 {
+    int slot = usb_json_int(args, "slot", 0);
+    if (slot < 0 || slot >= WIFI_CREDENTIAL_SLOTS)
+        slot = 0;
+
+    //* Retry: the console's button. Aim at a non-empty slot (the active one when
+    //? it is provisioned, otherwise the fallback), leave offline mode and let
+    //* wifi_join_begin() move the radio or re-point the current link.
+    if (strstr(args, "\"retry\":true") != nullptr)
+    {
+        if (!wifi_has_credentials())
+        {
+            usb_send_error("wifi", -1, "no saved network");
+            return;
+        }
+        uint8_t target = wifi_credential_active();
+        if (!wifi_credential_present(target))
+            target = wifi_credential_next(target);
+        wifi_offline_store(false);
+        wifi_join_begin(target);
+        usb_send_wifi_ack((int)target, true, wifi_credential_ssid(target), true);
+        return;
+    }
+
+    //* Forget one slot. When the radio is on and the other slot survived, move
+    //? the attempt there instead of waiting for the link to drop on its own.
+    if (strstr(args, "\"clear\":true") != nullptr)
+    {
+        wifi_credential_clear((uint8_t)slot);
+        if (!wifi_offline_saved() && wifi_has_credentials())
+        {
+            uint8_t target = wifi_credential_active();
+            if (!wifi_credential_present(target))
+                target = wifi_credential_next(target);
+            if (wifi_credential_present(target))
+                wifi_join_begin(target);
+        }
+        usb_send_wifi_ack(slot, false, String(), false);
+        return;
+    }
+
     const String ssid = usb_json_field(args, "ssid");
     const String password = usb_json_field(args, "pass");
     if (ssid.length() == 0)
     {
-        usb_send_error("wifi", -1, "expected {\"ssid\":\"...\",\"pass\":\"...\"}");
+        usb_send_error("wifi", -1, "expected {\"slot\":0,\"ssid\":\"...\",\"pass\":\"...\"}");
         return;
     }
 
     //* Same path as POST /api/wifi: store the credential, leave offline mode,
     //? and let the pending join move the radio. The password is never echoed.
-    wifi_credential_store(0, ssid.c_str(), password.c_str());
+    wifi_credential_store((uint8_t)slot, ssid.c_str(), password.c_str());
     wifi_offline_store(false);
-    wifi_join_begin(0);
-
-    String json;
-    json.reserve(180);
-    usb_json_begin(json, "ack", -1);
-    json += F(",\"ok\":true,\"cmd\":\"wifi\",\"saved\":true,\"ssid\":\"");
-    json += webpage_json_escape(ssid.c_str());
-    json += F("\"}\n");
-    usb_write_line(json);
+    wifi_join_begin((uint8_t)slot);
+    usb_send_wifi_ack(slot, true, ssid, false);
 }
 
 void usb_handle_line(char *line)

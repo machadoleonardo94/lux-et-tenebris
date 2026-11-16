@@ -146,6 +146,12 @@ While the board's configuration hotspot is open, the page says *config hotspot
 open* and the radio toggle is disabled. The console still works there — that is
 the whole reason the firmware services USB from the portal loop.
 
+Diagnostics → **Saved networks** holds the primary and fallback credentials, each
+with Save and a forget X, plus **Retry connection**. Both SSIDs come back in the
+state; passwords never do. Saving a slot leaves offline mode and joins it, and a
+board with the radio on aims at a non-empty slot: the primary when set, otherwise
+the fallback.
+
 ### USB updater
 
 Diagnostics → **USB updater** turns the console into a computer-side updater:

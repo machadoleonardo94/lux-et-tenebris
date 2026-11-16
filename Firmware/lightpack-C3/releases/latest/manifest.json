@@ -1,17 +1,17 @@
-{
+﻿{
   "name": "lightpack-C3",
-  "version": "0.6.3-dev",
-  "built": "2026-11-16T10:39:59-03:00",
-  "source": "0.6.3-wifi",
-  "size": 1306480,
-  "sha256": "7B50276F6CA5DF3AC878665BB151A390D6FF06B0B541CC5101D60280DA21CAF5",
-  "notes": "0.6.3: the console Shared page sends SSID/password over USB with @WIFI; the board stores slot 0, leaves offline mode and joins. No 6 s hotspot hold needed. The password is never read back. Includes the Recovery button listener fix and the PlatformIO esptool path fix.",
+  "version": "0.6.4-dev",
+  "built": "2026-11-16T11:38:33-03:00",
+  "source": "0.6.4-slots",
+  "size": 1307440,
+  "sha256": "0381A5DC4044BAF81B8D21E996EA01C29840BCB243E12453393E7C8DDCFEBE9C",
+  "notes": "0.6.4: the console's Diagnostics page edits two saved networks (primary and fallback), forgets either with X, and retries the connection; @WIFI grew slot/clear/retry and the state reports both SSIDs. The board aims at a non-empty saved slot whenever the radio is on.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
         { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
-        { "path": "firmware.bin", "offset": 65536, "sha256": "7B50276F6CA5DF3AC878665BB151A390D6FF06B0B541CC5101D60280DA21CAF5" }
+        { "path": "firmware.bin", "offset": 65536, "sha256": "0381A5DC4044BAF81B8D21E996EA01C29840BCB243E12453393E7C8DDCFEBE9C" }
       ]
     }
   ]

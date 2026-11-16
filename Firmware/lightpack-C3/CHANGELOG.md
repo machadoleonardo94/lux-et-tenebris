@@ -4,6 +4,18 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [0.6.4-dev] - 2026-11-16
+
+Two saved networks on the Diagnostics page.
+
+- The console's Network panel moves from Shared to Diagnostics, beside the radio
+  toggle: primary and fallback SSID rows, a per-row forget (X), and Retry
+  connection.
+- `@WIFI` accepts `slot`, `clear` and `retry`; the state reports both saved SSIDs
+  and never the passwords.
+- With the radio on, the board aims at a non-empty saved slot, so a cleared active
+  slot still falls back to the other network.
+
 ## [0.6.3-dev] - 2026-11-16
 
 Network provisioning over USB.
