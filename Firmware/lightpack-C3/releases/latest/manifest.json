@@ -1,17 +1,17 @@
 {
   "name": "lightpack-C3",
-  "version": "0.6.1-dev",
-  "built": "2026-11-16T09:35:29-03:00",
-  "source": "0.6.1-schema",
+  "version": "0.6.2-dev",
+  "built": "2026-11-16T10:21:12-03:00",
+  "source": "0.6.2-recovery",
   "size": 1305744,
-  "sha256": "C288DC43EBF71E2715E9377EAC8285154E719EBD199499BB91A204F6BF34A210",
-  "notes": "0.6.1: USB updater naming, live-rail diagnostics and [UPDATE] serial logging. The web upload and @UPDATE path hold the strip off, heartbeat purple on progress, go solid on a stall, and blink red three times on failure. Old boards use tools/usb_installer.py with GPIO9 install mode.",
+  "sha256": "B6D4EDBDA2718503AD554A4AEB7EC21A0E0B6C546831BA8809A8D915BD524FA0",
+  "notes": "0.6.2: console Update and Recovery. Recovery uses the vendored esptool-js 0.7.1 through the C3 ROM bootloader (GPIO9 install mode), writing boot_app0 at 0xE000 and the app at 0x10000; NVS is preserved. The device page remains the single-update fallback.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
         { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
-        { "path": "firmware.bin", "offset": 65536, "sha256": "C288DC43EBF71E2715E9377EAC8285154E719EBD199499BB91A204F6BF34A210" }
+        { "path": "firmware.bin", "offset": 65536, "sha256": "B6D4EDBDA2718503AD554A4AEB7EC21A0E0B6C546831BA8809A8D915BD524FA0" }
       ]
     }
   ]

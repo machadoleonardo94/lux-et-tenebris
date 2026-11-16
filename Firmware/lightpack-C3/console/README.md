@@ -172,20 +172,25 @@ For a fully computer-side path without the console page, use
 verifies the SHA-256, and speaks the same `@UPDATE` protocol over the serial
 port. The board still needs no network.
 
-### Old boards without `@UPDATE`
+### Recovery (old boards, or a board that will not boot)
 
-The console updater needs the installed firmware to answer `@UPDATE` (0.5.0-dev
-and newer). On an older board, use the ROM installer instead; it does not use
-the installed firmware at all:
+The **Recovery** button beside **Install over USB** uses the vendored **esptool-js
+0.7.1** and the C3 ROM bootloader. It does not need the installed firmware to
+answer anything:
 
 1. Hold **GPIO9 (BOOT)** while plugging the board in or pressing RESET.
-2. Release GPIO9 once the port appears; the C3 ROM is now in install mode.
-3. Run `<platformio-python> tools/usb_installer.py --port COM9`.
+2. Release GPIO9 once the port appears.
+3. Click **Recovery** and select the port in the browser picker.
 
-The installer writes `boot_app0.bin` at `0xE000` and `firmware.bin` at `0x10000`.
-The NVS partition at `0x9000` is untouched, so settings, presets, networks and
-login survive. This is the recovery route for any build, including one that no
-longer boots.
+It writes `boot_app0.bin` at `0xE000` and the app at `0x10000`. The NVS partition
+at `0x9000` is untouched, so settings, presets, networks and login survive. This is
+the recovery route for any build, including one that no longer boots.
+
+The board's own page cannot host this: in ROM mode the board is not serving it.
+The console page is the standard surface. `tools/usb_installer.py` is the same ROM
+path without a browser. The vendored library and its notices live in
+`console/vendor/esptool-js/` (Apache-2.0; the pako and atob-lite notices are
+included).
 
 Writing flash can make the USB CDC pause for a moment. The board keeps the
 upload state and the host retries the same byte offset, so the progress bar may

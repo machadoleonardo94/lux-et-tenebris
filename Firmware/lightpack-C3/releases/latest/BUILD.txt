@@ -1,15 +1,14 @@
 lightpack-C3 USB update channel
 ===============================
 
-firmware:      0.6.1-dev
-source:        0.6.1-schema
-built:         2026-11-16T09:35:29-03:00
+firmware:      0.6.2-dev
+source:        0.6.2-recovery
+built:         2026-11-16T10:21:12-03:00
 firmware.bin:  1305744 bytes
-sha256:        C288DC43EBF71E2715E9377EAC8285154E719EBD199499BB91A204F6BF34A210
+sha256:        B6D4EDBDA2718503AD554A4AEB7EC21A0E0B6C546831BA8809A8D915BD524FA0
 
-The USB updater is the app-level @UPDATE path (0.5.0-dev and newer):
-tools/usb_updater.py or the console page. The strip is held off, the status pixel
-heartbeats purple, goes solid on a stall and blinks red three times on failure.
-Old boards without @UPDATE use tools/usb_installer.py: hold GPIO9 (BOOT) at reset
-to enter the ROM install mode; it writes boot_app0.bin at 0xE000 and the app at
-0x10000, leaving NVS untouched.
+0.6.2 adds the console Recovery button. It uses the vendored esptool-js 0.7.1
+through the C3 ROM bootloader: hold GPIO9 (BOOT) at reset, release when the port
+appears, then click Recovery. It writes boot_app0.bin at 0xE000 and the app at
+0x10000; NVS is preserved. This is the path for boards that predate @UPDATE.
+The device page keeps the single Update button as the fallback.

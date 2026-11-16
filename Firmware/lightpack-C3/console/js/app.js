@@ -1,14 +1,17 @@
 //? Lightpack USB console.
 //?
-//? Zero-install on purpose: static HTML/CSS/ES modules, no build step and no
-//? dependency. Chrome or Edge on a desktop is the only requirement, because
-//? Web Serial is the only way a page can open the C3's CDC port.
+//? Static HTML/CSS/ES modules with no build step. One vendor bundle
+//? (esptool-js, Apache-2.0) is used only by the Recovery button; the normal
+//? update still rides the board's @UPDATE link. Chrome or Edge on a desktop is
+//? the only requirement, because Web Serial is the only way a page can open the
+//? C3's USB port.
 //!
 //? The wire contract lives in docs/usb-control.md. Everything here is policy:
 //? the handshake, request matching, batching edits into one SET, the debounced
 //? COMMIT and the reconnect loop. Transport is js/serial.js, framing is
 //? js/protocol.js, and the parameter metadata is js/spec.js.
 
+import { ESPLoader, Transport } from '../vendor/esptool-js/bundle.js';
 import {
   PALETTE_SWATCHES,
   PAGES,
@@ -78,6 +81,7 @@ const app = {
 
   updateManifest: null,
   updateBusy: false,
+  recoveryBusy: false,
 };
 
 //* ---------------------- BOOT ----------------------
@@ -1305,14 +1309,14 @@ function renderConnectionUI() {
   connectButton.textContent = app.connected ? 'Disconnect' : 'Connect';
   connectButton.classList.toggle('solid', !app.connected);
   connectButton.classList.toggle('ghost', app.connected);
-  connectButton.disabled = app.connecting || app.updateBusy;
+  connectButton.disabled = app.connecting || app.updateBusy || app.recoveryBusy;
 
   if (app.demo) {
     connectButton.textContent = 'Demo';
     connectButton.disabled = true;
   }
 
-  $('#btnReconnect').hidden = app.connected || app.connecting || !app.port || app.demo || app.updateBusy;
+  $('#btnReconnect').hidden = app.connected || app.connecting || !app.port || app.demo || app.updateBusy || app.recoveryBusy;
 
   $('#btnSave').disabled = !ready;
   $('#btnRevert').disabled = !ready;
@@ -1348,7 +1352,7 @@ function renderConnectionUI() {
   if (fileButton) fileButton.classList.toggle('disabled', !ready);
 
   if (!app.connected) {
-    $('#btnConnect').disabled = app.connecting || app.updateBusy;
+    $('#btnConnect').disabled = app.connecting || app.updateBusy || app.recoveryBusy;
   }
 
   renderUpdatePanel();
@@ -1527,6 +1531,121 @@ async function installLatest() {
   }
 }
 
+//* Recovery writes boot_app0 + app through the C3 ROM via the vendored
+//? esptool-js. It does not use the app-level @UPDATE link, so it works on a board
+//* whose installed firmware predates that command.
+function binaryString(bytes) {
+  let out = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    out += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return out;
+}
+
+async function runRecovery() {
+  if (app.demo) {
+    showError('Demo mode: there is no board to recover.');
+    return;
+  }
+  if (!('serial' in navigator)) {
+    showError('Recovery needs Chrome or Edge over HTTPS or localhost.');
+    return;
+  }
+  if (app.updateBusy || app.recoveryBusy) return;
+
+  if (!app.updateManifest) {
+    await checkLatestBuild();
+    if (!app.updateManifest) return;
+  }
+
+  const parts = (app.updateManifest.builds?.[0]?.parts) || [];
+  const bootPart = parts.find((part) => Number(part.offset) === 0xE000);
+  const appPart = parts.find((part) => Number(part.offset) === 0x10000);
+  if (!bootPart || !appPart) {
+    showError('The release has no boot_app0/app pair.');
+    return;
+  }
+
+  const ok = confirm(
+    'Recovery writes the firmware directly through the board\'s ROM bootloader.\n\n' +
+    '1. Hold GPIO9 (BOOT).\n' +
+    '2. Plug the board in or press RESET.\n' +
+    '3. Release GPIO9 when the port appears.\n' +
+    '4. Select the port in the browser picker.\n\n' +
+    'Your settings, presets and networks are preserved.'
+  );
+  if (!ok) return;
+
+  app.recoveryBusy = true;
+  renderUpdatePanel();
+  setUpdateProgress('Preparing recovery…', 0);
+
+  let transport = null;
+  try {
+    const base = new URL(UPDATE_MANIFEST_URL, window.location.href);
+    const version = app.updateManifest.source || app.updateManifest.version || String(Date.now());
+
+    async function fetchImage(part) {
+      const url = new URL(part.path, base);
+      url.searchParams.set('v', version);
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error(`download ${part.path} -> HTTP ${response.status}`);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      if (part.sha256 && (await sha256Hex(bytes)) !== String(part.sha256).toLowerCase()) {
+        throw new Error(`checksum mismatch for ${part.path}`);
+      }
+      return bytes;
+    }
+
+    setUpdateProgress('Downloading recovery images…', 0);
+    const boot = await fetchImage(bootPart);
+    const appImage = await fetchImage(appPart);
+
+    const port = await navigator.serial.requestPort();
+    transport = new Transport(port, true);
+    const loader = new ESPLoader({
+      transport,
+      baudrate: 460800,
+      terminal: {
+        clean() {},
+        writeLine(data) { log(String(data)); },
+        write(data) { log(String(data)); },
+      },
+    });
+
+    setUpdateProgress('Connecting to the ROM bootloader…', 0);
+    await loader.main();
+    await loader.writeFlash({
+      fileArray: [
+        { data: binaryString(boot), address: 0xE000 },
+        { data: binaryString(appImage), address: 0x10000 },
+      ],
+      flashSize: 'keep',
+      flashMode: 'keep',
+      flashFreq: 'keep',
+      eraseAll: false,
+      compress: true,
+      reportProgress: (fileIndex, written, total) => {
+        const pct = total > 0 ? (written / total) * 100 : 0;
+        setUpdateProgress(fileIndex === 0 ? 'Writing boot selector…' : 'Writing application…', pct);
+      },
+    });
+    setUpdateProgress('Recovery complete — board restarting…', 100);
+  } catch (error) {
+    setUpdateProgress(`Recovery failed: ${error.message}`, null);
+    showError(`Recovery failed: ${error.message}`);
+  } finally {
+    if (transport) {
+      try {
+        await transport.disconnect();
+      } catch {}
+    }
+    app.recoveryBusy = false;
+    renderUpdatePanel();
+  }
+}
+
 function isUpdateAck(frame) {
   return frame.t === 'ack' && frame.cmd === 'update';
 }
@@ -1564,7 +1683,7 @@ function renderUpdatePanel() {
   const current = app.pong ? `current ${app.pong.fw}` : 'current unknown';
   setText('updateCurrent', current);
 
-  const busy = app.updateBusy;
+  const busy = app.updateBusy || app.recoveryBusy;
   const check = $('#btnCheckUpdate');
   if (check) check.disabled = busy;
 
@@ -1585,9 +1704,25 @@ function renderUpdatePanel() {
             : 'Writes the latest build over the USB link';
   }
 
+  const recovery = $('#btnRecovery');
+  if (recovery) {
+    const serialSupported = 'serial' in navigator;
+    recovery.disabled = app.demo || !app.updateManifest || busy || app.connecting || !serialSupported;
+    recovery.title = app.demo
+      ? 'Demo mode: there is no board to recover'
+      : !serialSupported
+        ? 'Recovery needs Chrome or Edge over HTTPS or localhost'
+        : !app.updateManifest
+          ? 'Check for a build first'
+          : busy
+            ? 'An update is already running'
+            : 'Hold GPIO9 at boot, then write through the ROM bootloader';
+  }
+
   const hint = $('#updateHint');
   if (hint) {
-    if (busy) hint.textContent = 'Updating — keep the board plugged in.';
+    if (app.recoveryBusy) hint.textContent = 'Recovery running — keep the board plugged in.';
+    else if (busy) hint.textContent = 'Updating — keep the board plugged in.';
     else if (app.demo) hint.textContent = 'Demo mode: no board to update.';
     else if (!app.updateManifest) hint.textContent = 'Check for a build first.';
     else if (!app.connected) hint.textContent = 'Connect to the board first.';

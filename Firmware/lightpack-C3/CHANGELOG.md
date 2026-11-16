@@ -4,6 +4,20 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
+## [0.6.2-dev] - 2026-11-16
+
+Recovery hotfix.
+
+- The console gains a **Recovery** button beside **Install over USB**. It uses the
+  vendored esptool-js 0.7.1 to write `boot_app0.bin` at `0xE000` and the app at
+  `0x10000` through the C3 ROM bootloader, so a board whose firmware predates
+  `@UPDATE` can be recovered without a command line.
+- The Recovery flow explains the GPIO9 install mode, then lets the user pick the
+  ROM port; settings, presets and networks are preserved.
+- `console/vendor/esptool-js/` carries the Apache-2.0 license, the pako and
+  atob-lite notices, the version and the exact source of the unmodified bundle.
+- The device page remains the fallback single-update surface.
+
 ## [0.6.1-dev] - 2026-11-16
 
 Version stamp and the USB updater status.
