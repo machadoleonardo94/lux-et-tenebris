@@ -12,6 +12,8 @@ Version stamp and the main-page OTA status.
 - The web upload owns the strip: off during the transfer, purple heartbeat on
   progress, solid on a stall, three red blinks on failure.
 - The main page shows the running firmware version.
+- Diagnostics read the live averaged rail, so **LED rail** no longer waits for
+  the 10 s `[ADC]` telemetry tick.
 
 ## [0.6.0-dev] - 2026-11-15
 

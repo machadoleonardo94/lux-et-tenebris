@@ -669,7 +669,10 @@ void webpage_state_json(String &json)
   json += F(",\"loop_rate\":");
   json += String((unsigned)usb_loop_rate);
   json += F(",\"rail_mv\":");
-  json += String((unsigned long)adcVoltage);
+  //* The live averaged rail, not the adcVoltage scratch: that one is only
+  //? refreshed by the 10 s [ADC] telemetry line, so the diagnostics read 0
+  //* until the first telemetry tick.
+  json += String((unsigned long)supply_rail_mv());
   json += F(",\"free_heap\":");
   json += String((unsigned long)ESP.getFreeHeap());
   json += F(",\"gyro\":");

@@ -3,11 +3,11 @@ lightpack-C3 USB update channel
 
 firmware:      0.6.1-dev
 source:        0.6.1-schema
-built:         2026-11-15T20:57:39-03:00
+built:         2026-11-15T21:16:14-03:00
 firmware.bin:  1304880 bytes
-sha256:        938D85A7AB23A4C0227A7CC109B7EE35383B41113020F08FCED3FAF80AADE49F
+sha256:        E4DB555F523BCF05DAB6ECF0EC70F48A3E5EDA4A3963F140D31920473CAA996B
 
 0.6.1 stamps the build so an update is distinguishable from the installed one.
-The main page's web upload now owns the strip: off during the transfer, purple
+The main page's web upload owns the strip: off during the transfer, purple
 heartbeat on progress, solid purple on a stall, three red blinks on failure.
-The main page shows the running firmware version.
+The main page shows the running firmware version; diagnostics read the live rail.
