@@ -1,16 +1,16 @@
 lightpack-C3 USB update channel
 ===============================
 
-firmware:      0.6.3-dev
-source:        0.6.3-wifi
-built:         2026-11-16T10:51:37-03:00
-firmware.bin:  1306480 bytes
-sha256:        7B50276F6CA5DF3AC878665BB151A390D6FF06B0B541CC5101D60280DA21CAF5
+firmware:      0.6.4-dev
+source:        0.6.4-slots
+built:         2026-11-16T11:38:33-03:00
+firmware.bin:  1307440 bytes
+sha256:        0381A5DC4044BAF81B8D21E996EA01C29840BCB243E12453393E7C8DDCFEBE9C
 
-0.6.3 adds network provisioning over USB. The console's Shared -> Network panel
-sends @WIFI {"ssid","pass"}; the board stores slot 0, leaves offline mode and
-starts the join, using the same path as POST /api/wifi. No 6 s hotspot hold is
-needed. The password is never read back.
+0.6.4 moves the console's network panel to Diagnostics and gives it two saved
+networks (primary and fallback), a per-row forget X, and Retry connection.
+@WIFI accepts slot, clear and retry; the state reports both SSIDs and never the
+passwords. With the radio on, the board aims at a non-empty saved slot.
 
 Update works on a board running 0.5.0-dev or newer. Recovery uses the vendored
 esptool-js 0.7.1 through the C3 ROM: hold GPIO9 (BOOT) at reset, release when the

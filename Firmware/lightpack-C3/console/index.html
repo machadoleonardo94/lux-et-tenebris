@@ -116,21 +116,6 @@
         <div id="sharedFields" class="fields"></div>
         <p class="hint" id="stripInfo">Connect to read the strip length the firmware was built for.</p>
         <p class="hint" id="budgetNotice"></p>
-
-        <div class="panel inline-panel">
-          <div class="panel-head"><h2>Network</h2><span id="wifiCurrent" class="mono muted"></span></div>
-          <p class="hint">Send a network name and password over USB. The board saves the credential and
-             leaves offline mode, so the 6 s hotspot hold is not needed when the details are known. The
-             password is written to the board and never read back.</p>
-          <div class="inline-row">
-            <label for="wifiSsid">SSID</label>
-            <input id="wifiSsid" type="text" placeholder="Network name" autocomplete="off">
-            <label for="wifiPass">Password</label>
-            <input id="wifiPass" type="password" placeholder="Password" autocomplete="new-password">
-            <button id="btnWifiConnect" class="btn" type="button" disabled>Connect</button>
-            <span id="wifiStatus" class="muted"></span>
-          </div>
-        </div>
       </section>
 
       <section id="page-flame" class="page" hidden aria-labelledby="page-flame-title">
@@ -238,6 +223,37 @@
           </div>
           <p class="hint">Switching the radio off leaves USB, the strip and every mode working. Switching it
              on joins the saved network in the background; this console never needs that join.</p>
+        </div>
+
+        <div class="panel network-panel">
+          <div class="panel-head">
+            <h2>Saved networks</h2>
+            <span id="wifiCurrent" class="muted mono"></span>
+          </div>
+          <p class="hint">Two saved networks; with the radio on the board tries the primary, then the
+             fallback. The password is written to the board and never read back.</p>
+          <div class="network-row">
+            <span class="net-name">Primary</span>
+            <span id="wifiSaved0" class="net-saved mono muted">not saved</span>
+            <input id="wifiSsid0" type="text" placeholder="SSID" autocomplete="off">
+            <input id="wifiPass0" type="password" placeholder="Password" autocomplete="new-password">
+            <button id="btnWifiSave0" class="btn" type="button" disabled>Save</button>
+            <button id="btnWifiClear0" class="btn ghost icon-btn" type="button"
+                    title="Forget this network" disabled>&times;</button>
+          </div>
+          <div class="network-row">
+            <span class="net-name">Fallback</span>
+            <span id="wifiSaved1" class="net-saved mono muted">not saved</span>
+            <input id="wifiSsid1" type="text" placeholder="SSID" autocomplete="off">
+            <input id="wifiPass1" type="password" placeholder="Password" autocomplete="new-password">
+            <button id="btnWifiSave1" class="btn" type="button" disabled>Save</button>
+            <button id="btnWifiClear1" class="btn ghost icon-btn" type="button"
+                    title="Forget this network" disabled>&times;</button>
+          </div>
+          <div class="row">
+            <button id="btnWifiRetry" class="btn" type="button" disabled>Retry connection</button>
+            <span id="wifiStatus" class="muted"></span>
+          </div>
         </div>
 
         <div class="panel stress-panel">
@@ -387,6 +403,6 @@
   </footer>
 </div>
 
-<script type="module" src="js/app.js?v=0.6.3-r3"></script>
+<script type="module" src="js/app.js?v=0.6.4"></script>
 </body>
 </html>

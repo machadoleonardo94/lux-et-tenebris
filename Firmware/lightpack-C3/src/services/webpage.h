@@ -687,7 +687,20 @@ void webpage_state_json(String &json)
   //? The network the board is aiming at, not necessarily the one it is on: in
   //* NET_CONNECTING those differ, and that is exactly the state worth seeing.
   json += webpage_json_escape(wifi_saved_ssid().c_str());
-  json += F("\"}");
+  json += F("\",\"wifi_slots\":[");
+  //? Both saved SSIDs, never the passwords. The console uses this to show the
+  //* primary/fallback state and to offer forget buttons without a second GET.
+  for (uint8_t slot = 0; slot < WIFI_CREDENTIAL_SLOTS; slot++)
+  {
+    if (slot)
+      json += ',';
+    json += F("{\"slot\":");
+    json += String((unsigned)slot);
+    json += F(",\"ssid\":\"");
+    json += webpage_json_escape(wifi_credential_ssid(slot).c_str());
+    json += F("\"}");
+  }
+  json += F("]}");
 }
 
 void webpage_handle_state()

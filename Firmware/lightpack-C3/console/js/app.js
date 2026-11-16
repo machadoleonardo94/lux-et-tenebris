@@ -473,7 +473,11 @@ function bindEvents() {
   });
   $('#btnInstallUpdate').addEventListener('click', () => installLatest());
   $('#btnRecovery').addEventListener('click', () => runRecovery());
-  $('#btnWifiConnect').addEventListener('click', () => connectWifi());
+  $('#btnWifiSave0').addEventListener('click', () => saveWifi(0));
+  $('#btnWifiSave1').addEventListener('click', () => saveWifi(1));
+  $('#btnWifiClear0').addEventListener('click', () => clearWifi(0));
+  $('#btnWifiClear1').addEventListener('click', () => clearWifi(1));
+  $('#btnWifiRetry').addEventListener('click', () => retryWifi());
 
   $('#btnReboot').addEventListener('click', () => rebootBoard());
   $('#btnCopyDiag').addEventListener('click', () => copyDiagnostics());
@@ -1733,15 +1737,42 @@ function renderUpdatePanel() {
   }
 }
 
-function renderNetwork() {
-  setText('wifiCurrent', app.state ? (app.state.wifi_ssid || 'none saved') : '');
-  const button = $('#btnWifiConnect');
-  if (button) button.disabled = !app.connected || app.demo;
+function savedSsid(slot) {
+  const slots = Array.isArray(app.state?.wifi_slots) ? app.state.wifi_slots : [];
+  const entry = slots.find((item) => Number(item.slot) === slot);
+  if (entry && entry.ssid) return String(entry.ssid);
+  //? A 0.6.3 board reports one name only; show it in the primary row.
+  if (slot === 0 && !slots.length && app.state?.wifi_ssid) return String(app.state.wifi_ssid);
+  return '';
 }
 
-async function connectWifi() {
-  const ssid = $('#wifiSsid').value.trim();
-  const pass = $('#wifiPass').value;
+function renderNetwork() {
+  const twoSlots = Boolean(app.state && Array.isArray(app.state.wifi_slots));
+  setText('wifiCurrent', app.state ? (app.state.offline_mode ? 'radio off' : 'radio on') : '');
+  for (const slot of [0, 1]) {
+    const saved = savedSsid(slot);
+    setText(`wifiSaved${slot}`, saved || 'not saved');
+    const save = $(`#btnWifiSave${slot}`);
+    if (save) save.disabled = !app.connected || app.demo || (slot === 1 && !twoSlots);
+    const clear = $(`#btnWifiClear${slot}`);
+    if (clear) clear.disabled = !app.connected || app.demo || (slot === 1 && !twoSlots) || !saved;
+  }
+  const retry = $('#btnWifiRetry');
+  if (retry) retry.disabled = !app.connected || app.demo || !twoSlots;
+}
+
+//* Pull a fresh state after a slot change. The ACK carries the slot but not the
+//? radio transition, and the panel's saved labels and radio toggle read state.
+async function refreshState() {
+  try {
+    const frame = await request(commands.get(), (answer) => answer.t === 'state', 4000);
+    handleFrame(frame);
+  } catch {}
+}
+
+async function saveWifi(slot) {
+  const ssid = $(`#wifiSsid${slot}`).value.trim();
+  const pass = $(`#wifiPass${slot}`).value;
   if (!ssid) {
     showError('Enter the network name first.');
     return;
@@ -1750,25 +1781,83 @@ async function connectWifi() {
     showError('Connect to the board first.');
     return;
   }
+  if (slot === 1 && !Array.isArray(app.state?.wifi_slots)) {
+    showError('The board needs 0.6.4 for a fallback slot; update it first.');
+    return;
+  }
 
-  const button = $('#btnWifiConnect');
+  const button = $(`#btnWifiSave${slot}`);
   button.disabled = true;
   setText('wifiStatus', 'Sending…');
   try {
     const ack = await request(
-      commands.wifi(ssid, pass),
+      commands.wifi(slot, ssid, pass),
       (frame) => frame.t === 'ack' && frame.cmd === 'wifi',
       8000,
     );
     if (!ack.ok) throw new Error(ack.err || 'the board refused the network');
-    setText('wifiStatus', `Saved ${ack.ssid}; joining…`);
-    log(`wifi: saved ${ack.ssid}`);
-    $('#wifiPass').value = '';
+    await refreshState();
+    setText('wifiStatus', `Saved ${ack.ssid} as ${slot === 0 ? 'primary' : 'fallback'}; joining…`);
+    log(`wifi: saved ${ack.ssid} in slot ${ack.slot}`);
+    $(`#wifiPass${slot}`).value = '';
+    $(`#wifiSsid${slot}`).value = '';
   } catch (error) {
     setText('wifiStatus', '');
     showError(`Wi-Fi: ${error.message}`);
   } finally {
-    button.disabled = !app.connected || app.demo;
+    renderNetwork();
+  }
+}
+
+async function clearWifi(slot) {
+  const saved = savedSsid(slot);
+  if (!saved || !app.connected) return;
+
+  setText('wifiStatus', 'Forgetting…');
+  try {
+    const ack = await request(
+      commands.wifiClear(slot),
+      (frame) => frame.t === 'ack' && frame.cmd === 'wifi',
+      8000,
+    );
+    if (!ack.ok) throw new Error(ack.err || 'the board refused');
+    await refreshState();
+    setText('wifiStatus', `Forgot ${saved}.`);
+    log(`wifi: forgot slot ${slot}`);
+  } catch (error) {
+    setText('wifiStatus', '');
+    showError(`Wi-Fi: ${error.message}`);
+  } finally {
+    renderNetwork();
+  }
+}
+
+async function retryWifi() {
+  if (!app.connected) {
+    showError('Connect to the board first.');
+    return;
+  }
+  if (!Array.isArray(app.state?.wifi_slots)) {
+    showError('The board needs 0.6.4 for Retry; update it first.');
+    return;
+  }
+
+  setText('wifiStatus', 'Retrying…');
+  try {
+    const ack = await request(
+      commands.wifiRetry(),
+      (frame) => frame.t === 'ack' && frame.cmd === 'wifi',
+      8000,
+    );
+    if (!ack.ok) throw new Error(ack.err || 'the board refused');
+    await refreshState();
+    setText('wifiStatus', `Retrying ${ack.ssid}…`);
+    log(`wifi: retry ${ack.ssid}`);
+  } catch (error) {
+    setText('wifiStatus', '');
+    showError(`Wi-Fi: ${error.message}`);
+  } finally {
+    renderNetwork();
   }
 }
 
