@@ -1968,7 +1968,7 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
 </section>
 
 <section>
-  <h2>Firmware <span id="fwVersion" class="muted"></span></h2>
+  <h2>USB updater <span id="fwVersion" class="muted"></span></h2>
   <div class="row">
     <label class="filebtn">Choose firmware.bin<input type="file" id="fwFile"
       accept=".bin,application/octet-stream"></label>
@@ -1976,9 +1976,10 @@ dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;word-break:break-
   </div>
   <div class="bar" id="fwBarWrap" style="display:none"><div id="fwBar"></div></div>
   <p class="hint" id="fwInfo">Checking the target slot&hellip;</p>
-  <p class="hint">Uploads a firmware image to the <em>inactive</em> flash slot and
-     reboots into it. Take the file from
-     <code>.pio/build/C3-OTA/firmware.bin</code> - a full flash dump or a merged
+  <p class="hint">Writes the app over the USB link to the <em>inactive</em> flash
+     slot and reboots into it. Take the file from
+     <code>releases/latest/firmware.bin</code> (or
+     <code>.pio/build/C3-USB/firmware.bin</code>) - a full flash dump or a merged
      factory image is not an app image and will be rejected. The running firmware
      is never overwritten, and a rejected or interrupted upload leaves the device
      on the firmware it is running now. Settings and presets live in NVS and

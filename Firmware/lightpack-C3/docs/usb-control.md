@@ -90,7 +90,7 @@ and do not use it.
 | `@STRESS <mask> [ceiling] [step] [rail_floor]` | `ack` | Power stress test; mask R=1 G=2 B=4, ceiling 500–6000 mA, step 500/2000 ms, rail floor 0=ignore / 3000 mV |
 | `@SENSE <count> [burst_ms]` | `ack` | Channel resistance: 1–100 white LEDs, 200/2000 ms burst, 5 s unplug |
 | `@SAFE OFF` | `ack` | Clear safe mode without a power cycle |
-| `@UPDATE BEGIN <size>` | `ack` (`state:"ready"`) | Start an app-only OTA into the inactive slot |
+| `@UPDATE BEGIN <size>` | `ack` (`state:"ready"`) | Start an app-only USB update into the inactive app slot |
 | `@UPDATE DATA <offset> <base64>` | `ack` (`state:"data"`) | One 2 KiB chunk; offset must equal the board's received count or be a retry |
 | `@UPDATE END` | `ack` (`state:"complete"`) | Mark the new slot bootable and reboot |
 | `@UPDATE ABORT` | `ack` (`state:"aborted"`) | Drop the partial image; the running image is unchanged |
@@ -265,21 +265,23 @@ impact would. The flame mode consumes it on its next frame. The detector's
 counters are untouched. In a mode other than Step flame the value waits in the
 latch, so select the mode first if you want to see it immediately.
 
-### 3.8 Firmware update
+### 3.8 USB updater
 
-The console sends the app image to the **inactive OTA slot** over the same
-line. It does not enter the ROM bootloader and does not touch NVS.
+The console (or `tools/usb_updater.py`) sends the app image to the **inactive app
+slot** over the same line. It does not enter the ROM bootloader and does not touch
+NVS. During the transfer the strip is held off and the status pixel heartbeats
+purple; a stall turns it solid and a failure gives three red blinks.
 
 ```
-@UPDATE BEGIN 1282704
+@UPDATE BEGIN 1304880
 @UPDATE DATA 0 <base64 of 2048 bytes>
 @UPDATE DATA 2048 <base64>
 …
 @UPDATE END
 ```
 
-`BEGIN` replies with `state:"ready"` and `size`; each `DATA` replies with
-`state:"data"`, `received` and `total`; `END` replies `state:"complete"` and
+`BEGIN` replies with `state:"ready"`, `received` and `total`; each `DATA` replies
+with `state:"data"`, `received` and `total`; `END` replies `state:"complete"` and
 the board restarts after a short delay. Errors are normal `ack` frames with
 `ok:false` and `err`.
 
@@ -292,7 +294,10 @@ image.
 
 This command exists from **0.5.0-dev**; older builds answer `unknown command`.
 A board that predates it must be flashed once with PlatformIO or the browser
-installer.
+installer. For a firmware-agnostic route, `tools/usb_installer.py` uses the C3
+ROM bootloader instead: hold **GPIO9 (BOOT)** while plugging the board in or
+pressing RESET, release once the port appears, then run the installer. It writes
+`boot_app0.bin` at `0xE000` and the app at `0x10000`; NVS is untouched.
 
 ### 3.9 Power stress test and safe mode
 

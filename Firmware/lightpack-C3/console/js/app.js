@@ -1354,9 +1354,9 @@ function renderConnectionUI() {
   renderUpdatePanel();
 }
 
-//* ---------------------- FIRMWARE UPDATE ----------------------
+//* ---------------------- USB UPDATER ----------------------
 //? The update rides the same `@` link: BEGIN <size>, DATA <offset> <base64>,
-//? END. The firmware writes the app to the inactive OTA slot through Update.h;
+//? END. The firmware writes the app to the inactive app slot through Update.h;
 //? the running image and NVS are untouched until END marks the new slot
 //? bootable. No ROM bootloader, no port close/reset, no esptool-js dependency.
 //!
@@ -1443,7 +1443,7 @@ async function installLatest() {
   try {
     const manifest = app.updateManifest;
     const build = manifest.builds[0];
-    // USB OTA writes the app to the inactive OTA slot; boot_app0 belongs to
+    // The USB updater writes the app to the inactive app slot; boot_app0 belongs to
     // the ROM-bootloader path and is not sent over this link.
     const appPart = build.parts.find((part) => Number(part.offset) === 65536) ||
       build.parts[build.parts.length - 1];
@@ -1582,7 +1582,7 @@ function renderUpdatePanel() {
           ? 'Check for a build first'
           : busy
             ? 'An update is already running'
-            : 'Writes the latest build to the inactive OTA slot over the USB link';
+            : 'Writes the latest build over the USB link';
   }
 
   const hint = $('#updateHint');
@@ -1591,7 +1591,7 @@ function renderUpdatePanel() {
     else if (app.demo) hint.textContent = 'Demo mode: no board to update.';
     else if (!app.updateManifest) hint.textContent = 'Check for a build first.';
     else if (!app.connected) hint.textContent = 'Connect to the board first.';
-    else hint.textContent = 'Ready. The board keeps running; NVS is preserved.';
+    else hint.textContent = 'Ready. The strip is held off during the transfer; NVS is preserved.';
   }
 }
 

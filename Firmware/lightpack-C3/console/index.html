@@ -33,7 +33,7 @@
     <p id="gateFix" class="gate-fix"></p>
     <p class="gate-links">
       <a href="../../../install/README.md">Installer notes</a>
-      <a href="../README.md">Firmware README</a>
+      <a href="../README.md">USB updater README</a>
     </p>
   </div>
 </section>
@@ -284,17 +284,19 @@
 
         <div class="panel update-panel">
           <div class="panel-head">
-            <h2>Firmware update</h2>
+            <h2>USB updater</h2>
             <span id="updateCurrent" class="muted mono"></span>
           </div>
-          <p class="hint">Checks the repository's <code>releases/latest</code> channel and writes the app
-             to the board's inactive OTA slot over the existing USB control link. Connect to the board
-             first. The running image keeps running and NVS is untouched until the new slot is complete,
-             so mode, palette, presets, networks and login survive.</p>
+          <p class="hint">Downloads the release from the web (the computer's connection) and writes the
+             app over the existing USB control link. The board does not need internet. The strip is held
+             off while the transfer runs; the status pixel heartbeats purple on progress, turns solid if
+             it stalls, and blinks red three times on failure. Connect to the board first. NVS is
+             untouched until the new slot is complete, so mode, palette, presets, networks and login
+             survive.</p>
           <div class="row">
             <button id="btnCheckUpdate" class="btn" type="button">Check for latest build</button>
             <button id="btnUpdateDisconnect" class="btn ghost" type="button" disabled>Disconnect console</button>
-            <button id="btnInstallUpdate" class="btn primary" type="button" disabled>Install latest</button>
+            <button id="btnInstallUpdate" class="btn primary" type="button" disabled>Install over USB</button>
           </div>
           <div class="row">
             <span id="updateInfo" class="muted"></span>
@@ -307,10 +309,11 @@
               <span id="updatePercent" class="mono"></span>
             </div>
           </div>
-          <p class="hint">No bootloader hand-off and no extra browser dependency: the image is sent as
-             base64 chunks on the same <code>@</code> link, acknowledged by the board and written through
-             <code>Update.h</code>. If it is interrupted, the board keeps running the image it booted
-             with; retry, or use the <a href="../../../install/">browser installer</a>.</p>
+          <p class="hint">The image is sent as base64 chunks on the same <code>@</code> link, acknowledged
+             by the board and written through <code>Update.h</code>. If it is interrupted, the board
+             keeps running the image it booted with; retry, or use the
+             <a href="../../../install/">browser installer</a>. For the computer-side path without this
+             page, use <code>tools/usb_updater.py</code>.</p>
         </div>
 
         <dl id="diag" class="diag"></dl>

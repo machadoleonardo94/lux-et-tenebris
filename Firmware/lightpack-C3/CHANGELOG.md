@@ -4,9 +4,9 @@ Version history for the Lux et Portabilis V2 firmware.
 
 ---
 
-## [0.6.1-dev] - 2026-11-15
+## [0.6.1-dev] - 2026-11-16
 
-Version stamp and the main-page OTA status.
+Version stamp and the USB updater status.
 
 - `0.6.1-dev` version so an update is distinguishable from the installed build.
 - The web upload owns the strip: off during the transfer, purple heartbeat on
@@ -14,6 +14,14 @@ Version stamp and the main-page OTA status.
 - The main page shows the running firmware version.
 - Diagnostics read the live averaged rail, so **LED rail** no longer waits for
   the 10 s `[ADC]` telemetry tick.
+- The user-facing surface is the **USB updater**, not OTA.
+- `tools/usb_updater.py`: a computer-side updater that downloads the release,
+  verifies the SHA-256 and speaks `@UPDATE` over the serial port; the board
+  needs no network.
+- `tools/usb_installer.py`: a firmware-agnostic ROM installer for boards that do
+  not support `@UPDATE`; hold GPIO9 (BOOT) at reset to enter install mode.
+- The USB update path logs `[UPDATE] begin/data/end/fail` lines on the serial
+  port for diagnosis.
 
 ## [0.6.0-dev] - 2026-11-15
 

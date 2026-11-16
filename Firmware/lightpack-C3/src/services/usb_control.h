@@ -935,6 +935,7 @@ void usb_handle_update(char *args)
         if (size == 0 || end == rest || *end != '\0')
         {
             usb_send_error("update", -1, "expected BEGIN <image bytes>");
+            Serial.println("[UPDATE] bad BEGIN size");
             ota_fail_status();
             return;
         }
@@ -954,6 +955,7 @@ void usb_handle_update(char *args)
             if (esp_ota_set_boot_partition(running) != ESP_OK)
             {
                 usb_send_error("update", -1, "could not select the inactive OTA slot");
+                Serial.println("[UPDATE] could not set the running slot as boot");
                 ota_fail_status();
                 return;
             }
@@ -962,12 +964,15 @@ void usb_handle_update(char *args)
         if (target == nullptr || target == running)
         {
             usb_send_error("update", -1, "no inactive OTA slot");
+            Serial.println("[UPDATE] no inactive OTA slot");
             ota_fail_status();
             return;
         }
         if (usb_update_total > target->size)
         {
             usb_send_error("update", -1, "image does not fit the OTA slot");
+            Serial.printf("[UPDATE] image %u > slot %u bytes\n",
+                          (unsigned)usb_update_total, (unsigned)target->size);
             ota_fail_status();
             return;
         }
@@ -975,6 +980,7 @@ void usb_handle_update(char *args)
         if (!Update.begin(usb_update_total, U_FLASH))
         {
             usb_send_error("update", -1, Update.errorString());
+            Serial.printf("[UPDATE] begin failed: %s\n", Update.errorString());
             ota_fail_status();
             return;
         }
@@ -991,6 +997,10 @@ void usb_handle_update(char *args)
 
         usb_update_active = true;
         usb_update_reboot_at = 0;
+        Serial.printf("[UPDATE] begin %u bytes -> %s 0x%08X slot %u KB, heap %u\n",
+                      (unsigned)usb_update_total, target->label,
+                      (unsigned)target->address, (unsigned)(target->size / 1024),
+                      (unsigned)ESP.getFreeHeap());
         usb_send_update_state("ready");
         return;
     }
@@ -1056,12 +1066,17 @@ void usb_handle_update(char *args)
             const char *message = Update.errorString();
             Update.abort();
             usb_update_active = false;
+            Serial.printf("[UPDATE] write failed at %u: %s\n",
+                          (unsigned)offset, message);
             usb_send_error("update", -1, message);
             return;
         }
 
         usb_update_received += decoded;
         ota_last_chunk_ms = millis();
+        if (offset == 0 || (usb_update_received / USB_UPDATE_CHUNK) % 16 == 0)
+            Serial.printf("[UPDATE] data %u/%u\n",
+                          (unsigned)usb_update_received, (unsigned)usb_update_total);
         usb_send_update_state("data");
         return;
     }
@@ -1075,6 +1090,8 @@ void usb_handle_update(char *args)
         }
         if (usb_update_received != usb_update_total)
         {
+            Serial.printf("[UPDATE] end incomplete %u/%u\n",
+                          (unsigned)usb_update_received, (unsigned)usb_update_total);
             usb_send_error("update", -1, "image incomplete");
             return;
         }
@@ -1083,12 +1100,15 @@ void usb_handle_update(char *args)
             const char *message = Update.errorString();
             Update.abort();
             usb_update_active = false;
+            Serial.printf("[UPDATE] end failed: %s\n", message);
             usb_send_error("update", -1, message);
             return;
         }
 
         usb_update_active = false;
         usb_update_reboot_at = millis() + 700;
+        Serial.printf("[UPDATE] end ok %u bytes, restarting\n",
+                      (unsigned)usb_update_received);
         usb_send_update_state("complete");
         return;
     }
@@ -1101,6 +1121,8 @@ void usb_handle_update(char *args)
         usb_update_reboot_at = 0;
         strip_update_hold = false;
         strip_brightness_dirty = true;
+        Serial.printf("[UPDATE] abort at %u/%u\n",
+                      (unsigned)usb_update_received, (unsigned)usb_update_total);
         //? Answer before the blink so the console is not held for 900 ms.
         usb_send_update_state("aborted");
         ota_fail_status();

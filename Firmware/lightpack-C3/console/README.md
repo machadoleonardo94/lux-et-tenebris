@@ -146,19 +146,19 @@ While the board's configuration hotspot is open, the page says *config hotspot
 open* and the radio toggle is disabled. The console still works there — that is
 the whole reason the firmware services USB from the portal loop.
 
-### Firmware update
+### USB updater
 
-Diagnostics → **Firmware update** turns the console into a USB updater:
+Diagnostics → **USB updater** turns the console into a computer-side updater:
 
 1. **Connect to the board first.** The update rides the existing `@` control
    link; it does not close the port, reset into a bootloader or load esptool-js.
 2. **Check for latest build** fetches `releases/latest/manifest.json` from this
    repository and shows the version, build date, size and source commit.
-3. **Install latest** downloads the app part, verifies its SHA-256, sends
+3. **Install over USB** downloads the app part, verifies its SHA-256, sends
    `UPDATE BEGIN`, then 2048-byte base64 chunks (`UPDATE DATA <offset> <base64>`)
    and waits for the board to acknowledge each one. Progress comes from the
    board's own received count, not a browser-side estimate.
-4. `UPDATE END` marks the inactive OTA slot bootable and the board reboots into
+4. `UPDATE END` marks the inactive app slot bootable and the board reboots into
    it. The console reconnects automatically; **Connect** is there if it does not.
 
 The running image and NVS are untouched until `Update.end()`. An interrupted or
@@ -166,6 +166,26 @@ rejected transfer leaves the board running exactly what it booted with; retry,
 or recover with the [browser installer](../../../install/). The update does not
 need the ROM bootloader, does not change the port, and has no runtime
 dependency.
+
+For a fully computer-side path without the console page, use
+`tools/usb_updater.py`: it downloads the release (the computer's connection),
+verifies the SHA-256, and speaks the same `@UPDATE` protocol over the serial
+port. The board still needs no network.
+
+### Old boards without `@UPDATE`
+
+The console updater needs the installed firmware to answer `@UPDATE` (0.5.0-dev
+and newer). On an older board, use the ROM installer instead; it does not use
+the installed firmware at all:
+
+1. Hold **GPIO9 (BOOT)** while plugging the board in or pressing RESET.
+2. Release GPIO9 once the port appears; the C3 ROM is now in install mode.
+3. Run `<platformio-python> tools/usb_installer.py --port COM9`.
+
+The installer writes `boot_app0.bin` at `0xE000` and `firmware.bin` at `0x10000`.
+The NVS partition at `0x9000` is untouched, so settings, presets, networks and
+login survive. This is the recovery route for any build, including one that no
+longer boots.
 
 Writing flash can make the USB CDC pause for a moment. The board keeps the
 upload state and the host retries the same byte offset, so the progress bar may
@@ -207,7 +227,7 @@ reconnects by itself.
 | Update fails at a chunk or at END | The board keeps running the image it booted with. Retry; the chunk offset makes a resent chunk idempotent. If the board itself rejects the image, check the manifest hash and the firmware log. |
 | Update fails with "unknown command" or no UPDATE ack | The board is running a build older than `0.5.0-dev`. Flash that once with `pio run -e C3-USB -t upload` or the browser installer; the USB updater is in the new image. |
 | No progress appears after Install | The progress line starts with **Downloading firmware**; if it does not, the manifest fetch failed. Check the device log and the error banner. |
-| The update finishes but the board still runs the old build | The update writes app0 and forces the OTA selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
+| The update finishes but the board still runs the old build | The update writes app0 and forces the boot selector to it. If the board did not reboot, power-cycle it; if it still shows the old build, check the manifest's `source` and rebuild `releases/latest/`. |
 | The update was interrupted | Do not keep retrying from the console. The application may be incomplete; recover with the [browser installer](../../../install/) or a full release image. |
 | The values snap back | The firmware clamps every write, and `changed` reports what it actually stored. The UI follows the device. |
 | Preset import says "old firmware format" | The slot was written by a different preset struct version. Save over it or import the matching JSON. |
@@ -215,7 +235,7 @@ reconnects by itself.
 The console writes firmware only when you click **Install latest** after a
 successful **Check for latest build**. For recovery, use the
 [browser installer](../../../install/) or `pio run -e C3-USB -t upload` /
-`pio run -e C3-OTA -t upload`.
+`pio run -e C3-USB -t upload`.
 
 ---
 

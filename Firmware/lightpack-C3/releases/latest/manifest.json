@@ -1,17 +1,17 @@
 {
   "name": "lightpack-C3",
   "version": "0.6.1-dev",
-  "built": "2026-11-15T21:16:14-03:00",
+  "built": "2026-11-16T09:35:29-03:00",
   "source": "0.6.1-schema",
-  "size": 1304880,
-  "sha256": "E4DB555F523BCF05DAB6ECF0EC70F48A3E5EDA4A3963F140D31920473CAA996B",
-  "notes": "0.6.1: version stamp, main-page OTA status and live-rail diagnostics. The web upload holds the strip off, heartbeats purple on progress, goes solid on a stall, and blinks red three times on failure. The main page shows the running firmware version.",
+  "size": 1305744,
+  "sha256": "C288DC43EBF71E2715E9377EAC8285154E719EBD199499BB91A204F6BF34A210",
+  "notes": "0.6.1: USB updater naming, live-rail diagnostics and [UPDATE] serial logging. The web upload and @UPDATE path hold the strip off, heartbeat purple on progress, go solid on a stall, and blink red three times on failure. Old boards use tools/usb_installer.py with GPIO9 install mode.",
   "builds": [
     {
       "chipFamily": "ESP32-C3",
       "parts": [
         { "path": "boot_app0.bin", "offset": 57344, "sha256": "F94C5D786A7A8FAB06AC5D10E33BF37711A6697636DC037559EA19CC410A17F0" },
-        { "path": "firmware.bin", "offset": 65536, "sha256": "E4DB555F523BCF05DAB6ECF0EC70F48A3E5EDA4A3963F140D31920473CAA996B" }
+        { "path": "firmware.bin", "offset": 65536, "sha256": "C288DC43EBF71E2715E9377EAC8285154E719EBD199499BB91A204F6BF34A210" }
       ]
     }
   ]

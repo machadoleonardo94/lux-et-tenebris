@@ -403,7 +403,7 @@ input[type="color"] {
 .diag dd { margin: 0; font-family: var(--mono); word-break: break-word; }
 .danger-panel { border-color: rgba(251, 113, 133, 0.25); }
 
-/* ── Firmware update ──────────────────────────────────────────────────────── */
+/* ── USB updater ──────────────────────────────────────────────────────────── */
 
 .update-panel { border-color: rgba(138, 99, 232, 0.28); }
 .update-panel .hint { margin-top: 0; }
