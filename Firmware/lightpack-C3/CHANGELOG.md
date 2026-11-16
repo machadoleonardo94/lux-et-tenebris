@@ -15,6 +15,9 @@ Network provisioning over USB.
 - The password is written to the board and never read back or echoed in the ACK.
 - The command uses the same `wifi_credential_store` / `wifi_offline_store` /
   `wifi_join_begin` path as `POST /api/wifi`.
+- Recovery opens the port picker immediately on the click (Chrome drops the user
+  activation after the image download) and shows the GPIO9 steps inline, so a
+  suppressed `confirm()` can no longer make the button do nothing.
 
 ## [0.6.2-dev] - 2026-11-16
 

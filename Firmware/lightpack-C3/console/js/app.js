@@ -1558,8 +1558,8 @@ async function runRecovery() {
   if (app.updateBusy || app.recoveryBusy) return;
 
   if (!app.updateManifest) {
-    await checkLatestBuild();
-    if (!app.updateManifest) return;
+    showError('Check for a latest build first, then click Recovery.');
+    return;
   }
 
   const parts = (app.updateManifest.builds?.[0]?.parts) || [];
@@ -1570,19 +1570,29 @@ async function runRecovery() {
     return;
   }
 
-  const ok = confirm(
-    'Recovery writes the firmware directly through the board\'s ROM bootloader.\n\n' +
-    '1. Hold GPIO9 (BOOT).\n' +
-    '2. Plug the board in or press RESET.\n' +
-    '3. Release GPIO9 when the port appears.\n' +
-    '4. Select the port in the browser picker.\n\n' +
-    'Your settings, presets and networks are preserved.'
-  );
-  if (!ok) return;
+  //* The port picker must run inside the click's transient activation. Closing
+  //? the console link is quick, but opening the picker after the image download
+  //! is not: Chrome refuses it with a SecurityError by then.
+  let port;
+  try {
+    if (app.link) {
+      try {
+        await app.link.close();
+      } catch {}
+    }
+    app.connected = false;
+    app.port = null;
+    renderConnectionUI();
+
+    port = await navigator.serial.requestPort();
+  } catch (error) {
+    showError(`Recovery cancelled: ${error.message}`);
+    return;
+  }
 
   app.recoveryBusy = true;
   renderUpdatePanel();
-  setUpdateProgress('Preparing recovery…', 0);
+  setUpdateProgress('Downloading recovery images…', 0);
 
   let transport = null;
   try {
@@ -1601,22 +1611,9 @@ async function runRecovery() {
       return bytes;
     }
 
-    setUpdateProgress('Downloading recovery images…', 0);
     const boot = await fetchImage(bootPart);
     const appImage = await fetchImage(appPart);
 
-    //* The console's normal link owns the same Web Serial port. Recovery needs
-    //? the port exclusively, so drop the app-level connection before the picker.
-    if (app.link) {
-      try {
-        await app.link.close();
-      } catch {}
-    }
-    app.connected = false;
-    app.port = null;
-    renderConnectionUI();
-
-    const port = await navigator.serial.requestPort();
     transport = new Transport(port, true);
     const loader = new ESPLoader({
       transport,

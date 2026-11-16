@@ -314,6 +314,10 @@
             <button id="btnInstallUpdate" class="btn primary" type="button" disabled>Install over USB</button>
             <button id="btnRecovery" class="btn ghost" type="button" disabled>Recovery</button>
           </div>
+          <p class="hint" id="recoverySteps"><strong>Recovery</strong> (older board, or one that will not
+             update): hold <strong>GPIO9 (BOOT)</strong> while plugging the board in or pressing RESET,
+             release it when the port appears, then click <strong>Recovery</strong> and pick that port.
+             It writes the same firmware through the ROM and keeps settings and presets.</p>
           <div class="row">
             <span id="updateInfo" class="muted"></span>
             <span id="updateHint" class="muted"></span>
@@ -383,6 +387,6 @@
   </footer>
 </div>
 
-<script type="module" src="js/app.js"></script>
+<script type="module" src="js/app.js?v=0.6.3-r2"></script>
 </body>
 </html>
